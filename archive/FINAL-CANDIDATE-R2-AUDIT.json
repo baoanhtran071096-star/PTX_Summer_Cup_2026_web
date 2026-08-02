@@ -1,0 +1,25 @@
+{
+  "release": "PRODUCTION FINAL CANDIDATE R2",
+  "source": "PTX-Summer-Cup-2026-PRODUCTION-FINAL-CANDIDATE(1).zip",
+  "root_cause": "computeDashboardStats trusted stale legacy ptx_stat_* aggregate keys whenever Match Control had zero PUBLISHED matches.",
+  "fix": "Public dashboard counters now derive exclusively from PUBLISHED Match Control state. Legacy keys are preserved but non-authoritative.",
+  "non_destructive": true,
+  "source_index_sha256": "b3aa73cee1737bf9b9e6f0808df97459555793acb0972e6052006698e60d0eb9",
+  "final_index_sha256": "9595ce46b814ed328e4bd620bb0238e88e61fdcd78025414fcd33a6c61c56d55",
+  "checks": {
+    "dashboard_no_legacy_goals_fallback": true,
+    "dashboard_no_legacy_matches_fallback": true,
+    "dashboard_no_legacy_yellow_fallback": true,
+    "dashboard_no_legacy_red_fallback": true,
+    "no_published_means_zero_goals": true,
+    "played_derived_from_published": true,
+    "yellow_derived_from_published": true,
+    "red_derived_from_published": true,
+    "runtime_invariant_added": true,
+    "legacy_storage_not_destructively_deleted_by_fix": true,
+    "native_media_authority_preserved": true,
+    "historic_results_not_seeded": true,
+    "match_states_preserved": true
+  },
+  "live_browser_gate_required": true
+}

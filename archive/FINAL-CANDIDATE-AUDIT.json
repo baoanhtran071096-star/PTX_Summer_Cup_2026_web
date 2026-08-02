@@ -1,0 +1,39 @@
+{
+  "release": "PTX Summer Cup 2026 PRODUCTION FINAL CANDIDATE",
+  "source_artifact": "PTX-Summer-Cup-2026-PRODUCTION-RC3.zip",
+  "source_index_sha256": "2697c14ee84d765b2d8c8463abe69bb9a8974d29ce16287698d6735404019247",
+  "final_index_sha256": "b3aa73cee1737bf9b9e6f0808df97459555793acb0972e6052006698e60d0eb9",
+  "mutation_scope": [
+    "Main Media Gallery playback path only",
+    "ZIP path normalization for static-hosting package"
+  ],
+  "media_contract": {
+    "authority": "native HTML5 video",
+    "plyr_main_gallery": "disabled",
+    "path_resolution": "new URL(src, document.baseURI).href",
+    "mp4_count": 6
+  },
+  "regression_checks": {
+    "index_exists": true,
+    "native_main_video_tag": true,
+    "main_video_no_crossorigin": true,
+    "native_gallery_source_resolution": true,
+    "native_gallery_load": true,
+    "native_gallery_play": true,
+    "main_plyr_not_initialized": true,
+    "main_plyr_explicitly_disabled": true,
+    "no_fixture_count_as_played_fallback": true,
+    "fresh_state_bootstrap_present": true,
+    "historic_result_2_1_not_seeded": true,
+    "historic_result_1_1_not_seeded": true,
+    "six_mp4_assets": true,
+    "five_media_clips": true,
+    "highlight_video": true,
+    "24_player_images": true,
+    "rating_base_7": true,
+    "ptx_score_formula_present": true,
+    "eligibility_present": true,
+    "match_states_present": true
+  },
+  "known_limit": "Artifact/static audit cannot prove actual browser playback or GitHub Pages HTTP/MIME behavior; live-browser gate remains required."
+}

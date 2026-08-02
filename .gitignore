@@ -1,0 +1,17 @@
+# Secrets — KHÔNG BAO GIỜ commit file .env thật
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Firebase & build
+.firebase/
+
+# Logs
+*.log

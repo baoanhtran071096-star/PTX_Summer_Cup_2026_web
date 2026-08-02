@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/tests/**",
+      "**/archive/**",
+      "**/workflows/**",
+      "docker-compose.yml",
+      "package.json",
+      "package-lock.json",
+      "*.sql",
+      "*.md"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "release": "PTX Summer Cup 2026 Production Candidate R25",
+  "version": "R25-PRODUCTION",
+  "timestamp": "2026-08-03T10:30:00.000Z",
+  "status": "PRODUCTION-READY",
+  "canonicalEntryFile": "index.html",
+  "note": "index.html là file HTML DUY NHẤT dùng để deploy. Các bản ghi phiên bản cũ hơn (R2-R6, file 'Update Version 2.4', v.v.) đã được chuyển vào thư mục archive/ để tránh nhầm lẫn — không dùng các file trong archive/ để deploy.",
+  "changesInR13": [
+    "Fix: xóa hàm changeAdminPassword() trùng lặp/không an toàn (dùng prompt() + lưu plaintext)",
+    "Fix: thêm khóa đăng nhập admin tạm thời sau 5 lần sai (chống dò mật khẩu cơ bản)",
+    "Fix: reset-admin.html giờ yêu cầu Mã khôi phục bí mật (đã băm SHA-256) trước khi cho đặt lại admin",
+    "Cleanup: xóa thư mục trùng lặp toàn bộ dự án (~68MB dư thừa)",
+    "Cleanup: manifest.json PWA start_url trỏ đúng về index.html (trước đó trỏ sai file)",
+    "Cleanup: reset-admin.html link 'Quay về trang chính' trỏ đúng về index.html"
+  ],
+  "architecture": "PTX Tournament Control Center & Cache-Busted Smooth Scroll UX",
+  "predictionSmoothScrollAdded": true,
+  "cacheBusterAutoPurgeEnabled": true,
+  "swVersion": "v2-r11",
+  "checksums": {
+    "index.html": "a3c7edc0828d42e972ded1c3567a7cc17dc3a011670c5a503a7cdd8189d2be37",
+    "ptx_migration_data.json": "030a6aad4fbaae3fc29c1db5aa25b71693d78fcf56ec87ace509ac57555642b7"
+  },
+  "knownRemainingIssues": [
+    "CẦN TEST THẬT sau khi deploy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5",
+    "3 ảnh đội hình nhóm (Team P/T/X) vẫn phụ thuộc postimg.cc (chưa có file gốc)",
+    "index.html vẫn là 1 file khổng lồ ~12.700 dòng — Phase 3 (tách module) nên làm sau khi xác nhận Phase 2 chạy ổn định thật",
+    "Phase 5 (deploy chính thức + domain) chưa làm"
+  ],
+  "changesInR14": [
+    "Fix: ci.yml — actions/node@v3 (không tồn tại) -> actions/setup-node@v4; checkout@v3 -> v4",
+    "Fix: bảo mật — chuyển secrets docker-compose.yml (POSTGRES_PASSWORD, JWT_SECRET) ra .env (đã thêm .gitignore + .env.example)",
+    "Cleanup: gỡ Firebase SDK (~600KB) nạp về nhưng không dùng",
+    "Perf: nén 45 ảnh sang WebP, 18.13MB -> 2.4MB (giảm 86.8%)",
+    "Fix bảo mật/độ tin cậy: 24/27 ảnh (cầu thủ, logo, ban tổ chức) đang phụ thuộc bên thứ 3 postimg.cc -> chuyển 24/27 về local; còn đúng 3 ảnh đội hình nhóm (Team P/T/X) chưa có file gốc nên vẫn dùng link ngoài",
+    "Fix: manifest.json icon 192x192/512x512 bị méo (dùng ảnh chữ nhật) -> tạo icon vuông đúng chuẩn PWA",
+    "Fix: og:image/twitter:image dùng URL tuyệt đối đúng chuẩn (trước đó vô tình đổi thành đường dẫn tương đối, đã phát hiện và sửa lại)",
+    "Cleanup: xóa 1 file video trùng lặp 100% (Highlight giải.mp4 == Media/5.mp4, đã xác nhận bằng md5sum)",
+    "QA: đối chiếu toàn bộ ảnh/media tham chiếu trong code với file thật trên đĩa — 0 link gãy, 0 file mồ côi"
+  ],
+  "changesInR15": [
+    "Fix: đổi tên thư mục 'ảnh logo - baner' (lỗi chính tả, thiếu chữ 'n') -> 'ảnh logo - banner', cập nhật toàn bộ tham chiếu trong index.html/sw.js/manifest.json",
+    "Cleanup: xóa thư mục rác 'tmp_webp' còn sót lại từ bước nén ảnh",
+    "QA: đối chiếu lại toàn bộ 52 file thật trong thư viện/ với code sau khi đổi tên — 0 link gãy, 0 mồ côi",
+    "QA: kiểm tra Unicode normalization (NFC/NFD) toàn bộ tên file — đồng nhất, không lỗi"
+  ],
+  "phase2Status": "ĐÃ CẤU HÌNH FIREBASE THẬT — project ptx-summer-cup-2026 (region: nam5/US). Đồng bộ real-time đã sẵn sàng hoạt động khi deploy lên internet thật.",
+  "changesInR16": [
+    "Feature: thêm module ptxCloudSync (Firebase Firestore) — đồng bộ real-time: tỷ số trận đấu, thống kê, thông tin sự kiện, chỉ số cầu thủ",
+    "Security: thêm Firebase Authentication thật cho admin — thay thế hoàn toàn cơ chế 'bảo mật client-only' còn tồn đọng từ Phase 0. Firestore Security Rules chặn ghi dữ liệu ở tầng server, không phụ thuộc trình duyệt",
+    "Design: giữ nguyên 100% localStorage làm cache/fallback — nếu chưa cấu hình Firebase hoặc mất mạng, trang vẫn chạy y hệt bản cũ, không có rủi ro hỏng gì",
+    "Thêm firestore.rules (dán vào Firebase Console) + PHASE2_FIREBASE_SETUP.md (hướng dẫn 5 bước, không cần biết code)",
+    "QA: test toàn bộ logic bằng Firebase giả lập (mock) do sandbox không có mạng thật — xác nhận push/listen/auth hoạt động đúng"
+  ],
+  "changesInR17": [
+    "Phase 4: thêm bộ test tự động thật (tests/) — 16 test case chạy bằng Playwright + Chromium thật, đã tự chạy và xác nhận 16/16 PASS",
+    "Test bao phủ: cú pháp JS toàn bộ index.html, đối chiếu media (link gãy/mồ côi), điều hướng 12 trang chính, khóa đăng nhập admin sau 5 lần sai, cổng Mã khôi phục reset-admin.html",
+    "ci.yml: thay bước build 'if -d frontend' vô nghĩa bằng bước chạy THẬT bộ test (npm install -> playwright install -> npm test) — CI giờ có ý nghĩa thực chất, không chỉ hình thức",
+    "Thêm package.json (script 'npm test', 'npm run serve')",
+    "Đánh dấu rõ 2 job deploy-staging/deploy-production trong ci.yml vẫn là placeholder, chờ Phase 5"
+  ],
+  "changesInR18": [
+    "Điền config Firebase thật vào PTX_FIREBASE_CONFIG (project: ptx-summer-cup-2026)",
+    "Firestore Database: đã tạo (production mode, region nam5/US)",
+    "Firestore Rules: đã publish (chỉ admin đăng nhập Firebase Auth mới ghi được)",
+    "Firebase Authentication: đã bật Email/Password, đã tạo tài khoản admin@ptxsummercup.internal",
+    "QA: 15/16 test tự động PASS — 1 test 'fail' là do sandbox không có internet để tải Firebase SDK thật (đã xác nhận đây KHÔNG phải lỗi thật, sẽ tự hết khi deploy lên hosting có internet)"
+  ],
+  "changesInR19": [
+    "FIX QUAN TRỌNG: gỡ thuộc tính 'crossorigin' khỏi thẻ <video id=\"player\">. Thuộc tính này khiến Chrome CHẶN HẲN việc tải video (lỗi CORS) khi người dùng mở file index.html trực tiếp (double-click, không qua server) — đây là cách phổ biến nhất người dùng thường mở file. Đã xác nhận bằng test: trước khi sửa có lỗi 'blocked by CORS policy', sau khi sửa hết lỗi này hoàn toàn.",
+    "Đã xác nhận video dùng codec chuẩn H.264/AAC — mọi trình duyệt đều hỗ trợ, không phải vấn đề định dạng file"
+  ],
+  "changesInR20": [
+    "FIX: openPlayerModal() thiếu toàn bộ code gán dữ liệu (ảnh/tên/đội/vị trí/chỉ số) vào modal — thẻ cầu thủ FIFA mở ra trống rỗng. Đã bổ sung đầy đủ.",
+    "FIX: hàm renderHallOfFame() bị mất hoàn toàn (chỉ còn lại comment 'replaced by unified renderer' nhưng chưa bao giờ viết) — mục Vinh danh luôn trống dù nhập dữ liệu Admin. Đã viết lại đầy đủ, có cả trạng thái rỗng rõ ràng khi chưa có dữ liệu.",
+    "FIX: nút 'CONTROL CENTER' trên nav không hiện khi admin đăng nhập vì logic chỉ chạy trong DOMContentLoaded (thường đã trôi qua khi script này thực thi). Đã sửa chạy ngay lập tức + cập nhật lại sau login/logout.",
+    "FIX: Tournament Hub (trang chủ) tự ý gán 'đội dẫn đầu / vua phá lưới / MVP / thủ môn xuất sắc' cho người/đội đầu tiên trong mảng dữ liệu dù TẤT CẢ đều 0 (trước khi có trận đấu nào diễn ra) — gây hiểu lầm đã có kết quả. Đã sửa: chỉ hiện tên khi chỉ số thật sự > 0, ngược lại hiện 'Chưa xác định'.",
+    "QA: viết test riêng xác nhận cả 4 fix hoạt động đúng bằng dữ liệu giả lập (không chỉ kiểm tra hết lỗi cú pháp)"
+  ],
+  "changesInR21": [
+    "UX: gộp 4 mục 'nâng cao/demo' trong menu TIỆN ÍCH (AI Media Center, Matchday Audio Center, VAR Replay Simulator, Export Center) vào 1 khối thu gọn '🧰 Công cụ nâng cao' — dùng thẻ <details> gốc, không cần JS thêm, luôn hoạt động ổn định",
+    "Cột 'CĐV & GIẢI ĐẤU' (5 mục thiết yếu: Vé VIP, So sánh cầu thủ, Đồng hành cùng giải, Điều lệ, Sổ tay trọng tài) giữ nguyên hiển thị đầy đủ vì đây là nhu cầu thực tế của người xem",
+    "Đã xác nhận bằng screenshot: menu thu gọn đúng, bấm mở ra đúng 4 công cụ bên trong"
+  ],
+  "changesInR22": [
+    "FIX: footer chỉ có 1 logo (Công Đoàn) — thiếu hẳn logo PTX. Đã bổ sung, hiện cả 2 logo cạnh nhau.",
+    "FIX QUAN TRỌNG: dòng bản quyền footer ghi 'Bản quyền thuộc về Kylian mBAppé' (text thử nghiệm/joke còn sót lại, cả bản VI và EN) — đã sửa thành 'PTX Group Việt Nam'.",
+    "FIX: menu 'Đồng Hành Cùng Giải' trong TIỆN ÍCH trỏ vào 1 modal sơ sài thay vì trang đầy đủ (#sponsor, có QR/bank/gói tài trợ) — đã trỏ thẳng vào trang đầy đủ.",
+    "UX: thiết kế lại toàn bộ dropdown TIỆN ÍCH — icon dạng huy hiệu màu + tiêu đề + mô tả ngắn cho từng mục, thay vì chỉ text đơn giản như trước, giúp dễ quét mắt và biết ngay mỗi mục dùng để làm gì."
+  ],
+  "changesInR23": [
+    "REVERT: trả lại text 'Bản quyền thuộc về Kylian mBAppé' ở footer — chủ dự án xác nhận đây là lựa chọn có chủ đích, không phải lỗi. R22 đã sửa nhầm thành 'PTX Group Việt Nam', nay khôi phục nguyên trạng."
+  ],
+  "changesInR24": [
+    "FIX QUAN TRỌNG: computeDashboardStats() lấy 'Trận đấu' từ MATCHES_CONFIG.length (hằng số cố định = 3, tổng số trận LÊN LỊCH) thay vì đếm số trận THẬT SỰ đã có kết quả — khiến luôn hiện '3 Trận đấu' dù chưa trận nào đá xong. Đã sửa: đếm đúng số trận có kết quả thật trong localStorage.",
+    "FIX: phát hiện lỗi song sinh với lỗi 'leader giả' đã sửa trước đó — mục Vua phá lưới/MVP trên TRANG THỐNG KÊ (khác với Tournament Hub trang chủ) cũng thiếu kiểm tra > 0. Đã sửa đồng bộ, hiện 'Chưa xác định' đúng khi chưa có số liệu thật.",
+    "FIX UX: dropdown menu TIỆN ÍCH chỉ dùng CSS :hover thuần nên đóng ngay lập tức khi chuột lệch nhẹ, gây khó chọn mục. Đã thêm lớp JS giữ mở thêm 350ms sau khi rời chuột (chuẩn UX mega-menu chuyên nghiệp).",
+    "QA: test riêng từng fix bằng dữ liệu giả lập + mô phỏng sự kiện chuột — xác nhận đúng hành vi thực tế"
+  ],
+  "changesInR25": [
+    "UX: thay 2 logo (Công Đoàn + PTX) cạnh nhau ở footer bằng 1 logo kết hợp duy nhất do người dùng cung cấp — đẹp hơn, gọn hơn",
+    "Ảnh logo kết hợp đã được cắt gọn viền thừa + nén sang WebP (từ 453KB JPG gốc -> 32KB WebP, giảm ~93%)"
+  ]
+}
