@@ -7784,6 +7784,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             if (typeof renderTeamsPageRoster === 'function') renderTeamsPageRoster();
             if (typeof renderTacticsPitch === 'function') renderTacticsPitch();
         }
+        window.applyLanguage = applyLanguage;
 
         document.querySelectorAll('.lang-switch button').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -8028,6 +8029,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
         const savedTheme = localStorage.getItem('theme') || 'dark';
         applyTheme(savedTheme);
+
+        window.toggleTheme = toggleTheme;
+        window.applyTheme = applyTheme;
 
         // ============================================================
         // HERO COUNTDOWN
