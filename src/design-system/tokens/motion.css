@@ -1,0 +1,5 @@
+:root {
+  --ptx-transition-fast: 150ms ease;
+  --ptx-transition: 220ms ease;
+  --ptx-transition-slow: 400ms ease;
+}

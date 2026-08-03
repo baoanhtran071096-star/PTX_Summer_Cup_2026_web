@@ -6,7 +6,8 @@
 // Yêu cầu: đã chạy `npx playwright install chromium` ít nhất 1 lần trước đó.
 
 const { chromium } = require('playwright');
-const { spawn } = require('child_process');
+const http = require('http');
+const fs = require('fs');
 const path = require('path');
 
 const PORT = 8123;
@@ -28,17 +29,61 @@ function assert(condition, message) {
     }
 }
 
-async function withServer(fn) {
-    const server = spawn('python3', ['-m', 'http.server', String(PORT)], {
-        cwd: PROJECT_ROOT,
-        stdio: 'ignore',
+const MIME_TYPES = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8',
+    '.mjs': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.webp': 'image/webp',
+    '.mp4': 'video/mp4',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+};
+
+// Minimal static file server standing in for `python3 -m http.server`,
+// which relies on a `python3` binary that is not a working interpreter in
+// every environment (e.g. an unconfigured Windows App Execution Alias
+// stub) — this removes that external dependency entirely.
+function createStaticServer(rootDir) {
+    return http.createServer((req, res) => {
+        try {
+            const urlPath = decodeURIComponent(req.url.split('?')[0]);
+            let relPath = urlPath === '/' ? '/index.html' : urlPath;
+            const filePath = path.join(rootDir, relPath);
+            if (!filePath.startsWith(rootDir)) {
+                res.writeHead(403);
+                res.end('Forbidden');
+                return;
+            }
+            if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+                res.writeHead(404);
+                res.end('Not found');
+                return;
+            }
+            const ext = path.extname(filePath).toLowerCase();
+            res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' });
+            fs.createReadStream(filePath).pipe(res);
+        } catch (err) {
+            res.writeHead(500);
+            res.end(String(err));
+        }
     });
-    // Đợi server sẵn sàng
-    await new Promise(resolve => setTimeout(resolve, 800));
+}
+
+async function withServer(fn) {
+    const server = createStaticServer(PROJECT_ROOT);
+    await new Promise((resolve, reject) => {
+        server.once('error', reject);
+        server.listen(PORT, resolve);
+    });
     try {
         await fn();
     } finally {
-        server.kill();
+        await new Promise((resolve) => server.close(resolve));
     }
 }
 

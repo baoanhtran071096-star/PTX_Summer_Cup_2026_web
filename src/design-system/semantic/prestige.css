@@ -1,0 +1,8 @@
+/**
+ * Prestige semantics — Hall of Fame, trophies, VIP tickets, awards.
+ */
+:root {
+  --prestige-gold: var(--ptx-gold);
+  --prestige-accent: color-mix(in srgb, var(--ptx-gold) 70%, var(--ptx-orange));
+  --prestige-glow: 0 0 24px color-mix(in srgb, var(--ptx-gold) 45%, transparent);
+}

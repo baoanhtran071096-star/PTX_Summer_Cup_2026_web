@@ -1,0 +1,5 @@
+:root {
+  --ptx-shadow-card: 0 4px 20px rgba(29, 53, 87, 0.08);
+  --ptx-shadow-card-hover: 0 8px 32px rgba(29, 53, 87, 0.14);
+  --ptx-shadow-elevated: 0 16px 48px rgba(29, 53, 87, 0.2);
+}

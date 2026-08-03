@@ -1,0 +1,32 @@
+/**
+ * PTX Sports Luxe — primitive color tokens.
+ * Values ported from the R25 legacy palette (docs/legacy/r25-ui-inventory.md §2)
+ * per the R25 Visual Fidelity Contract — do not change these without updating
+ * docs/migration/r25-visual-fidelity-contract.md.
+ */
+:root {
+  /* Brand primitives */
+  --ptx-navy: #1d3557;
+  --ptx-orange: #f15a24;
+  --ptx-gold: #d4a13e;
+  --ptx-white: #ffffff;
+
+  /* Team identity primitives */
+  --ptx-team-phoenix: #1a5bb5;
+  --ptx-team-tiger: #d32f2f;
+  --ptx-team-xiphias: #f5a623;
+
+  /* Status primitives */
+  --ptx-live-red: #dc2626;
+  --ptx-success: #10b981;
+  --ptx-warning: #f59e0b;
+  --ptx-danger: #ef4444;
+
+  /* Neutral scale */
+  --ptx-neutral-50: #f8fafc;
+  --ptx-neutral-100: #f1f5f9;
+  --ptx-neutral-300: #cbd5e1;
+  --ptx-neutral-500: #64748b;
+  --ptx-neutral-700: #334155;
+  --ptx-neutral-900: #1a1a1a;
+}

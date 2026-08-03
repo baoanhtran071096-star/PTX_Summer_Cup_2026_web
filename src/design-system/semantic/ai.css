@@ -1,0 +1,10 @@
+/**
+ * AI identity semantics — chat assistant / analysis surfaces.
+ * Distinct from --interactive-* so AI surfaces read as a distinct
+ * assistant layer per Architecture v1.3 §15 (AI is a capability, not
+ * an authority) rather than blending into primary brand actions.
+ */
+:root {
+  --ai-accent: #7c3aed;
+  --ai-surface: color-mix(in srgb, #7c3aed 8%, var(--surface-card));
+}

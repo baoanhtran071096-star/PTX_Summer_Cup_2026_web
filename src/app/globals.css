@@ -1,0 +1,36 @@
+@import '../design-system/tokens/colors.css';
+@import '../design-system/tokens/typography.css';
+@import '../design-system/tokens/spacing.css';
+@import '../design-system/tokens/radius.css';
+@import '../design-system/tokens/shadows.css';
+@import '../design-system/tokens/motion.css';
+
+@import '../design-system/semantic/surfaces.css';
+@import '../design-system/semantic/interactions.css';
+@import '../design-system/semantic/sports.css';
+@import '../design-system/semantic/prestige.css';
+@import '../design-system/semantic/status.css';
+@import '../design-system/semantic/ai.css';
+
+@import '../design-system/themes/light.css';
+@import '../design-system/themes/dark.css';
+@import '../design-system/themes/summer.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--ptx-font-ui);
+  transition: background-color var(--ptx-transition), color var(--ptx-transition);
+}

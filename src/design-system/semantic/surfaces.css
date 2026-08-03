@@ -1,0 +1,18 @@
+/**
+ * Semantic surface tokens. Components must consume these, never
+ * --ptx-navy / raw hex directly, and never a theme's primitive value
+ * directly (Architecture v1.3 §14 — no hardcoded semantic colors).
+ * Default (no data-theme) falls back to Light values.
+ */
+:root {
+  --surface-page: var(--ptx-neutral-50);
+  --surface-card: var(--ptx-white);
+  --surface-elevated: var(--ptx-white);
+  --surface-nav: color-mix(in srgb, var(--ptx-navy) 92%, black);
+  --border-color: var(--ptx-neutral-300);
+  --text-primary: var(--ptx-neutral-900);
+  --text-muted: var(--ptx-neutral-500);
+  --text-on-navy: var(--ptx-white);
+  --radius-card: var(--ptx-radius-card);
+  --shadow-card: var(--ptx-shadow-card);
+}

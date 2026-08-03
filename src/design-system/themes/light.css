@@ -1,0 +1,12 @@
+/**
+ * Light theme — ported 1:1 from legacy [data-theme="light"]
+ * (docs/legacy/r25-ui-inventory.md §2).
+ */
+:root[data-theme='light'] {
+  --surface-page: var(--ptx-neutral-50);
+  --surface-card: var(--ptx-white);
+  --surface-nav: var(--ptx-navy);
+  --border-color: var(--ptx-neutral-300);
+  --text-primary: var(--ptx-neutral-900);
+  --text-muted: var(--ptx-neutral-500);
+}

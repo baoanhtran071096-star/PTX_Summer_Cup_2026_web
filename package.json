@@ -4,10 +4,44 @@
   "private": true,
   "description": "PTX Summer Cup 2026 - website giải bóng đá nội bộ PTX Group",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "verify:architecture": "node scripts/verify-architecture.js",
+    "verify:design-tokens": "node scripts/audit-colors.js",
+    "test:legacy": "node tests/run-tests.js",
     "test": "node tests/run-tests.js",
-    "serve": "python3 -m http.server 8123"
+    "serve": "node .claude/dev-server.js"
   },
   "devDependencies": {
-    "playwright": "^1.56.0"
+    "@eslint/eslintrc": "^3.3.6",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@vitejs/plugin-react": "^6.0.5",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.12",
+    "jsdom": "^30.0.1",
+    "playwright": "^1.56.0",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.112.0",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
+  },
+  "overrides": {
+    "postcss": "^8.5.25",
+    "sharp": "^0.35.3"
   }
 }

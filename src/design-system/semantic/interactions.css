@@ -1,0 +1,8 @@
+:root {
+  --interactive-primary: var(--ptx-orange);
+  --interactive-primary-hover: color-mix(in srgb, var(--ptx-orange) 85%, black);
+  --interactive-secondary: var(--ptx-navy);
+  --interactive-secondary-hover: color-mix(in srgb, var(--ptx-navy) 85%, black);
+  --focus-ring: var(--ptx-orange);
+  --transition-interactive: var(--ptx-transition);
+}

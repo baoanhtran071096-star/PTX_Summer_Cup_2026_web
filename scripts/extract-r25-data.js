@@ -42,7 +42,6 @@ function evalLiteral(literalText) {
     // so we evaluate as a JS expression in an isolated Function scope rather
     // than JSON.parse. No legacy code is executed — only a single object/array
     // literal expression.
-    // eslint-disable-next-line no-new-func
     return new Function(`"use strict"; return (${literalText});`)();
 }
 

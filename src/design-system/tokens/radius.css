@@ -1,0 +1,11 @@
+/**
+ * --ptx-radius-card ported from legacy --radius-card: 20px
+ * (docs/legacy/r25-ui-inventory.md §2) — preserves the recognizable
+ * rounded-card visual identity.
+ */
+:root {
+  --ptx-radius-sm: 8px;
+  --ptx-radius-md: 14px;
+  --ptx-radius-card: 20px;
+  --ptx-radius-pill: 999px;
+}
