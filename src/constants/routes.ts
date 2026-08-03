@@ -24,4 +24,5 @@ export const ROUTES = {
   sponsor: '/tai-tro',
   contact: '/lien-he',
   admin: '/admin',
+  login: '/dang-nhap',
 } as const;

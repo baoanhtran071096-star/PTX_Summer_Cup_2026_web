@@ -9,6 +9,16 @@
  * as the canonical source over the hand-authored version.
  */
 
+export type ProfileRole = 'admin' | 'viewer';
+
+export type ProfileRow = {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  role: ProfileRole;
+  created_at: string;
+};
+
 export type TeamRow = {
   id: string;
   name: string;

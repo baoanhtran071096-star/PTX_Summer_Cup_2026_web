@@ -14,6 +14,20 @@ export type Env = z.infer<typeof envSchema>;
 
 let cached: Env | null = null;
 
+/**
+ * Non-throwing check for UI code paths that should degrade gracefully
+ * (e.g. the admin layout showing a setup message) instead of crashing
+ * with a raw stack trace before a Supabase project is provisioned.
+ */
+export function isSupabaseConfigured(): boolean {
+  return envSchema
+    .pick({ NEXT_PUBLIC_SUPABASE_URL: true, NEXT_PUBLIC_SUPABASE_ANON_KEY: true })
+    .safeParse({
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    }).success;
+}
+
 export function getEnv(): Env {
   if (cached) return cached;
   const parsed = envSchema.safeParse({

@@ -1,21 +1,16 @@
-import { createBrowserClient, createServerClient } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getEnv } from '@/lib/env';
-
-/**
- * Browser client — safe for Client Components. Uses the anon key,
- * so it only ever operates under RLS as the current authenticated user.
- */
-export function createSupabaseBrowserClient() {
-  const env = getEnv();
-  return createBrowserClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-}
 
 /**
  * Server client for Server Components / Server Actions / Route Handlers.
  * Still uses the anon key + the request's auth cookie, so it still
  * operates under RLS — this is NOT the service-role client
  * (docs/architecture §9: service role is not the default admin path).
+ *
+ * Kept in its own file (not alongside the browser client) since it
+ * imports `next/headers`, which cannot appear in any module reachable
+ * from a Client Component bundle.
  */
 export async function createSupabaseServerClient() {
   const env = getEnv();
