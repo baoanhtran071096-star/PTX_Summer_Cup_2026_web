@@ -1,0 +1,335 @@
+{
+  "exportVersion": "2.4",
+  "exportedAt": "2026-07-30T14:13:00.000Z",
+  "teams": {
+    "p": {
+      "id": "p",
+      "name": "TEAM P",
+      "fullName": "PHOENIX",
+      "icon": "🦅",
+      "color": "#1A5BB5",
+      "captain": "Anh Trương",
+      "stats": {
+        "attack": 92,
+        "defense": 88,
+        "speed": 90,
+        "power": 85
+      },
+      "ovr": 89
+    },
+    "t": {
+      "id": "t",
+      "name": "TEAM T",
+      "fullName": "TIGER",
+      "icon": "🐯",
+      "color": "#D32F2F",
+      "captain": "Minh Thế",
+      "stats": {
+        "attack": 88,
+        "defense": 85,
+        "speed": 80,
+        "power": 90
+      },
+      "ovr": 86
+    },
+    "x": {
+      "id": "x",
+      "name": "TEAM X",
+      "fullName": "XIPHIAS",
+      "icon": "🐟",
+      "color": "#F5A623",
+      "captain": "Đình Huy",
+      "stats": {
+        "attack": 85,
+        "defense": 90,
+        "speed": 95,
+        "power": 82
+      },
+      "ovr": 88
+    }
+  },
+  "players": [
+    {
+      "id": 1,
+      "name": "Anh Trương",
+      "team": "p",
+      "position": "FW",
+      "avatar": "https://i.postimg.cc/VLrMX52J/Anh-Truong.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 2,
+      "name": "Phan Hiền",
+      "team": "p",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/sDkWmsR9/Phan-Hien.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 3,
+      "name": "Thanh Long",
+      "team": "p",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/X7R5L402/Thanh-Long.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 4,
+      "name": "Thanh Trúc",
+      "team": "p",
+      "position": "GK",
+      "avatar": "https://i.postimg.cc/Dy9G6nKD/Thanh-Truc.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 5,
+      "name": "Mậu Quốc",
+      "team": "p",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/wTCN2gdm/Mau-Quoc.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 6,
+      "name": "Quang Minh",
+      "team": "p",
+      "position": "FW",
+      "avatar": "https://i.postimg.cc/5NhzgbM7/Quang-Minh.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 7,
+      "name": "Khánh Hưng",
+      "team": "p",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/BQrFp4Gj/Khanh-Hung.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 8,
+      "name": "Mạnh Tuấn",
+      "team": "p",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/Dy9G6nK4/Manh-Tuan.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 9,
+      "name": "Minh Thế",
+      "team": "t",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/VLxtgmcM/Minh-The.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 10,
+      "name": "Tường Khánh",
+      "team": "t",
+      "position": "GK",
+      "avatar": "https://i.postimg.cc/YCQWyZpX/Tuong-Khanh.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 11,
+      "name": "Hoàng Nam",
+      "team": "t",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/WbBZ8TPD/Hoang-Nam.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 12,
+      "name": "Đăng Quân",
+      "team": "t",
+      "position": "FW",
+      "avatar": "https://i.postimg.cc/zXbWT34L/Dang-Quan.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 13,
+      "name": "Thanh Tú",
+      "team": "t",
+      "position": "FW",
+      "avatar": "https://i.postimg.cc/wjDmbZ6w/Thanh-Tu.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 14,
+      "name": "Chí Đại",
+      "team": "t",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/Nf9TRLZ2/Chi-Dai.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 15,
+      "name": "Quang Toàn",
+      "team": "t",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/SNB9dkpg/Quang-Toan.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 16,
+      "name": "Phát Tài",
+      "team": "t",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/7YFz9wyV/Phat-Tai.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 17,
+      "name": "Đình Huy",
+      "team": "x",
+      "position": "GK",
+      "avatar": "https://i.postimg.cc/J4fXxMWD/Dinh-Huy.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 18,
+      "name": "Xuân Sử",
+      "team": "x",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/L6cPD2Mj/Nguyen-Su.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 19,
+      "name": "Văn Lân",
+      "team": "x",
+      "position": "FW",
+      "avatar": "https://i.postimg.cc/VkXCHpYH/Van-Lan.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 20,
+      "name": "Thiên Phú",
+      "team": "x",
+      "position": "DF",
+      "avatar": "https://i.postimg.cc/Z56dD2TV/Thien-Phu.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 21,
+      "name": "Bảo Anh",
+      "team": "x",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/L6YfjhGY/Bao-Anh.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 22,
+      "name": "Phương Toàn",
+      "team": "x",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/dtbC6wKn/Phuong-Toan.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 23,
+      "name": "Minh Hiếu",
+      "team": "x",
+      "position": "FW",
+      "avatar": "https://i.postimg.cc/7YFz9wyz/Minh-Hieu.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    },
+    {
+      "id": 24,
+      "name": "Thành Thái",
+      "team": "x",
+      "position": "MF",
+      "avatar": "https://i.postimg.cc/PrgDyTkF/Thanh-Thai.jpg",
+      "goals": 0,
+      "assists": 0,
+      "mvp": 0
+    }
+  ],
+  "matches": [
+    {
+      "id": 1,
+      "startH": 17,
+      "startM": 0,
+      "endH": 17,
+      "endM": 35,
+      "home": "p",
+      "away": "t"
+    },
+    {
+      "id": 2,
+      "startH": 17,
+      "startM": 50,
+      "endH": 18,
+      "endM": 25,
+      "home": "p",
+      "away": "x"
+    },
+    {
+      "id": 3,
+      "startH": 18,
+      "startM": 40,
+      "endH": 19,
+      "endM": 15,
+      "home": "x",
+      "away": "t"
+    }
+  ],
+  "localStorage": {
+    "ptx_stat_goals": "0",
+    "ptx_stat_matches": "0",
+    "ptx_stat_players": "24",
+    "ptx_stat_yellow": "0",
+    "ptx_stat_red": "0",
+    "ptx_slogan": "Làm hết sức – Chơi hết mình",
+    "ptx_msg": "Giải bóng đá truyền thống do Công đoàn PTX Group Việt Nam tổ chức",
+    "ptx_date": "07/08/2026",
+    "ptx_location": "152 Hoàng Hoa Thám, Bảy Hiền, Hồ Chí Minh, Việt Nam",
+    "hof_2025": "TEAM P (PHOENIX) | Chưa đủ dữ liệu (Cập nhật sau) | Chưa đủ dữ liệu (Cập nhật sau) | Chưa đủ dữ liệu (Cập nhật sau) | Chưa đủ dữ liệu (Cập nhật sau)",
+    "gallery_2025": "https://i.postimg.cc/J4BFgJp7/CD.jpg"
+  }
+}

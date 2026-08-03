@@ -1,0 +1,22 @@
+{
+  "release": "PRODUCTION FINAL CANDIDATE R5",
+  "source": "PTX-Summer-Cup-2026-PRODUCTION-FINAL-CANDIDATE-R4.zip",
+  "fixes": [
+    "Persistent admin session; explicit logout only.",
+    "Broken local iframe sources neutralized.",
+    "Runtime guard for accidental raw JavaScript text leakage."
+  ],
+  "source_index_sha256": "e75f3efdae6669056419da0189adfaad3f2ed62a907417297fdf36229bf0e638",
+  "final_index_sha256": "62364576b879aefef5ab19b6d11c23aba2d76cd417f693b573b8402b5e3433a6",
+  "checks": {
+    "persistent_admin_read": true,
+    "explicit_logout_patch": true,
+    "no_session_admin_auth": true,
+    "raw_code_guard": true,
+    "r4_progress": true,
+    "r4_portrait": true,
+    "native_media": true,
+    "six_mp4": true
+  },
+  "note": "Live browser verification remains required for parser/layout defects."
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Command python,python3,py -ErrorAction SilentlyContinue)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(py --version)",
+      "Bash(npm -v)",
+      "Bash(git --version)",
+      "Bash(npm ping *)",
+      "Bash(npm view *)",
+      "Bash(npm install *)",
+      "Bash(npm test *)",
+      "Bash(npx playwright *)"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "PTX Summer Cup 2026",
+  "short_name": "PTX Cup",
+  "description": "Giải bóng đá truyền thống PTX Summer Cup 2026 – Công đoàn PTX Group Việt Nam",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1D3557",
+  "theme_color": "#1D3557",
+  "orientation": "portrait-primary",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "thư viện/ảnh logo - banner/icon-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "thư viện/ảnh logo - banner/icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "entertainment"],
+  "screenshots": [
+    {
+      "src": "thư viện/ảnh logo - banner/banner PTX Summer Cup.webp",
+      "sizes": "1280x720",
+      "type": "image/webp"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "release": "PRODUCTION FINAL CANDIDATE R3",
+  "source": "PTX-Summer-Cup-2026-PRODUCTION-FINAL-CANDIDATE-R2(1).zip",
+  "scope": "Adaptive Media UI only; R2 official-data/runtime fixes preserved.",
+  "source_index_sha256": "9595ce46b814ed328e4bd620bb0238e88e61fdcd78025414fcd33a6c61c56d55",
+  "final_index_sha256": "bdc7adb61281e511ef57effe6ff79eb743e6c8e9c2a222205c4b0d1dd5f24f25",
+  "checks": {
+    "existing_wrapper_used": true,
+    "aspect_detection": true,
+    "portrait": true,
+    "landscape": true,
+    "square": true,
+    "viewport_cap": true,
+    "contain": true,
+    "mobile": true,
+    "r2_native_media": true,
+    "r2_published_stats": true,
+    "r2_no_legacy_fallback": true,
+    "r2_runtime_invariant": true,
+    "states": true,
+    "six_mp4": true
+  },
+  "live_browser_gate_required": true
+}

@@ -1,0 +1,36 @@
+{
+  "release": "PRODUCTION FINAL CANDIDATE R4",
+  "source": "PTX-Summer-Cup-2026-PRODUCTION-FINAL-CANDIDATE-R3(1).zip",
+  "scope": [
+    "Portrait Media UX",
+    "Tournament Progress Display"
+  ],
+  "business_semantics": {
+    "played_matches": "PUBLISHED matches only",
+    "total_matches": "MATCHES_CONFIG.length",
+    "display": "played / total",
+    "expected_sequence": [
+      "0 / 3",
+      "1 / 3",
+      "2 / 3",
+      "3 / 3"
+    ]
+  },
+  "source_index_sha256": "bdc7adb61281e511ef57effe6ff79eb743e6c8e9c2a222205c4b0d1dd5f24f25",
+  "final_index_sha256": "e75f3efdae6669056419da0189adfaad3f2ed62a907417297fdf36229bf0e638",
+  "checks": {
+    "portrait_centered": true,
+    "portrait_width_460": true,
+    "portrait_height_68vh": true,
+    "home_progress_0_of_3_structure": true,
+    "stats_page_progress_structure": true,
+    "total_from_match_config": true,
+    "played_still_published_only": true,
+    "no_legacy_played_fallback": true,
+    "native_media_preserved": true,
+    "pre_kickoff_invariant_preserved": true,
+    "match_states_preserved": true,
+    "six_mp4": true
+  },
+  "live_browser_gate_required": true
+}

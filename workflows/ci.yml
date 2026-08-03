@@ -1,0 +1,58 @@
+name: PTX Summer Cup 2026 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, dev, 'feature/*' ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install test dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run automated test suite
+        run: npm test
+
+      - name: Install & Test Backend
+        run: |
+          if [ -d "backend" ]; then
+            cd backend
+            npm ci || npm install
+            npm run test --if-present
+          fi
+
+  # ⚠️ 2 job dưới đây vẫn là PLACEHOLDER (chưa deploy thật) — sẽ hoàn thiện ở Phase 5
+  # của lộ trình nâng cấp, sau khi chọn xong nền tảng hosting (Vercel/Netlify/Cloudflare Pages).
+  deploy-staging:
+    name: Auto Deploy Staging
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Vercel/Railway Staging
+        run: echo "🚀 Deploying to Staging Environment..."
+
+  deploy-production:
+    name: Auto Deploy Production
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Vercel/Railway Production
+        run: echo "🎉 Deploying to Production Environment..."

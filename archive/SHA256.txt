@@ -1,0 +1,4 @@
+index.html SHA-256: 5e46e167a407bed26bfc8b66e440e6e9214b9cb90c3771db992cd68518178735
+ptx_migration_data.json SHA-256: 030a6aad4fbaae3fc29c1db5aa25b71693d78fcf56ec87ace509ac57555642b7
+Build Timestamp: 2026-08-02T17:00:19.777Z
+Release Candidate: R12 (Smooth Scroll Prediction Game, Cache Buster Auto-Purge & Widescreen Media Player)
