@@ -59,28 +59,68 @@
 
     <style>
         /* ============================================================
-           ROOT VARIABLES & RESET
+           PTX SPORTS LUXE DESIGN SYSTEM v1.0 — SEMANTIC CONTRACT
            ============================================================ */
         :root {
-            --navy: #1D3557;
-            --ptx-orange: #F15A24;
+            /* Surface */
+            --surface-page: var(--theme-surface-page);
+            --surface-primary: var(--theme-surface-primary);
+            --surface-secondary: var(--theme-surface-secondary);
+            --surface-elevated: var(--theme-surface-elevated);
+
+            /* Text */
+            --text-primary: var(--theme-text-primary);
+            --text-secondary: var(--theme-text-secondary);
+            --text-muted: var(--theme-text-muted);
+            --text-inverse: var(--theme-text-inverse);
+
+            /* Border */
+            --border-default: var(--theme-border-default);
+            --border-strong: var(--theme-border-strong);
+
+            /* Interaction */
+            --interactive-primary: var(--theme-interactive-primary);
+            --interactive-hover: var(--theme-interactive-hover);
+            --interactive-active: var(--theme-interactive-active);
+            --focus-ring: var(--theme-focus-ring);
+
+            /* Sports Semantics */
+            --sports-live: var(--theme-live);
+            --sports-win: var(--theme-win);
+            --sports-loss: var(--theme-loss);
+            --sports-draw: var(--theme-draw);
+            --sports-upcoming: var(--theme-upcoming);
+
+            /* Prestige */
+            --prestige-gold: var(--theme-gold);
+            --prestige-silver: var(--theme-silver);
+            --prestige-bronze: var(--theme-bronze);
+
+            /* AI (Violet Intelligence) */
+            --ai-accent: var(--theme-ai-accent);
+            --ai-surface: var(--theme-ai-surface);
+            --ai-border: var(--theme-ai-border);
+
+            /* Feedback & Status */
+            --status-success: var(--theme-success);
+            --status-warning: var(--theme-warning);
+            --status-danger: var(--theme-danger);
+            --status-info: var(--theme-info);
+
+            /* Legacy Aliases & Structural Consts */
+            --navy: var(--surface-secondary);
+            --ptx-orange: var(--interactive-primary);
+            --cyber-cyan: var(--ai-accent);
             --white: #FFFFFF;
-            --gold: #D4A13E;
-            --bg-light: #F8FAFC;
-            --text-dark: #1A1A1A;
-            --text-muted: #64748B;
-            --shadow-card: 0 12px 40px rgba(29, 53, 87, 0.08);
-            --radius-card: 20px;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --bg-body: var(--bg-light);
-            --bg-card: var(--white);
-            --text-primary: var(--text-dark);
-            --border-color: rgba(0, 0, 0, 0.04);
-            --nav-blur: rgba(255, 255, 255, 0.85);
+            --gold: var(--prestige-gold);
+            --bg-body: var(--surface-page);
+            --bg-card: var(--surface-primary);
+            --border-color: var(--border-default);
+            --nav-blur: var(--surface-primary);
             --team-p-color: #1A5BB5;
             --team-t-color: #D32F2F;
             --team-x-color: #F5A623;
-            --live-red: #dc2626;
+            --live-red: var(--sports-live);
             --bottom-nav-height: 68px;
 
             /* ===== TYPOGRAPHY ===== */
@@ -89,26 +129,330 @@
             --font-ui: 'Be Vietnam Pro', 'Inter', system-ui, -apple-system, sans-serif;
         }
 
-        [data-theme="dark"] {
-            --navy: #0F1A2C;
-            --bg-body: #0F172A;
-            --bg-card: #1E293B;
-            --text-primary: #F1F5F9;
-            --text-muted: #94A3B8;
-            --border-color: rgba(255, 255, 255, 0.06);
-            --nav-blur: rgba(15, 23, 42, 0.85);
-            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.4);
+        /* Light — Porcelain Sports Luxe */
+        [data-theme="light"] {
+            --theme-surface-page: #F1F5F9;
+            --theme-surface-primary: #FFFFFF;
+            --theme-surface-secondary: #F8FAFC;
+            --theme-surface-elevated: #FFFFFF;
+
+            --theme-text-primary: #0F172A;
+            --theme-text-secondary: #475569;
+            --theme-text-muted: #64748B;
+            --theme-text-inverse: #F8FAFC;
+
+            --theme-border-default: #E2E8F0;
+            --theme-border-strong: #CBD5E1;
+
+            --theme-interactive-primary: #0284C7;
+            --theme-interactive-hover: #0369A1;
+            --theme-interactive-active: #075985;
+            --theme-focus-ring: rgba(2, 132, 199, 0.35);
+
+            --theme-live: #C2410C;
+
+            --theme-gold: #B45309;
+            --theme-silver: #64748B;
+            --theme-bronze: #9A3412;
+
+            --theme-ai-accent: #7C3AED;
+            --theme-ai-surface: linear-gradient(135deg, #F0F9FF, #F5F3FF);
+            --theme-ai-border: rgba(124, 58, 237, 0.22);
+
+            --theme-success: #15803D;
+            --theme-warning: #B45309;
+            --theme-danger: #B91C1C;
+            --theme-info: #0369A1;
+
+            --theme-win: #15803D;
+            --theme-loss: #B91C1C;
+            --theme-draw: #64748B;
+            --theme-upcoming: #0369A1;
         }
 
-        [data-theme="light"] {
-            --navy: #1E293B;
-            --bg-body: #F8FAFC;
-            --bg-card: #FFFFFF;
-            --text-primary: #0F172A;
-            --text-muted: #64748B;
-            --border-color: rgba(0, 0, 0, 0.08);
-            --nav-blur: rgba(255, 255, 255, 0.92);
-            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.08);
+        /* Dark — Cyber Obsidian Sports Luxe */
+        [data-theme="dark"] {
+            --theme-surface-page: #0F172A;
+            --theme-surface-primary: #1E293B;
+            --theme-surface-secondary: #182234;
+            --theme-surface-elevated: #243247;
+
+            --theme-text-primary: #F8FAFC;
+            --theme-text-secondary: #94A3B8;
+            --theme-text-muted: #64748B;
+            --theme-text-inverse: #0F172A;
+
+            --theme-border-default: rgba(255, 255, 255, 0.08);
+            --theme-border-strong: rgba(255, 255, 255, 0.14);
+
+            --theme-interactive-primary: #38BDF8;
+            --theme-interactive-hover: #7DD3FC;
+            --theme-interactive-active: #BAE6FD;
+            --theme-focus-ring: rgba(56, 189, 248, 0.40);
+
+            --theme-live: #F97316;
+
+            --theme-gold: #F59E0B;
+            --theme-silver: #CBD5E1;
+            --theme-bronze: #FB923C;
+
+            --theme-ai-accent: #A855F7;
+            --theme-ai-surface: linear-gradient(135deg, #1E1B4B, #0F172A);
+            --theme-ai-border: rgba(168, 85, 247, 0.35);
+
+            --theme-success: #4ADE80;
+            --theme-warning: #FBBF24;
+            --theme-danger: #F87171;
+            --theme-info: #38BDF8;
+
+            --theme-win: #4ADE80;
+            --theme-loss: #F87171;
+            --theme-draw: #94A3B8;
+            --theme-upcoming: #38BDF8;
+        }
+
+        body {
+            background-color: var(--surface-page) !important;
+            color: var(--text-primary) !important;
+        }
+
+        /* 1. COMPONENT DECOUPLED LAYER (ZERO THEME IF-ELSE) */
+        header, .navbar {
+            background: var(--surface-primary) !important;
+            border-bottom: 1px solid var(--border-default) !important;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
+        }
+        .nav-links li a {
+            color: var(--text-primary) !important;
+        }
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            color: var(--interactive-primary) !important;
+        }
+        .nav-dropdown-content {
+            background: var(--surface-primary) !important;
+            border: 1px solid var(--border-default) !important;
+        }
+
+        /* AI CARD COMPONENT TOKEN CONTRACT */
+        .ai-card,
+        div[style*="background:linear-gradient(135deg,#0f172a,#1e1b4b)"] {
+            background: var(--ai-surface) !important;
+            border: 1px solid var(--ai-border) !important;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.08) !important;
+            color: var(--text-primary) !important;
+            border-radius: 20px !important;
+        }
+        div[style*="background:linear-gradient(135deg,#0f172a,#1e1b4b)"] button {
+            background: var(--ai-accent) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* 1. NAVIGATION GLASS IN LIGHT MODE */
+        [data-theme="light"] header,
+        [data-theme="light"] .navbar {
+            background: var(--nav-bg) !important;
+            border-bottom: 1px solid var(--nav-border) !important;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
+        }
+        [data-theme="light"] .nav-links li a {
+            color: var(--text-nav) !important;
+        }
+        [data-theme="light"] .nav-links li a:hover,
+        [data-theme="light"] .nav-links li a.active {
+            color: var(--accent-blue) !important;
+        }
+        [data-theme="light"] .nav-dropdown-content {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-default) !important;
+            box-shadow: var(--shadow-floating) !important;
+        }
+        [data-theme="light"] .nav-dropdown-content a {
+            color: var(--text-primary) !important;
+        }
+        [data-theme="light"] .nav-dropdown-content a:hover {
+            background: var(--bg-surface-soft) !important;
+            color: var(--accent-blue) !important;
+        }
+
+        /* 2. SUB-PAGE HERO BANNERS (PORCELAIN NAVY BAR) */
+        [data-theme="light"] .hero-v3 {
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;
+            border-bottom: 3px solid var(--accent-orange) !important;
+            box-shadow: var(--shadow-card) !important;
+            color: #FFFFFF !important;
+        }
+        [data-theme="light"] .hero-v3 .hero-content h1,
+        [data-theme="light"] .hero-v3 h1,
+        [data-theme="light"] .hero-v3 .font-title,
+        [data-theme="light"] .hero-v3 [data-i18n$="_hero"] {
+            color: #FFFFFF !important;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+        }
+        [data-theme="light"] .hero-v3 .hero-content p,
+        [data-theme="light"] .hero-v3 p,
+        [data-theme="light"] .hero-v3 [data-i18n$="_sub"] {
+            color: #CBD5E1 !important;
+        }
+
+        /* 3. AI CARD VISUAL IDENTITY (ELEVATION & LIGHT GLOW) */
+        .ai-card,
+        [data-theme="light"] .ai-card,
+        [data-theme="light"] div[style*="background:linear-gradient(135deg,#0f172a,#1e1b4b)"] {
+            background: var(--ai-bg) !important;
+            border: 1px solid var(--ai-border) !important;
+            box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+            color: var(--text-primary) !important;
+            border-radius: 20px !important;
+        }
+        [data-theme="light"] div[style*="background:linear-gradient(135deg,#0f172a,#1e1b4b)"] button {
+            background: var(--accent-blue) !important;
+            color: #FFFFFF !important;
+        }
+
+        /* 4. VISUAL HIERARCHY: ACCENTS SCOPED STRICTLY BY SEMANTICS */
+        [data-theme="light"] [style*="color:#fbbf24"],
+        [data-theme="light"] [style*="color: #fbbf24"],
+        [data-theme="light"] [style*="color:#facc15"] {
+            color: var(--accent-amber) !important; /* Gold hardware / Champion / Trophy / MVP state */
+            font-weight: 800 !important;
+        }
+        [data-theme="light"] [style*="color:#60a5fa"],
+        [data-theme="light"] [style*="color: #60a5fa"],
+        [data-theme="light"] [style*="color:#38bdf8"] {
+            color: var(--accent-blue) !important; /* Interactive / Link / Active state */
+            font-weight: 800 !important;
+        }
+        [data-theme="light"] [style*="color:#f97316"],
+        [data-theme="light"] [style*="color: #f97316"] {
+            color: var(--accent-orange) !important; /* Flame / High priority callouts */
+            font-weight: 800 !important;
+        }
+        [data-theme="light"] [style*="color:#94a3b8"],
+        [data-theme="light"] [style*="color: #94a3b8"],
+        [data-theme="light"] [style*="color:rgba(255,255,255,0.8)"] {
+            color: var(--text-secondary) !important; /* Standard secondary hierarchy text */
+        }
+
+        /* 5. FORM CONTROLS & LABELS IN LIGHT MODE */
+        [data-theme="light"] label,
+        [data-theme="light"] div[style*="font-size:13px;font-weight:900"],
+        [data-theme="light"] div[style*="font-size:12px;font-weight:700"] {
+            color: var(--text-primary) !important;
+        }
+        [data-theme="light"] select, 
+        [data-theme="light"] input[type="text"], 
+        [data-theme="light"] input[type="password"], 
+        [data-theme="light"] input[type="number"], 
+        [data-theme="light"] textarea {
+            background: var(--bg-surface-soft) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-default) !important;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+        }
+        [data-theme="light"] select:focus, 
+        [data-theme="light"] input:focus, 
+        [data-theme="light"] textarea:focus {
+            border-color: var(--accent-blue) !important;
+            background: var(--bg-surface) !important;
+            outline: none !important;
+        }
+
+        /* 6. SURFACES & CARDS IN LIGHT MODE (PORCELAIN / NAVY 85-90% RULE) */
+        [data-theme="light"] .card,
+        [data-theme="light"] .stat-card,
+        [data-theme="light"] .match-card-v3, 
+        [data-theme="light"] .standing-card, 
+        [data-theme="light"] .team-stat-card,
+        [data-theme="light"] .about-card,
+        [data-theme="light"] .organizer-card,
+        [data-theme="light"] .committee-card,
+        [data-theme="light"] .rule-card,
+        [data-theme="light"] .faq-item,
+        [data-theme="light"] .gallery-card,
+        [data-theme="light"] .video-card {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--border-default) !important;
+            box-shadow: var(--shadow-card) !important;
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="light"] table,
+        [data-theme="light"] .standing-table {
+            color: var(--text-primary) !important;
+        }
+        [data-theme="light"] th {
+            background: var(--bg-surface-soft) !important;
+            color: var(--text-primary) !important;
+            border-bottom: 2px solid var(--border-default) !important;
+        }
+        [data-theme="light"] td {
+            border-bottom: 1px solid var(--border-default) !important;
+            color: var(--text-secondary) !important;
+        }
+        [data-theme="light"] tr:nth-child(even) {
+            background: var(--bg-surface-soft) !important;
+        }
+
+        /* 7. AI ASSISTANT FLOATING WIDGET (SUBTLE ELEVATION) */
+        [data-theme="light"] #ptxAiChatWidget > div {
+            background: var(--bg-surface) !important;
+            border: 1px solid var(--nav-border) !important;
+            box-shadow: var(--shadow-floating) !important;
+        }
+        [data-theme="light"] #ptxAiChatMessages {
+            background: var(--bg-surface-soft) !important;
+            border: 1px solid var(--border-default) !important;
+        }
+        [data-theme="light"] #ptxAiChatMessages > div[style*="background:rgba(30,41,59"] {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-default) !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+        }
+        [data-theme="light"] #ptxAiChatInput {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-default) !important;
+        }
+
+        /* 8. FIFA PLAYER CARDS IN LIGHT MODE */
+        [data-theme="light"] .player-card-fifa {
+            background: linear-gradient(135deg, #FFFFFF 0%, #FFFBEB 100%) !important;
+            border: 1.5px solid #D4A13E !important;
+            box-shadow: 0 8px 24px rgba(212, 161, 62, 0.14) !important;
+            color: var(--text-primary) !important;
+        }
+        [data-theme="light"] .player-card-fifa .p-name {
+            color: var(--text-primary) !important;
+            font-weight: 900 !important;
+        }
+        [data-theme="light"] .player-card-fifa .p-pos {
+            color: var(--text-secondary) !important;
+            font-weight: 700 !important;
+        }
+        [data-theme="light"] .player-card-fifa .p-stats-grid {
+            background: var(--bg-surface-soft) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: 10px !important;
+        }
+        [data-theme="light"] .player-card-fifa .p-stat-item .lbl {
+            color: var(--text-secondary) !important;
+            font-weight: 900 !important;
+            font-size: 10px !important;
+        }
+        [data-theme="light"] .player-card-fifa .p-stat-item .val {
+            color: var(--accent-amber) !important;
+            font-weight: 900 !important;
+            font-size: 14px !important;
+        }
+
+        /* 9. MODALS OVERLAY IN LIGHT MODE */
+        [data-theme="light"] .modal-overlay > div {
+            background: var(--bg-surface) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-default) !important;
+            box-shadow: var(--shadow-floating) !important;
         }
 
         /* Reset & Base */
@@ -145,6 +489,29 @@
             letter-spacing: 0.04em;
             font-weight: 400;
         }
+        [data-theme="light"] .bottom-nav {
+            background: rgba(255, 255, 255, 0.96) !important;
+            border-top: 1px solid #E2E8F0 !important;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
+        }
+        [data-theme="light"] .bottom-nav .nav-item {
+            color: #64748B !important;
+        }
+        [data-theme="light"] .bottom-nav .nav-item.active {
+            color: var(--ptx-orange) !important;
+        }
+
+        /* HIDE SCROLLBAR FOR AI CHIP SUGGESTIONS */
+        .ptx-ai-chips-scroll::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        .ptx-ai-chips-scroll {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+
         .font-title {
             font-family: var(--font-title);
             font-weight: 700;
@@ -749,16 +1116,22 @@
             stroke-width: 2;
         }
         .nav-links li a:hover {
-            background: rgba(241, 90, 36, 0.08);
-            color: var(--ptx-orange);
+            background: rgba(241, 90, 36, 0.12) !important;
+            color: var(--ptx-orange) !important;
+            transform: translateY(-1px);
         }
         .nav-links li a.active {
-            background: rgba(255, 255, 255, 0.6);
-            color: var(--ptx-orange);
-            box-shadow: inset 0 -2px 0 var(--ptx-orange);
+            background: linear-gradient(135deg, rgba(249,115,22,0.22) 0%, rgba(234,88,12,0.15) 100%) !important;
+            color: #f97316 !important;
+            border: 1.5px solid rgba(249,115,22,0.5) !important;
+            box-shadow: 0 4px 15px rgba(249,115,22,0.25) !important;
+            font-weight: 900 !important;
         }
-        [data-theme="dark"] .nav-links li a.active {
-            background: rgba(255, 255, 255, 0.1);
+        [data-theme="light"] .nav-links li a.active {
+            background: #FFF7ED !important;
+            color: #C2410C !important;
+            border: 1.5px solid #FDBA74 !important;
+            box-shadow: 0 4px 12px rgba(234,88,12,0.12) !important;
         }
         .lang-switch {
             display: flex;
@@ -3861,8 +4234,8 @@
         #preMatchAlert .alert-close { font-size: 18px; cursor: pointer; opacity: 0.7; background: none; border: none; color: #fff; }
 
         /* NAV DROPDOWN UTILITY & SINGLE LINE OPTIMIZATION */
-        .nav-links { flex-wrap: nowrap !important; gap: clamp(4px, 0.7vw, 12px) !important; align-items: center !important; flex: 1; justify-content: space-evenly; }
-        .nav-links li a { font-size: 13px !important; padding: 6px 10px !important; white-space: nowrap !important; border-radius: 8px; transition: all 0.2s ease; }
+        .nav-links { flex-wrap: nowrap !important; gap: clamp(8px, 1.2vw, 20px) !important; align-items: center !important; flex: 1; justify-content: space-between; }
+        .nav-links li a { font-size: 13.5px !important; font-weight: 700 !important; padding: 8px 14px !important; white-space: nowrap !important; border-radius: 10px; transition: all 0.2s ease; }
         .nav-links li a:hover { background: rgba(255,255,255,0.08); }
         .lang-switch { margin-left: 12px; flex-shrink: 0; }
         .nav-dropdown-content summary::-webkit-details-marker { display: none; }
@@ -3885,9 +4258,9 @@
         }
         .nav-dropdown:hover .nav-dropdown-content,
         .nav-dropdown.active .nav-dropdown-content {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px;
             animation: dropdownFadeIn 0.25s ease forwards;
         }
         @keyframes dropdownFadeIn {
@@ -3939,6 +4312,116 @@
             color: #94a3b8 !important;
             line-height: 1.3;
             white-space: normal;
+        }
+
+        /* ============================================================
+           ULTIMATE UI & ULTIMATE EXPERIENCE ENHANCEMENTS
+           ============================================================ */
+        .ultimate-glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 0 20px rgba(241, 90, 36, 0.05);
+            border-radius: var(--radius-card);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+        }
+
+        [data-theme="dark"] .ultimate-glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 242, 254, 0.08);
+        }
+
+        .ultimate-glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.12), 0 0 30px rgba(241, 90, 36, 0.15);
+        }
+
+        /* 3D Tilt Card Effect */
+        .card-3d-tilt {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out, box-shadow 0.3s ease;
+        }
+        .card-3d-tilt:hover {
+            transform: translateY(-6px) rotateX(4deg) rotateY(-4deg);
+            box-shadow: 0 20px 40px rgba(241, 90, 36, 0.2), 0 0 25px rgba(255, 215, 0, 0.2);
+        }
+
+        /* LED Stadium HUD Scoreboard */
+        .hud-scoreboard {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 2px solid var(--ptx-orange);
+            border-radius: 20px;
+            padding: 16px 24px;
+            box-shadow: 0 0 30px rgba(241, 90, 36, 0.3), inset 0 0 15px rgba(0, 242, 254, 0.1);
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        .hud-scoreboard::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(241,90,36,0.1) 0%, transparent 70%);
+            animation: rotateGlow 12s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Pulse Live Indicator */
+        .pulse-live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px solid rgba(220, 38, 38, 0.4);
+            border-radius: 20px;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .pulse-live-badge .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ef4444;
+            animation: pulseLive 1.4s infinite;
+        }
+
+        @keyframes pulseLive {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        @keyframes spinCoin {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg) scale(1.15); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* Confetti Overlay Canvas */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 99999;
         }
     </style>
 <style>
@@ -4129,22 +4612,28 @@
             transform: translateX(4px) !important;
         }
 
-        /* Dropdown Mega Menu Tiện ích (Issue 4) */
-        .mega-menu-content {
+        /* Dropdown Mega Menu Tiện ích (Fix Layout Overflow & Vertical Text Wrap) */
+        .nav-dropdown-content, .mega-menu-content {
             position: absolute !important;
             top: calc(100% + 8px) !important;
             right: 0 !important;
             left: auto !important;
-            width: min(620px, 94vw) !important;
-            max-width: 94vw !important;
+            width: min(640px, 90vw) !important;
+            max-width: 90vw !important;
             background: rgba(15, 23, 42, 0.98) !important;
             backdrop-filter: blur(18px) !important;
             border: 1.5px solid var(--ptx-orange, #f97316) !important;
             border-radius: 18px !important;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85) !important;
-            padding: 20px !important;
+            padding: 16px 18px !important;
             z-index: 9999 !important;
             box-sizing: border-box !important;
+        }
+
+        #megaMenuTournamentStatus {
+            white-space: nowrap !important;
+            flex-wrap: nowrap !important;
+            word-break: normal !important;
         }
 
         /* Widescreen Video Player Fix (Issue 5) */
@@ -4173,6 +4662,8 @@
 </style>
 </head>
 <body>
+    <!-- ULTIMATE CELEBRATION CONFETTI CANVAS -->
+    <canvas id="confettiCanvas"></canvas>
 
     <!-- SPLASH SCREEN -->
     <div id="splash-screen" onclick="this.style.display='none'" title="Nhấp để đóng màn hình chờ">
@@ -4352,9 +4843,8 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
         // Update Header & Mega Menu Status on Load
         function updateControlCenterButtonVisibility() {
-            const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
             const btn = document.getElementById('headerControlCenterBtn');
-            if (btn) btn.style.display = isLoggedIn ? 'block' : 'none';
+            if (btn) btn.style.display = 'inline-block';
         }
         updateControlCenterButtonVisibility();
         updateMegaMenuTournamentStatus();
@@ -4509,7 +4999,6 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             </button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#home" class="active" data-i18n="home_nav">Trang chủ</a></li>
-                <li><a href="#about" data-i18n="about_nav">Giới thiệu</a></li>
                 <li><a href="#schedule" data-i18n="schedule_nav">Lịch thi đấu</a></li>
                 <li><a href="#standings" data-i18n="standings_nav">BXH</a></li>
                 
@@ -4525,31 +5014,39 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     </div>
                 </li>
 
-                <li><a href="#gallery" data-i18n="gallery_nav">Thư viện</a></li>
-                <li><a href="#hall-of-fame" data-i18n="hof_nav">Vinh danh</a></li>
-                <li><a href="#contact" data-i18n="contact_nav">Liên hệ</a></li>
-
                 <li>
                     <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link" style="color:#f97316;font-weight:900;background:rgba(249,115,22,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(249,115,22,0.4);" data-i18n="nav_prediction">
                         🎯 DỰ ĐOÁN
                     </a>
                 </li>
+
+                <!-- Group Extra Informational Pages -->
+                <li class="nav-dropdown">
+                    <a href="#" class="nav-link nav-dropdown-toggle" onclick="return false;" style="font-weight:700;" data-i18n="nav_explore">
+                        📌 KHÁM PHÁ ▾
+                    </a>
+                    <div class="nav-dropdown-content">
+                        <a href="#about" data-i18n="about_nav">ℹ️ Giới thiệu giải đấu</a>
+                        <a href="#gallery" data-i18n="gallery_nav">📸 Thư viện Ảnh & Video</a>
+                        <a href="#hall-of-fame" data-i18n="hof_nav">🏆 Bảng Vinh Danh (Hall of Fame)</a>
+                        <a href="#contact" data-i18n="contact_nav">📞 Liên hệ Ban Tổ Chức</a>
+                    </div>
+                </li>
+
                 <li>
-                    <a href="#" onclick="openLiveStreamHubModal(); return false;" class="nav-link" style="color:#ef4444;font-weight:900;background:rgba(239,68,68,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(239,68,68,0.4);">
-                        <span style="display:inline-block;width:8px;height:8px;background:#ef4444;border-radius:50%;margin-right:4px;"></span>📺 LIVESTREAM
+                    <a href="#" onclick="openLiveStreamHubModal(); return false;" class="nav-link" style="color:#ef4444;font-weight:900;background:rgba(239,68,68,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(239,68,68,0.4);" data-i18n="nav_livestream">
+                        📺 LIVESTREAM
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link" style="color:#fbbf24;font-weight:900;background:rgba(251,191,36,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(251,191,36,0.4);">
+                    <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link" style="color:#fbbf24;font-weight:900;background:rgba(251,191,36,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(251,191,36,0.4);" data-i18n="nav_vip_ticket">
                         🎟️ VÉ VÀNG VIP
                     </a>
                 </li>
                 
-                <!-- Utility & Extra Pages Dropdown Menu -->
-                
-                <li id="headerControlCenterBtn" style="display:none;">
-                    <a href="#admin" onclick="navigateToPage('admin'); return false;" class="nav-link" style="color:#fdba74;font-weight:900;background:rgba(249,115,22,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(249,115,22,0.4);">
-                        <span style="margin-right:4px;">🛡️</span> CONTROL CENTER <span style="font-size:9px;background:#f97316;color:#fff;padding:1px 5px;border-radius:4px;margin-left:4px;">ADMIN</span>
+                <li id="headerControlCenterBtn">
+                    <a href="#admin" onclick="navigateToPage('admin'); return false;" class="nav-link" style="color:#fdba74;font-weight:900;background:rgba(249,115,22,0.2);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(249,115,22,0.5);box-shadow:0 0 10px rgba(249,115,22,0.3);" data-i18n="nav_admin">
+                        🛡️ QUẢN TRỊ ADMIN
                     </a>
                 </li>
 
@@ -4558,102 +5055,79 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         ⚡ TIỆN ÍCH <span style="font-size:10px;">▼</span>
                     </a>
                     
-                    <div class="nav-dropdown-content" style="width:600px;padding:18px;">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                            <!-- Column 1: 🏆 CĐV & GIẢI ĐẤU -->
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <div style="font-size:11px; font-weight:900; color:#fbbf24; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; border-bottom:1px solid rgba(251,191,36,0.2); padding-bottom:4px; font-family:var(--font-title);">
-                                    🏆 CĐV & GIẢI ĐẤU
+                    <div class="nav-dropdown-content ultimate-glass-card" style="position:absolute;top:calc(100% + 8px);right:0;left:auto;width:min(580px, 92vw);max-width:92vw;padding:18px;background:rgba(15,23,42,0.98);border:1.5px solid rgba(241,90,36,0.4);border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,0.85);z-index:9999;box-sizing:border-box;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;">
+                            <!-- Column 1: 🏆 CĐV & VIP TRẢI NGHIỆM -->
+                            <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                                <div style="font-size:11px; font-weight:900; color:#fbbf24; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; border-bottom:1.5px solid rgba(251,191,36,0.3); padding-bottom:4px; font-family:var(--font-title);">
+                                    🏆 CĐV & VIP TRẢI NGHIỆM
                                 </div>
-                                <a href="#" onclick="openVipTicketModal(); return false;">
-                                    <span class="util-icon-badge" style="background:rgba(253,224,71,0.15);">🎫</span>
-                                    <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#fde047;">Tạo Vé VIP</span>
-                                        <span class="util-desc">Tạo vé điện tử cá nhân hóa</span>
+                                <a href="#" onclick="openVipTicketModal(); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); text-decoration:none; border:1px solid rgba(255,255,255,0.08); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(253,224,71,0.2); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🎫</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#fde047; font-weight:800; font-size:13px; display:flex; align-items:center; gap:6px;">Vé VIP Điện Tử <span style="font-size:8px; background:#eab308; color:#0f172a; padding:1px 5px; border-radius:4px; font-weight:900;">VIP</span></span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Tạo vé bốc thăm cá nhân</span>
                                     </span>
                                 </a>
-                                <a href="#" onclick="openComparePlayersModal(); return false;">
-                                    <span class="util-icon-badge" style="background:rgba(192,132,252,0.15);">⚔️</span>
-                                    <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#c084fc;">So Sánh Cầu Thủ</span>
-                                        <span class="util-desc">Đối chiếu chỉ số 2 cầu thủ</span>
+                                <a href="#" onclick="openComparePlayersModal(); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); text-decoration:none; border:1px solid rgba(255,255,255,0.08); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(192,132,252,0.2); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">⚔️</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#c084fc; font-weight:800; font-size:13px;">So Sánh Cầu Thủ</span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Đối chiếu chỉ số 2 danh thủ</span>
                                     </span>
                                 </a>
-                                <a href="#sponsor" onclick="navigateToPage('sponsor'); return false;" style="background:rgba(251,191,36,0.1);">
-                                    <span class="util-icon-badge" style="background:rgba(251,191,36,0.25);">🤝</span>
-                                    <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#fbbf24;">Đồng Hành Cùng Giải <span style="font-size:9px; background:#fbbf24; color:#0f172a; padding:1px 6px; border-radius:6px; font-weight:900;">HOT</span></span>
-                                        <span class="util-desc">Tài trợ & ủng hộ giải đấu</span>
-                                    </span>
-                                </a>
-                                <a href="#rules" onclick="navigateToPage('rules'); return false;">
-                                    <span class="util-icon-badge">📖</span>
-                                    <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#e2e8f0;">Điều Lệ 5v5</span>
-                                        <span class="util-desc">Luật thi đấu chính thức</span>
-                                    </span>
-                                </a>
-                                <a href="#" onclick="openRefereeToolkit(); return false;">
-                                    <span class="util-icon-badge" style="background:rgba(16,185,129,0.15);">🏁</span>
-                                    <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#10b981;">Sổ Tay Trọng Tài</span>
-                                        <span class="util-desc">Cẩm nang cho trọng tài</span>
+                                <a href="#sponsor" onclick="navigateToPage('sponsor'); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(251,191,36,0.12); text-decoration:none; border:1px solid rgba(251,191,36,0.3); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(251,191,36,0.3); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🤝</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#fbbf24; font-weight:800; font-size:13px; display:flex; align-items:center; gap:6px;">Đồng Hành Giải <span style="font-size:8px; background:#fbbf24; color:#0f172a; padding:1px 5px; border-radius:4px; font-weight:900;">HOT</span></span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Tài trợ & ủng hộ giải đấu</span>
                                     </span>
                                 </a>
                             </div>
 
-                            <!-- Column 2: ⚡ MATCHDAY & MEDIA -->
-                            <div style="display:flex; flex-direction:column; gap:5px;">
-                                <div style="font-size:11px; font-weight:900; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; border-bottom:1px solid rgba(56,189,248,0.2); padding-bottom:4px; font-family:var(--font-title);">
-                                    ⚡ MATCHDAY & MEDIA
+                            <!-- Column 2: ⚡ MATCHDAY, AI & VAR -->
+                            <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                                <div style="font-size:11px; font-weight:900; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; border-bottom:1.5px solid rgba(56,189,248,0.3); padding-bottom:4px; font-family:var(--font-title);">
+                                    ⚡ MATCHDAY, AI & VAR
                                 </div>
-                                <details style="background:rgba(255,255,255,0.03); border-radius:12px; overflow:hidden;">
-                                    <summary style="cursor:pointer; padding:9px 10px; color:#cbd5e1; font-weight:800; font-size:13px; list-style:none; display:flex; align-items:center; gap:10px; user-select:none;">
-                                        <span class="util-icon-badge" style="background:rgba(148,163,184,0.15);">🧰</span>
-                                        <span class="util-text-wrap">
-                                            <span class="util-title">Công cụ nâng cao</span>
-                                            <span class="util-desc">4 tiện ích thử nghiệm bổ sung</span>
-                                        </span>
-                                        <span style="font-size:10px; opacity:0.7; flex-shrink:0;">▾</span>
-                                    </summary>
-                                    <div style="display:flex; flex-direction:column; gap:5px; padding:2px 6px 8px;">
-                                        <a href="#" onclick="openAiMediaCenterModal(); return false;">
-                                            <span class="util-icon-badge" style="background:rgba(96,165,250,0.15);">🤖</span>
-                                            <span class="util-text-wrap">
-                                                <span class="util-title" style="color:#60a5fa;">AI Media Center <span style="font-size:9px; background:#3b82f6; color:#fff; padding:1px 6px; border-radius:6px; font-weight:900;">AI</span></span>
-                                                <span class="util-desc">Tạo nội dung truyền thông bằng AI</span>
-                                            </span>
-                                        </a>
-                                        <a href="#" onclick="openAudioCenterModal(); return false;">
-                                            <span class="util-icon-badge" style="background:rgba(236,72,153,0.15);">🎧</span>
-                                            <span class="util-text-wrap">
-                                                <span class="util-title" style="color:#ec4899;">Matchday Audio Center</span>
-                                                <span class="util-desc">Âm thanh không khí sân đấu</span>
-                                            </span>
-                                        </a>
-                                        <a href="#" onclick="openVarSimulatorModal(); return false;">
-                                            <span class="util-icon-badge" style="background:rgba(244,63,94,0.15);">🖥️</span>
-                                            <span class="util-text-wrap">
-                                                <span class="util-title" style="color:#f43f5e;">VAR Replay Simulator <span style="font-size:9px; background:#a855f7; color:#fff; padding:1px 6px; border-radius:6px; font-weight:900;">MÔ PHỎNG</span></span>
-                                                <span class="util-desc">Xem lại tình huống kiểu VAR (giải trí)</span>
-                                            </span>
-                                        </a>
-                                        <a href="#" onclick="openExportCenterModal(); return false;">
-                                            <span class="util-icon-badge" style="background:rgba(52,211,153,0.15);">📤</span>
-                                            <span class="util-text-wrap">
-                                                <span class="util-title" style="color:#34d399;">Export Center</span>
-                                                <span class="util-desc">Xuất dữ liệu giải đấu</span>
-                                            </span>
-                                        </a>
-                                    </div>
-                                </details>
+                                <a href="#" onclick="openAiMediaCenterModal(); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); text-decoration:none; border:1px solid rgba(255,255,255,0.08); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(96,165,250,0.2); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🤖</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#60a5fa; font-weight:800; font-size:13px; display:flex; align-items:center; gap:6px;">AI Media Hub <span style="font-size:8px; background:#3b82f6; color:#fff; padding:1px 5px; border-radius:4px; font-weight:900;">AI</span></span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Tạo bài viết truyền thông AI</span>
+                                    </span>
+                                </a>
+                                <a href="#" onclick="openVarSimulatorModal(); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); text-decoration:none; border:1px solid rgba(255,255,255,0.08); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(244,63,94,0.2); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🖥️</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#f43f5e; font-weight:800; font-size:13px; display:flex; align-items:center; gap:6px;">VAR Replay Simulator <span style="font-size:8px; background:#e11d48; color:#fff; padding:1px 5px; border-radius:4px; font-weight:900;">VAR</span></span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Xem lại tình huống kiểu VAR</span>
+                                    </span>
+                                </a>
+                                <a href="#" onclick="openAudioCenterModal(); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); text-decoration:none; border:1px solid rgba(255,255,255,0.08); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(236,72,153,0.2); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🎧</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#ec4899; font-weight:800; font-size:13px;">Matchday Audio DJ</span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Âm thanh còi / vuvuzela sân đấu</span>
+                                    </span>
+                                </a>
+                                <a href="#" onclick="openRefereeToolkit(); return false;" class="card-3d-tilt" style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); text-decoration:none; border:1px solid rgba(255,255,255,0.08); transition:all 0.3s ease;">
+                                    <span class="util-icon-badge" style="background:rgba(16,185,129,0.2); font-size:16px; flex-shrink:0; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center;">🏁</span>
+                                    <span class="util-text-wrap" style="min-width:0; flex:1;">
+                                        <span class="util-title" style="color:#10b981; font-weight:800; font-size:13px;">Sổ Tay Trọng Tài</span>
+                                        <span class="util-desc" style="font-size:11px; color:#94a3b8;">Luật thi đấu 5v5 chính thức</span>
+                                    </span>
+                                </a>
                             </div>
                         </div>
 
                         <!-- Footer: ● TRẠNG THÁI GIẢI -->
-                        <div id="megaMenuTournamentStatus" style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94a3b8;font-weight:700;">
-                            <div>● TRẠNG THÁI GIẢI: <span id="statusLabelText" style="color:#38bdf8;font-weight:900;">Chưa khởi tranh</span></div>
-                            <div id="statusMatchesText" style="color:#fbbf24;font-weight:900;">0 / 3 trận đã đấu</div>
+                        <div id="megaMenuTournamentStatus" style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:#94a3b8; font-weight:700; width:100%;">
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span class="pulse-live-badge" style="padding:2px 8px; font-size:9px;"><span class="dot"></span> REALTIME</span>
+                                <span>TRẠNG THÁI: <span id="statusLabelText" style="color:#38bdf8; font-weight:900;">Chưa khởi tranh</span></span>
+                            </div>
+                            <div id="statusMatchesText" style="color:#fbbf24; font-weight:900;">0 / 3 trận đã đấu</div>
                         </div>
                     </div>
 
@@ -4781,8 +5255,8 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         </div>
                         <div>
                             <div style="font-size:11px;font-weight:900;color:#fbbf24;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;" data-i18n="date_label">NGÀY THI ĐẤU CHÍNH THỨC</div>
-                            <div id="scheduleDate" style="font-size:15px;font-weight:900;color:#fff;font-family:var(--font-title);">Thứ Sáu, 07/08/2026</div>
-                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 17:00</div>
+                            <div id="scheduleDate" style="font-size:15px;font-weight:900;color:#fff;font-family:var(--font-title);" data-i18n="match_date_text">Thứ Sáu, 07/08/2026</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;" data-i18n="opening_time">⏰ Khai mạc từ 17:00</div>
                         </div>
                     </div>
 
@@ -4800,8 +5274,8 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                     <!-- Card 3: Bản Đồ Google Maps -->
                     <div style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(37,99,235,0.25));border:1.5px solid #3b82f6;border-radius:18px;padding:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px;box-shadow:0 8px 20px rgba(59,130,246,0.2);transition:transform 0.25s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="font-size:12px;font-weight:900;color:#93c5fd;text-transform:uppercase;letter-spacing:0.5px;">GPS DẪN ĐƯỜNG</div>
-                        <a href="https://maps.app.goo.gl/WcMGu8BE8Ufo3XYm7" target="_blank" class="map-btn" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:8px 18px;border-radius:12px;font-weight:900;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(59,130,246,0.5);">
+                        <div style="font-size:12px;font-weight:900;color:#93c5fd;text-transform:uppercase;letter-spacing:0.5px;" data-i18n="gps_guide">GPS DẪN ĐƯỜNG</div>
+                        <a href="https://maps.app.goo.gl/WcMGu8BE8Ufo3XYm7" target="_blank" class="map-btn" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:8px 18px;border-radius:12px;font-weight:900;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(59,130,246,0.5);" data-i18n="open_maps">
                             📍 MỞ GOOGLE MAPS DẪN ĐƯỜNG
                         </a>
                     </div>
@@ -4842,67 +5316,24 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <h2 data-i18n="standings_title">BẢNG <span>XẾP HẠNG</span></h2>
                 <div class="sub" data-i18n="standings_sub">Premium Standings</div>
             </div>
-            <div class="standings-premium" id="standingsPremium">
-                <!-- Render by JS -->
-            </div>
-        </div>
-
-        <!-- ===== 5b. TOP SCORERS ===== -->
-        <div class="container section-gap reveal" id="top-scorers">
-            <div class="section-header">
-                <div class="icon">⚽</div>
-                <h2 data-i18n="topscorers_title">VUA <span>PHÁ LƯỚI</span></h2>
-                <div class="sub" data-i18n="topscorers_sub">Top Scorers</div>
-            </div>
-            
-            <div id="topScorersPodium"></div>
-
-            <div class="card" style="overflow-x:auto;">
-                <table class="top-scorers-table" id="topScorersTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Cầu thủ</th>
-                            <th>Đội</th>
-                            <th>Bàn thắng</th>
-                            <th>Kiến tạo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="topScorersBody">
-                        <!-- Render by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ===== FAN PREDICTION GAME (DỰ ĐOÁN TỶ SỐ & MVP) ===== -->
+                   <!-- ===== FAN PREDICTION GAME (DỰ ĐOÁN TỶ SỐ & MVP) ===== -->
         <div class="container section-gap reveal" id="fan-prediction">
             <div class="section-header">
                 <div class="icon">🎯</div>
-                <h2>DỰ ĐOÁN TỶ SỐ <span>NHẬN QUÀ</span></h2>
+                <h2 data-i18n="pred_game_title">DỰ ĐOÁN TỶ SỐ <span>NHẬN QUÀ</span></h2>
                 <div class="sub">PTX Summer Cup Fan Prediction Game</div>
-            </div>
-            
-            <!-- Mode Switcher Toolbar -->
-            <div style="display:flex;justify-content:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
-                <button onclick="switchToPreMatchState(); return false;" style="background:rgba(56,189,248,0.18);color:#38bdf8;border:1.5px solid #38bdf8;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(56,189,248,0.25);">
-                    ⏳ KHÔI PHỤC CHẾ ĐỘ TRƯỚC TRẬN ĐẤU (0 TRẬN / 0 ĐIỂM)
-                </button>
-                <button onclick="resetSystemDataToOfficialDefaults(); return false;" style="background:rgba(251,191,36,0.18);color:#fbbf24;border:1.5px solid #fbbf24;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(251,191,36,0.25);">
-                    ⚽ NẠP KẾT QUẢ ĐÃ THI ĐẤU (DEMO RESULTS)
-                </button>
             </div>
             
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;">
                 <!-- Prediction Form Card -->
                 <div class="card" style="padding:24px;background:linear-gradient(145deg,#0f172a,#1e293b);border:1.5px solid rgba(249,115,22,0.4);border-radius:20px;">
                     <div style="font-size:18px;font-weight:900;color:var(--ptx-orange);font-family:var(--font-title);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                        <span>🎯 GỬI THẺ DỰ ĐOÁN CÁ NHÂN</span>
+                        <span data-i18n="pred_game_card_title">🎯 GỬI THẺ DỰ ĐOÁN CÁ NHÂN</span>
                     </div>
                     
                     <div style="margin-bottom:16px;">
-                        <label style="font-size:12px;font-weight:700;color:#cbd5e1;display:block;margin-bottom:6px;">Họ tên / Nickname CĐV (*):</label>
-                        <input type="text" id="predFanName" placeholder="Ví dụ: Nguyễn Văn A (Phòng IT)..." style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
+                        <label style="font-size:12px;font-weight:700;color:#cbd5e1;display:block;margin-bottom:6px;" data-i18n="pred_fan_name_label">Họ tên / Nickname CĐV (*):</label>
+                        <input type="text" id="predFanName" placeholder="Ví dụ: Superman – Spider-Man – Iron Man – Batman..." data-i18n-ph="pred_fan_name_ph" style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
                     </div>
 
                     <!-- Match Predictions -->
@@ -4943,7 +5374,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                     <!-- MVP Selection -->
                     <div style="margin-bottom:16px;">
-                        <label style="font-size:12px;font-weight:700;color:#cbd5e1;display:block;margin-bottom:6px;">⭐ Dự đoán Cầu thủ MVP xuất sắc nhất:</label>
+                        <label style="font-size:12px;font-weight:700;color:#cbd5e1;display:block;margin-bottom:6px;" data-i18n="pred_mvp_pick">⭐ Dự đoán Cầu thủ MVP xuất sắc nhất:</label>
                         <select id="predMvpSelect" style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
                             <!-- Populated by JS -->
                         </select>
@@ -4951,18 +5382,34 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                     <!-- Golden Boot Selection -->
                     <div style="margin-bottom:16px;">
-                        <label style="font-size:12px;font-weight:700;color:#fbbf24;display:block;margin-bottom:6px;">⚽ Dự đoán Vua phá lưới (Golden Boot):</label>
+                        <label style="font-size:12px;font-weight:700;color:#fbbf24;display:block;margin-bottom:6px;" data-i18n="pred_gb_pick">⚽ Dự đoán Vua phá lưới (Golden Boot):</label>
                         <select id="predGoldenBootSelect" style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #fbbf24;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
                             <!-- Populated by JS -->
                         </select>
                     </div>
 
                     <!-- AI Auto Suggestion Button -->
-                    <button onclick="aiAutoSuggestPrediction(); return false;" style="width:100%;background:rgba(124,58,237,0.25);color:#c084fc;border:1px solid rgba(192,132,252,0.5);padding:10px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <button onclick="aiAutoSuggestPrediction(); return false;" style="width:100%;background:rgba(124,58,237,0.25);color:#c084fc;border:1px solid rgba(192,132,252,0.5);padding:10px;border-radius:12px;font-size:12px;font-weight:800;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;" data-i18n="pred_ai_auto_btn">
                         🤖 AI GỢI Ý TỶ SỐ & VUA PHÁ LƯỚI TỰ ĐỘNG
                     </button>
 
-                    <button onclick="submitFanPrediction()" style="width:100%;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border:none;padding:12px;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font-title);letter-spacing:1px;box-shadow:0 6px 20px rgba(249,115,22,0.4);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    <button onclick="submitFanPrediction()" style="width:100%;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border:none;padding:12px;border-radius:12px;font-size:14px;font-weight:900;cursor:pointer;font-family:var(--font-title);letter-spacing:1px;box-shadow:0 6px 20px rgba(249,115,22,0.4);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'" data-i18n="pred_submit_btn">
+                        🎯 XÁC NHẬN DỰ ĐOÁN
+                    </button>
+                    
+                    <div id="myPredictionTicketContainer" style="margin-top:16px;"></div>
+                </div>
+
+                <!-- Leaderboard Card -->
+                <div class="card" style="padding:24px;background:linear-gradient(145deg,#0f172a,#1e293b);border:1px solid rgba(255,255,255,0.1);border-radius:20px;">
+                    <div style="font-size:18px;font-weight:900;color:#fbbf24;font-family:var(--font-title);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+                        <span data-i18n="pred_board_title">🏆 BẢNG XẾP HẠNG THÀNH DỰ ĐOÁN</span>
+                        <span style="font-size:11px;font-weight:600;color:#94a3b8;background:rgba(255,255,255,0.06);padding:3px 10px;border-radius:12px;">Cập nhật tự động</span>
+                    </div>
+
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:14px;background:rgba(251,191,36,0.08);padding:8px 12px;border-radius:8px;border-left:3px solid #fbbf24;line-height:1.5;" data-i18n="pred_rules_box">
+                        Quy tắc tính điểm: Đúng tỷ số (+3đ) • Đúng đội thắng (+1đ) • Đúng MVP (+5đ) • Đúng Vua phá lưới (+6đ).
+                    </div>"this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                         🎯 XÁC NHẬN DỰ ĐOÁN
                     </button>
                     
@@ -5178,7 +5625,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG GIỚI THIỆU ==================== -->
     <section id="page-about" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="about_hero">GIỚI THIỆU</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="about_hero_sub">Tìm hiểu về giải đấu PTX Summer Cup</p></div>
         </div>
         <div class="container section-gap">
@@ -5465,7 +5912,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG ĐIỀU LỆ (chi tiết) ==================== -->
     <section id="page-rules" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="rules_hero">ĐIỀU LỆ GIẢI</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="rules_hero_sub">Quy định và luật thi đấu</p></div>
         </div>
         <div class="container section-gap">
@@ -5475,7 +5922,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG LIÊN HỆ ==================== -->
     <section id="page-contact" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="contact_hero">LIÊN HỆ</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="contact_hero_sub">Gửi thông tin cho Ban tổ chức</p></div>
         </div>
         <div class="container section-gap">
@@ -5502,7 +5949,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG BẢNG XẾP HẠNG ==================== -->
     <section id="page-standings" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="standings_hero">BẢNG XẾP HẠNG</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="standings_hero_sub">Thứ hạng các đội bóng</p></div>
         </div>
         <div class="container section-gap">
@@ -5517,16 +5964,16 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG ĐỘI BÓNG ==================== -->
     <section id="page-teams" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="teams_hero">ĐỘI BÓNG</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="teams_hero_sub">Danh sách 3 Đội bóng & Sơ đồ ra sân 5v5 FIFA Tùy chỉnh</p></div>
         </div>
         <div class="container section-gap">
             <!-- Team View Sub-Tabs: 1. Khung Đội hình 3 Đội | 2. Khung 5v5 FIFA Pitch -->
             <div style="display:flex;justify-content:center;gap:12px;margin-bottom:32px;flex-wrap:wrap;">
-                <button id="btnTeamTabRoster" class="subtab-btn active" onclick="switchTeamSubTab('roster')">
+                <button id="btnTeamTabRoster" class="subtab-btn active" onclick="switchTeamSubTab('roster')" data-i18n="tab_roster">
                     📋 1. DANH SÁCH 3 ĐỘI HÌNH (8 CẦU THỦ/ĐỘI)
                 </button>
-                <button id="btnTeamTabPitch" class="subtab-btn" onclick="switchTeamSubTab('pitch')">
+                <button id="btnTeamTabPitch" class="subtab-btn" onclick="switchTeamSubTab('pitch')" data-i18n="tab_pitch">
                     🏟️ 2. ĐỘI HÌNH RA SÂN 5V5 FIFA (SÂN TÁC THUẬT)
                 </button>
             </div>
@@ -5542,7 +5989,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <div style="display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;max-width:900px;background:rgba(15,23,42,0.9);padding:18px 24px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 10px 30px rgba(0,0,0,0.5);">
                     <!-- Row 1: Chọn Đội -->
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;">
-                        <span style="color:#cbd5e1;font-size:13px;font-weight:700;">Chọn Đội:</span>
+                        <span style="color:#cbd5e1;font-size:13px;font-weight:700;" data-i18n="tactics_select_team">Chọn Đội:</span>
                         <button onclick="selectPitchTeam('p')" id="btnPitchTeamP" style="padding:8px 18px;border-radius:20px;border:2px solid #3b82f6;background:#1e3a8a;color:#fff;font-weight:800;cursor:pointer;font-size:13px;">🦅 TEAM P</button>
                         <button onclick="selectPitchTeam('t')" id="btnPitchTeamT" style="padding:8px 18px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,0.15);color:#fca5a5;font-weight:800;cursor:pointer;font-size:13px;">🐯 TEAM T</button>
                         <button onclick="selectPitchTeam('x')" id="btnPitchTeamX" style="padding:8px 18px;border-radius:20px;border:1px solid #f59e0b;background:rgba(245,158,11,0.15);color:#fcd34d;font-weight:800;cursor:pointer;font-size:13px;">🐟 TEAM X</button>
@@ -5551,7 +5998,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     <!-- Row 2: Chọn Sơ Đồ & AI Gợi Ý -->
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;width:100%;">
                         <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:nowrap;">
-                            <span style="color:#cbd5e1;font-size:13px;font-weight:700;white-space:nowrap;">Sơ đồ:</span>
+                            <span style="color:#cbd5e1;font-size:13px;font-weight:700;white-space:nowrap;" data-i18n="tactics_formation">Sơ đồ:</span>
                             <select id="pitchFormationSelect" onchange="changePitchFormation(this.value)" style="max-width:360px;background:#0f172a;color:#fff;border:1px solid #3b82f6;padding:8px 14px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);outline:none;text-overflow:ellipsis;">
                                 <option value="1-2-1">🔷 1-2-1 (Kim cương - Cân bằng Futsal)</option>
                                 <option value="2-2">⬛ 2-2 (Vuông cân bằng - Phòng ngự phản công)</option>
@@ -5616,7 +6063,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG CẦU THỦ ==================== -->
     <section id="page-players" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="players_hero">CẦU THỦ</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="players_hero_sub">Danh sách 24 Thẻ FIFA Cầu Thủ (Đồng bộ Trang chủ)</p></div>
         </div>
         <div class="container section-gap">
@@ -5667,7 +6114,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG THƯ VIỆN ==================== -->
     <section id="page-gallery" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="gallery_hero">THƯ VIỆN ẢNH</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="gallery_hero_sub">Hình ảnh đội bóng và khoảnh khắc đẹp PTX Summer Cup 2026</p></div>
         </div>
         <div class="container section-gap">
@@ -5685,7 +6132,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG VINH DANH ==================== -->
     <section id="page-hall-of-fame" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="hof_hero">HALL OF FAME</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="hof_hero_sub">Vinh danh nhà vô địch qua các mùa giải (2025–2030)</p></div>
         </div>
         <div class="container section-gap">
@@ -5923,7 +6370,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
     <!-- ==================== TRANG QUẢN TRỊ (FIFA PRO ADMIN DASHBOARD) ==================== -->
     <section id="page-admin" class="page">
-        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
+        <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;">
             <div class="hero-content">
                 <h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="admin_hero">QUẢN TRỊ FIFA PRO</h1>
                 <p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="admin_hero_sub">Trung tâm Điều hành & Bảo mật Cập nhật Kết quả Live</p>
@@ -6966,7 +7413,55 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 topscorers_sub: 'Top Scorers',
                 nav_teams_players: '👥 ĐỘI & CẦU THỦ ▾',
                 nav_prediction: '🎯 DỰ ĐOÁN',
-                nav_utilities: '⚡ TIỆN ÍCH ▾'
+                nav_explore: '📌 KHÁM PHÁ ▾',
+                nav_livestream: '📺 LIVESTREAM',
+                nav_vip_ticket: '🎟️ VÉ VÀNG VIP',
+                nav_admin: '🛡️ QUẢN TRỊ ADMIN',
+                nav_utilities: '⚡ TIỆN ÍCH ▾',
+                gps_guide: 'GPS DẪN ĐƯỜNG',
+                open_maps: '📍 MỞ GOOGLE MAPS DẪN ĐƯỜNG',
+                match_date_text: 'Thứ Sáu, 07/08/2026',
+                opening_time: '⏰ Khai mạc 13:30',
+                pred_score_btn: '🎯 Dự đoán tỷ số',
+                livestream_4k_btn: '📺 Livestream 4K',
+                prematch_standings_title: '🏆 BẢNG XẾP HẠNG TRƯỚC KHAI MẠC (07/08/2026)',
+                pts_label: 'ĐIỂM SỐ',
+                gd_label: 'HIỆU SỐ',
+                win_prob_label: 'XÁC SUẤT VÔ ĐỊCH AI',
+                equal_prob: 'CÂN BẰNG 33.3%',
+                tbl_rank: 'HẠNG',
+                tbl_team: 'ĐỘI BÓNG',
+                tbl_p: 'TR',
+                tbl_w: 'W',
+                tbl_d: 'D',
+                tbl_l: 'L',
+                tbl_gd: 'HS',
+                tbl_pts: 'ĐIỂM',
+                not_played_yet: 'Chưa thi đấu',
+                chart_h2h_title: '📊 BIỂU ĐỒ SO SÁNH ĐIỂM SỐ & TỔNG BÀN THẮNG',
+                no_result_yet: '⏳ Chưa có kết quả',
+                tab_roster: '📋 1. DANH SÁCH 3 ĐỘI HÌNH (8 CẦU THỦ/ĐỘI)',
+                tab_pitch: '⚡ 2. ĐỘI HÌNH RA SÂN 5v5 FIFA (SÂN TÁC THUẬT)',
+                captain_label: 'Đội trưởng:',
+                badge_starter: 'ĐỘI HÌNH CHÍNH',
+                badge_sub: 'DỰ BỊ',
+                tactics_select_team: 'Chọn Đội:',
+                tactics_formation: 'Sơ đồ:',
+                tactics_auto_ai: '🤖 AI GỢI Ý ĐỘI HÌNH TỐI ƯU',
+                tactics_subs_title: '📋 CẦU THỦ DỰ BỊ (3 THÀNH VIÊN BẢNG GHẾ)',
+                tactics_swap: '🔄 Thay vào sân',
+                pred_game_title: 'DỰ ĐOÁN TỶ SỐ NHẬN QUÀ',
+                pred_game_card_title: '🎯 GỬI THẺ DỰ ĐOÁN CÁ NHÂN',
+                pred_fan_name_label: 'Họ tên / Nickname CĐV (*):',
+                pred_fan_name_ph: 'Ví dụ: Superman – Spider-Man – Iron Man – Batman...',
+                pred_mvp_pick: '⭐ Dự đoán Cầu thủ MVP xuất sắc nhất:',
+                pred_gb_pick: '⚽ Dự đoán Vua phá lưới (Golden Boot):',
+                pred_ai_auto_btn: '🤖 AI GỢI Ý TỶ SỐ & VUA PHÁ LƯỚI TỰ ĐỘNG',
+                pred_submit_btn: '🎯 XÁC NHẬN DỰ ĐOÁN',
+                pred_board_title: '🏆 BẢNG XẾP HẠNG THÀNH DỰ ĐOÁN',
+                pred_rules_box: 'Quy tắc tính điểm: Đúng tỷ số (+3đ) • Đúng đội thắng (+1đ) • Đúng MVP (+5đ) • Đúng Vua phá lưới (+6đ).',
+                draw_label: 'HÒA',
+                ai_pred_rate_label: '🤖 DỰ ĐOÁN TỈ LỆ AI:'
             },
             en: {
                 home_nav: 'Home',
@@ -6980,7 +7475,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 hof_nav: 'Hall of Fame',
                 rules_nav: 'Rules',
                 contact_nav: 'Contact',
-                admin_nav: 'Admin',
+                admin_nav: 'Admin Center',
                 committee_staff_title: 'LOGISTICS & MEDIA COMMITTEE',
                 standings_hero: 'PRO STANDINGS',
                 standings_hero_sub: 'Rankings & Championship Battle 2026',
@@ -6994,7 +7489,55 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 hof_hero_sub: 'Championship History & Individual Awards',
                 nav_teams_players: '👥 TEAMS & PLAYERS ▾',
                 nav_prediction: '🎯 PREDICTION',
+                nav_explore: '📌 EXPLORE ▾',
+                nav_livestream: '📺 LIVESTREAM',
+                nav_vip_ticket: '🎟️ VIP TICKET',
+                nav_admin: '🛡️ ADMIN CENTER',
                 nav_utilities: '⚡ UTILITIES ▾',
+                gps_guide: 'GPS NAVIGATION',
+                open_maps: '📍 OPEN GOOGLE MAPS DIRECTIONS',
+                match_date_text: 'Friday, Aug 07, 2026',
+                opening_time: '⏰ Opening 13:30',
+                pred_score_btn: '🎯 Predict score',
+                livestream_4k_btn: '📺 4K Stream',
+                prematch_standings_title: '🏆 PRE-OPENING STANDINGS (08/07/2026)',
+                pts_label: 'POINTS',
+                gd_label: 'GOAL DIFF',
+                win_prob_label: 'AI WIN PROBABILITY',
+                equal_prob: 'BALANCED 33.3%',
+                tbl_rank: 'RANK',
+                tbl_team: 'TEAM',
+                tbl_p: 'P',
+                tbl_w: 'W',
+                tbl_d: 'D',
+                tbl_l: 'L',
+                tbl_gd: 'GD',
+                tbl_pts: 'PTS',
+                not_played_yet: 'Not Played Yet',
+                chart_h2h_title: '📊 POINTS & GOALS COMPARISON CHART',
+                no_result_yet: '⏳ Pending Results',
+                tab_roster: '📋 1. SQUAD ROSTER (8 PLAYERS/TEAM)',
+                tab_pitch: '⚡ 2. 5v5 TACTICAL PITCH',
+                captain_label: 'Captain:',
+                badge_starter: 'STARTER',
+                badge_sub: 'SUBSTITUTE',
+                tactics_select_team: 'Select Team:',
+                tactics_formation: 'Formation:',
+                tactics_auto_ai: '🤖 AI OPTIMAL FORMATION',
+                tactics_subs_title: '📋 BENCH PLAYERS (3 SUBSTITUTES)',
+                tactics_swap: '🔄 Sub In',
+                pred_game_title: 'PREDICT SCORES & WIN PRIZES',
+                pred_game_card_title: '🎯 SUBMIT YOUR PREDICTION CARD',
+                pred_fan_name_label: 'Fan Name / Nickname (*):',
+                pred_fan_name_ph: 'E.g.: Superman – Spider-Man – Iron Man – Batman...',
+                pred_mvp_pick: '⭐ Predict MVP Player:',
+                pred_gb_pick: '⚽ Predict Golden Boot Winner:',
+                pred_ai_auto_btn: '🤖 AI AUTO-SUGGEST PREDICTION',
+                pred_submit_btn: '🎯 CONFIRM PREDICTION',
+                pred_board_title: '🏆 FAN PREDICTION LEADERBOARD',
+                pred_rules_box: 'Scoring Rules: Exact score (+3pts) • Winner (+1pt) • MVP (+5pts) • Golden Boot (+6pts).',
+                draw_label: 'DRAW',
+                ai_pred_rate_label: '🤖 AI PREDICTION ODDS:',
                 teams_nav: 'Teams',
                 players_nav: 'Players',
                 stats_nav: 'Stats',
@@ -7177,11 +7720,23 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     el.innerHTML = translations[lang][key];
                 }
             });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (translations[lang] && translations[lang][key] !== undefined) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
             localStorage.setItem('lang', lang);
             document.querySelectorAll('.lang-switch button').forEach(btn => {
                 const bLang = btn.getAttribute ? btn.getAttribute('data-lang') : (btn.dataset ? btn.dataset.lang : null);
                 btn.classList.toggle('active', bLang === lang);
             });
+
+            if (typeof renderStandingsPageTable === 'function') renderStandingsPageTable();
+            if (typeof renderMatches === 'function') renderMatches();
+            if (typeof renderStandings === 'function') renderStandings();
+            if (typeof renderTeamsPageRoster === 'function') renderTeamsPageRoster();
+            if (typeof renderTacticsPitch === 'function') renderTacticsPitch();
         }
 
         document.querySelectorAll('.lang-switch button').forEach(btn => {
@@ -7420,6 +7975,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     if (label) label.innerText = 'Dark';
                 }
             }
+            if (typeof drawTeamRadarCharts === 'function') {
+                try { drawTeamRadarCharts(); } catch(e) {}
+            }
         }
 
         const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -7537,10 +8095,12 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             if (isLive) card.classList.add('live');
             if (isFinished && result) card.classList.add('finished');
 
+            const tr = (k, defaultVal) => (window.translations && window.translations[currentLang] && window.translations[currentLang][k] !== undefined) ? window.translations[currentLang][k] : defaultVal;
+
             let statusHtml = '';
-            if (isLive) statusHtml = `<span class="match-status live" data-i18n="live_status">🔥 LIVE</span>`;
-            else if (isFinished) statusHtml = `<span class="match-status finished" data-i18n="finished_status">Đã kết thúc</span>`;
-            else statusHtml = `<span class="match-status" data-i18n="upcoming_status">Sắp diễn ra</span>`;
+            if (isLive) statusHtml = `<span class="match-status live" data-i18n="live_status">${tr('live_status', '🔥 LIVE')}</span>`;
+            else if (isFinished) statusHtml = `<span class="match-status finished" data-i18n="finished_status">${tr('finished_status', 'Finished')}</span>`;
+            else statusHtml = `<span class="match-status" data-i18n="upcoming_status">${tr('upcoming_status', 'Upcoming')}</span>`;
 
             let datetimeHtml = '';
             if (!isFinished) {
@@ -7643,10 +8203,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     s = diff % 60;
                 countdownHtml = `
                     <div class="match-countdown">
-                        <div class="cd-item"><span class="num">${String(d).padStart(2,'0')}</span><span class="label" data-i18n="days">Ngày</span></div>
-                        <div class="cd-item"><span class="num">${String(h).padStart(2,'0')}</span><span class="label" data-i18n="hours">Giờ</span></div>
-                        <div class="cd-item"><span class="num">${String(m).padStart(2,'0')}</span><span class="label" data-i18n="minutes">Phút</span></div>
-                        <div class="cd-item"><span class="num">${String(s).padStart(2,'0')}</span><span class="label" data-i18n="seconds">Giây</span></div>
+                        <div class="cd-item"><span class="num">${String(d).padStart(2,'0')}</span><span class="label" data-i18n="days">${tr('days','Days')}</span></div>
+                        <div class="cd-item"><span class="num">${String(h).padStart(2,'0')}</span><span class="label" data-i18n="hours">${tr('hours','Hours')}</span></div>
+                        <div class="cd-item"><span class="num">${String(m).padStart(2,'0')}</span><span class="label" data-i18n="minutes">${tr('minutes','Mins')}</span></div>
+                        <div class="cd-item"><span class="num">${String(s).padStart(2,'0')}</span><span class="label" data-i18n="seconds">${tr('seconds','Secs')}</span></div>
                     </div>
                 `;
             }
@@ -7663,12 +8223,14 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             const aiProbHome = match.id === 1 ? 45 : (match.id === 2 ? 40 : 38);
             const aiProbDraw = match.id === 1 ? 25 : (match.id === 2 ? 30 : 24);
             const aiProbAway = 100 - aiProbHome - aiProbDraw;
+            const drawText = tr('draw_label', 'HÒA');
+            const aiPredLabel = tr('ai_pred_rate_label', '🤖 DỰ ĐOÁN TỈ LỆ AI:');
 
             const aiProbHtml = `
                 <div style="margin-top:14px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 14px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:#94a3b8;margin-bottom:6px;">
-                        <span>🤖 DỰ ĐOÁN TỈ LỆ AI:</span>
-                        <span style="color:#60a5fa;">${homeTeam.name} ${aiProbHome}% - ${aiProbDraw}% HÒA - ${aiProbAway}% ${awayTeam.name}</span>
+                        <span>${aiPredLabel}</span>
+                        <span style="color:#60a5fa;">${homeTeam.name} ${aiProbHome}% - ${aiProbDraw}% ${drawText} - ${aiProbAway}% ${awayTeam.name}</span>
                     </div>
                     <div style="height:6px;width:100%;background:rgba(255,255,255,0.1);border-radius:6px;overflow:hidden;display:flex;">
                         <div style="width:${aiProbHome}%;background:${homeTeam.color};height:100%;"></div>
@@ -7680,11 +8242,11 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
             const actionsHtml = `
                 <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center;">
-                    <button onclick="openAiGrowthModal(); return false;" style="flex:1;min-width:110px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.4);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-                        🎯 Dự đoán tỷ số
+                    <button onclick="openAiGrowthModal(); return false;" style="flex:1;min-width:110px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.4);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;" data-i18n="pred_score_btn">
+                        ${tr('pred_score_btn', '🎯 Dự đoán tỷ số')}
                     </button>
-                    <button onclick="openLiveStreamHubModal(); return false;" style="flex:1;min-width:110px;background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-                        📺 Livestream 4K
+                    <button onclick="openLiveStreamHubModal(); return false;" style="flex:1;min-width:110px;background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.4);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;" data-i18n="livestream_4k_btn">
+                        ${tr('livestream_4k_btn', '📺 Livestream 4K')}
                     </button>
                 </div>
             `;
@@ -8445,6 +9007,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             });
 
             // Render Bench Players Below Pitch
+            const tr = (k, defaultVal) => (window.translations && window.translations[currentLang] && window.translations[currentLang][k] !== undefined) ? window.translations[currentLang][k] : defaultVal;
+            const swapBtnText = tr('tactics_swap', '🔄 Thay vào sân');
+
             benchPlayers.forEach(p => {
                 const benchCard = document.createElement('div');
                 benchCard.style.display = 'flex';
@@ -8461,11 +9026,11 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                         <img src="${p.avatar}" alt="${p.name}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid ${team.color};">
                         <div>
                             <div style="font-size:13px;font-weight:700;color:#fff;">${p.name}</div>
-                            <div style="font-size:11px;color:#94a3b8;">Vị trí: <strong style="color:#cbd5e1">${p.position}</strong> • ⚽ ${p.goals} 🎯 ${p.assists}</div>
+                            <div style="font-size:11px;color:#94a3b8;">POS: <strong style="color:#cbd5e1">${p.position}</strong> • ⚽ ${p.goals} 🎯 ${p.assists}</div>
                         </div>
                     </div>
                     <button onclick="openSubstitutionModalById(${p.id})" style="background:rgba(59,130,246,0.25);color:#60a5fa;border:1px solid rgba(59,130,246,0.5);font-size:11px;font-weight:900;padding:7px 14px;border-radius:10px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='#3b82f6';this.style.color='#fff';" onmouseout="this.style.background='rgba(59,130,246,0.25)';this.style.color='#60a5fa';">
-                        🔄 Thay vào sân
+                        ${swapBtnText}
                     </button>
                 `;
 
@@ -8988,10 +9553,16 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 teamCol.style.borderRadius = '16px';
                 teamCol.style.boxShadow = `0 10px 30px rgba(0,0,0,0.5)`;
 
+                const tr = (k, defaultVal) => (window.translations && window.translations[currentLang] && window.translations[currentLang][k] !== undefined) ? window.translations[currentLang][k] : defaultVal;
+
                 let playersHtml = players.map(p => {
                     const isCaptain = (p.name === team.captain || p.name === 'Anh Trương' && teamId==='p' || p.name === 'Minh Thế' && teamId==='t' || p.name === 'Đình Huy' && teamId==='x');
                     const starters = pitchStarters[teamId] || [];
                     const isStarter = starters.includes(p.id);
+
+                    const starterTag = tr('badge_starter', 'ĐỘI HÌNH CHÍNH');
+                    const subTag = tr('badge_sub', 'DỰ BỊ');
+                    const captainTag = tr('captain_label', 'Đội trưởng:');
 
                     return `
                         <div class="player-roster-item" onclick="openPlayerModalById(${p.id})" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:${isStarter ? 'rgba(34,197,94,0.06)' : 'rgba(255,255,255,0.03)'};border:1px solid ${isStarter ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.08)'};border-radius:10px;cursor:pointer;transition:all 0.2s ease;">
@@ -8999,12 +9570,12 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                                 <img src="${p.avatar}" alt="${p.name}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${team.color};box-shadow:0 2px 8px rgba(0,0,0,0.4);">
                                 <div>
                                     <div style="font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;">
-                                        ${isCaptain ? '<span style="color:#fbbf24;font-size:13px;" title="Đội trưởng">👑</span>' : ''}
+                                        ${isCaptain ? `<span style="color:#fbbf24;font-size:13px;" title="${captainTag}">👑</span>` : ''}
                                         <span style="${isCaptain ? 'color:#fbbf24;font-weight:800;' : ''}">${p.name}</span>
                                     </div>
                                     <div style="font-size:11px;color:#94a3b8;margin-top:2px;display:flex;align-items:center;gap:6px;">
-                                        <span>Vị trí: <strong style="color:#cbd5e1">${p.position}</strong></span>
-                                        ${isStarter ? '<span style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟢 ĐỘI HÌNH CHÍNH</span>' : '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟡 DỰ BỊ</span>'}
+                                        <span>POS: <strong style="color:#cbd5e1">${p.position}</strong></span>
+                                        ${isStarter ? `<span style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟢 ${starterTag}</span>` : `<span style="background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟡 ${subTag}</span>`}
                                     </div>
                                 </div>
                             </div>
@@ -9080,14 +9651,15 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     const pas = Math.min(99, 68 + p.assists * 7 + (p.position === 'MF' ? 12 : 5));
                     const phy = Math.min(99, 74 + (p.position === 'DF' || p.position === 'GK' ? 14 : 8) + p.mvp * 4);
 
+                    const cardIdFormatted = p.id < 10 ? '0' + p.id : p.id;
                     card.innerHTML = `
                         <div class="rating">${rating}</div>
-                        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.5);font-family:var(--font-title);letter-spacing:0.5px;z-index:5;white-space:nowrap;">#${p.number} • ${p.position}</div>
+                        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.4);font-family:var(--font-title);letter-spacing:0.5px;z-index:5;white-space:nowrap;">#${cardIdFormatted} • ${p.position}</div>
                         <div class="avatar-container">
                             <img src="${p.avatar}" class="avatar" alt="${p.name}">
                         </div>
                         <div class="p-name">${isCaptain ? '👑 ' : ''}${p.name}</div>
-                        <div class="p-pos">${team.fullName} • Áo số #${p.number}</div>
+                        <div class="p-pos">${team.fullName} • Vị trí ${p.position}</div>
                         
                         <div class="p-stats-grid">
                             <div class="p-stat-item"><span class="lbl">TỐC</span><span class="val">${pac}</span></div>
@@ -9619,10 +10191,13 @@ function renderGallery() {
             const leaderTeam = teams[0] ? TEAMS_DATA[teams[0].id] : null;
             const leaderObj = teams[0] ? teams[0].obj : null;
 
+            const tr = (k, defaultVal) => (window.translations && window.translations[currentLang] && window.translations[currentLang][k] !== undefined) ? window.translations[currentLang][k] : defaultVal;
+
             const isPreMatch = (leaderObj && leaderObj.played === 0);
             const aiWinOdds = isPreMatch ? [33.3, 33.3, 33.3] : [68, 22, 10];
+            const notPlayedStr = tr('not_played_yet', 'Chưa thi đấu');
             const formBadgesList = isPreMatch 
-                ? ['<span style="color:#94a3b8;font-weight:700;">⏳ Chưa thi đấu</span>', '<span style="color:#94a3b8;font-weight:700;">⏳ Chưa thi đấu</span>', '<span style="color:#94a3b8;font-weight:700;">⏳ Chưa thi đấu</span>']
+                ? [`<span style="color:#94a3b8;font-weight:700;">⏳ ${notPlayedStr}</span>`, `<span style="color:#94a3b8;font-weight:700;">⏳ ${notPlayedStr}</span>`, `<span style="color:#94a3b8;font-weight:700;">⏳ ${notPlayedStr}</span>`]
                 : [
                     '<span style="color:#22c55e;font-weight:900;">🟢 W</span> <span style="color:#eab308;font-weight:900;">🟡 D</span>',
                     '<span style="color:#eab308;font-weight:900;">🟡 D</span> <span style="color:#eab308;font-weight:900;">🟡 D</span>',
@@ -9636,8 +10211,8 @@ function renderGallery() {
                 const spotlight = document.createElement('div');
                 spotlight.style.cssText = 'background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(15,23,42,0.9));border:2px solid rgba(251,191,36,0.5);border-radius:20px;padding:18px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;box-shadow:0 10px 30px rgba(251,191,36,0.15);';
                 
-                const titleText = isPreMatch ? '🏟️ BẢNG XẾP HẠNG TRƯỚC KHAI MẠC (07/08/2026)' : '🏆 ĐỘI DẪN ĐẦU BẢNG XẾP HẠNG REALTIME';
-                const statusBadge = isPreMatch ? 'CÂN BẰNG 33.3% ⚖️' : '68% 🥇';
+                const titleText = isPreMatch ? tr('prematch_standings_title', '🏆 BẢNG XẾP HẠNG TRƯỚC KHAI MẠC (07/08/2026)') : '🏆 ĐỘI DẪN ĐẦU BẢNG XẾP HẠNG REALTIME';
+                const statusBadge = isPreMatch ? (tr('equal_prob', 'CÂN BẰNG 33.3%') + ' ⚖️') : '68% 🥇';
 
                 spotlight.innerHTML = `
                     <div style="display:flex;align-items:center;gap:14px;">
@@ -9650,11 +10225,11 @@ function renderGallery() {
                         </div>
                     </div>
                     <div style="display:flex;gap:16px;align-items:center;background:rgba(0,0,0,0.4);padding:8px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);">
-                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">ĐIỂM SỐ</div><div style="font-size:16px;font-weight:900;color:#fbbf24;">${leaderObj.pts} ĐIỂM</div></div>
+                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">${tr('pts_label', 'ĐIỂM SỐ')}</div><div style="font-size:16px;font-weight:900;color:#fbbf24;">${leaderObj.pts} ${tr('tbl_pts', 'ĐIỂM')}</div></div>
                         <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);"></div>
-                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">HIỆU SỐ</div><div style="font-size:16px;font-weight:900;color:#4ade80;">${leaderObj.gd > 0 ? '+' + leaderObj.gd : leaderObj.gd}</div></div>
+                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">${tr('gd_label', 'HIỆU SỐ')}</div><div style="font-size:16px;font-weight:900;color:#4ade80;">${leaderObj.gd > 0 ? '+' + leaderObj.gd : leaderObj.gd}</div></div>
                         <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);"></div>
-                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">XÁC SUẤT VÔ ĐỊCH AI</div><div style="font-size:16px;font-weight:900;color:#60a5fa;">${statusBadge}</div></div>
+                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">${tr('win_prob_label', 'XÁC SUẤT VÔ ĐỊCH AI')}</div><div style="font-size:16px;font-weight:900;color:#60a5fa;">${statusBadge}</div></div>
                     </div>
                 `;
                 container.appendChild(spotlight);
@@ -9664,14 +10239,14 @@ function renderGallery() {
             const header = document.createElement('div');
             header.className = 'std-page-header';
             header.innerHTML = `
-                <span>HẠNG</span>
-                <span>ĐỘI BÓNG</span>
-                <span>TR</span>
-                <span>W</span>
-                <span>D</span>
-                <span>L</span>
-                <span>HS</span>
-                <span>ĐIỂM</span>
+                <span>${tr('tbl_rank', 'HẠNG')}</span>
+                <span>${tr('tbl_team', 'ĐỘI BÓNG')}</span>
+                <span>${tr('tbl_p', 'TR')}</span>
+                <span>${tr('tbl_w', 'W')}</span>
+                <span>${tr('tbl_d', 'D')}</span>
+                <span>${tr('tbl_l', 'L')}</span>
+                <span>${tr('tbl_gd', 'HS')}</span>
+                <span>${tr('tbl_pts', 'ĐIỂM')}</span>
             `;
             container.appendChild(header);
 
@@ -9684,7 +10259,7 @@ function renderGallery() {
                 const gdStr = o.gd > 0 ? '+' + o.gd : '' + o.gd;
                 const ptsColor = idx === 0 ? '#fbbf24' : idx === 1 ? '#94a3b8' : '#cd7c4a';
                 const odds = aiWinOdds[idx] || 33.3;
-                const formBadges = formBadgesList[idx] || '<span style="color:#94a3b8;">⏳ Chưa thi đấu</span>';
+                const formBadges = formBadgesList[idx] || `<span style="color:#94a3b8;">⏳ ${notPlayedStr}</span>`;
 
                 row.innerHTML = `
                     <div class="std-rank">${medals[idx]}</div>
@@ -10437,155 +11012,187 @@ function renderGallery() {
             localStorage.setItem('ptx_stat_red', '0');
             localStorage.setItem('ptx_seeded_flag', 'true');
 
-            // Force re-render of all core modules
-            syncPlayerStatsFromMatches();
-            renderAllMatches();
-            renderStandings();
-            renderStandingsPageTable();
-            if (typeof renderPlayerCards === 'function') renderPlayerCards();
-            updateDashboard();
-
-            showToast('✅ KHÔI PHỤC TOÀN BỘ DỮ LIỆU GỐC HỆ THỐNG THÀNH CÔNG (100% RESTORED)!', 'success');
-        }
-        window.resetSystemDataToOfficialDefaults = resetSystemDataToOfficialDefaults;
-
-        // Expose all functions globally on window object
-        window.renderTeamStats = renderTeamStats;
-        window.renderPlayerCards = renderPlayerCards;
-        window.refreshAll = refreshAll;
-        window.loadFromStorage = loadFromStorage;
-        window.renderTopScorers = renderTopScorers;
-        window.renderStandingsPageTable = renderStandingsPageTable;
-        window.renderGalleryPage = renderGalleryPage;
-        window.initFanPredictionForm = typeof initFanPredictionForm !== 'undefined' ? initFanPredictionForm : null;
-        window.seedDefaultTournamentData = seedDefaultTournamentData;
-
-        // Synchronous Instant Rendering Pipeline (Guarantees 100% zero data loss across all pages and tabs)
-        function initFullPageRender() {
-            seedDefaultTournamentData();
-            try { renderTeamStats(); } catch(e){ console.warn(e); }
-            try { renderPlayerCards(); } catch(e){ console.warn(e); }
-            try { renderAllMatches(); } catch(e){ console.warn(e); }
-            try { renderStandings(); } catch(e){ console.warn(e); }
-            try { renderStandingsPageTable(); } catch(e){ console.warn(e); }
-            try { renderTournamentHub(); } catch(e){ console.warn(e); }
-            try { updateDashboard(); } catch(e){ console.warn(e); }
-            try { refreshAll(); } catch(e){ console.warn(e); }
-            try { loadFromStorage(); } catch(e){ console.warn(e); }
-            try { renderTopScorers(); } catch(e){ console.warn(e); }
-            try { if (typeof renderGallery === 'function') renderGallery(); } catch(e){ console.warn(e); }
-            try { if (typeof renderGalleryPage === 'function') renderGalleryPage(); } catch(e){ console.warn(e); }
-            try { if (typeof renderHallOfFame === 'function') if (typeof renderHallOfFame === 'function') renderHallOfFame(); } catch(e){ console.warn(e); }
-            try { if (typeof initFanPredictionForm === 'function') initFanPredictionForm(); } catch(e){ console.warn(e); }
-            try { if (typeof initFifa3DTilt === 'function') initFifa3DTilt(); } catch(e){ console.warn(e); }
-
-            // Re-trigger navigation to active hash page after rendering
-            const currentHash = window.location.hash.substring(1) || localStorage.getItem('currentPage') || 'home';
-            if (typeof navigate === 'function') navigate(currentHash);
+        function requireToken(styles, token) {
+            const val = styles.getPropertyValue(token).trim();
+            if (!val) {
+                throw new Error(`[PTX Design System] Missing required token: ${token}`);
+            }
+            return val;
         }
 
-        // Run immediately
-        initFullPageRender();
-        document.addEventListener('DOMContentLoaded', initFullPageRender);
-        window.addEventListener('load', initFullPageRender);
+        function drawTeamRadarCharts() {
+            const styles = getComputedStyle(document.documentElement);
+            const gridStroke = requireToken(styles, '--border-strong');
+            const textFill   = requireToken(styles, '--text-primary');
+            const teamPColor = requireToken(styles, '--team-p-color');
+            const teamTColor = requireToken(styles, '--team-t-color');
+            const teamXColor = requireToken(styles, '--team-x-color');
 
-        initAdminAccount().catch(err => console.warn('[PTX] init error:', err)).finally(() => {
-            ptxCloudSync.init();
-            if (localStorage.getItem('adminLoggedIn') === 'true') {
-                const lock = document.getElementById('adminAuthLock');
-                const panel = document.getElementById('adminPanel');
-                if (lock) lock.style.display = 'none';
-                if (panel) panel.style.display = 'block';
-                try { loadAdminData(); } catch(e){}
-            } else {
-                const lock = document.getElementById('adminAuthLock');
-                const panel = document.getElementById('adminPanel');
-                if (lock) lock.style.display = 'block';
-                if (panel) panel.style.display = 'none';
+            const teams = [
+                { id: 'p', name: 'TEAM P (Phoenix)', color: teamPColor, stats: { 'Tấn công': 85, 'Phòng thủ': 78, 'Tốc độ': 82, 'Sức mạnh': 84, 'Kỹ thuật': 88, 'Đồng đội': 90 } },
+                { id: 't', name: 'TEAM T (Tiger)', color: teamTColor, stats: { 'Tấn công': 92, 'Phòng thủ': 70, 'Tốc độ': 94, 'Sức mạnh': 88, 'Kỹ thuật': 81, 'Đồng đội': 82 } },
+                { id: 'x', name: 'TEAM X (Xiphias)', color: teamXColor, stats: { 'Tấn công': 78, 'Phòng thủ': 90, 'Tốc độ': 75, 'Sức mạnh': 80, 'Kỹ thuật': 84, 'Đồng đội': 87 } },
+            ];
+
+            // 1. Draw Individual Team Radar Charts
+            teams.forEach(team => {
+                const canvas = document.getElementById('radar-' + team.id);
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const cx = canvas.width / 2, cy = canvas.height / 2;
+                const r = Math.min(cx, cy) - 30;
+                const labels = Object.keys(team.stats);
+                const values = Object.values(team.stats);
+                const n = labels.length;
+                const angleStep = (Math.PI * 2) / n;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Background grid
+                [0.2, 0.4, 0.6, 0.8, 1.0].forEach(scale => {
+                    ctx.beginPath();
+                    labels.forEach((_, i) => {
+                        const angle = i * angleStep - Math.PI / 2;
+                        const x = cx + r * scale * Math.cos(angle);
+                        const y = cy + r * scale * Math.sin(angle);
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.strokeStyle = gridStroke;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+                // Spokes
+                labels.forEach((_, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+                    ctx.strokeStyle = gridStroke;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+                // Data polygon
+                ctx.beginPath();
+                values.forEach((v, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    const x = cx + r * (v / 100) * Math.cos(angle);
+                    const y = cy + r * (v / 100) * Math.sin(angle);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.fillStyle = team.color + '33';
+                ctx.fill();
+                ctx.strokeStyle = team.color;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+                // Dots
+                values.forEach((v, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    const x = cx + r * (v / 100) * Math.cos(angle);
+                    const y = cy + r * (v / 100) * Math.sin(angle);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = team.color;
+                    ctx.fill();
+                });
+                // Labels
+                ctx.font = 'bold 11px Arial';
+                ctx.fillStyle = textFill;
+                ctx.textAlign = 'center';
+                labels.forEach((label, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    const lx = cx + (r + 22) * Math.cos(angle);
+                    const ly = cy + (r + 22) * Math.sin(angle);
+                    ctx.fillText(label, lx, ly + 4);
+                    // Value
+                    ctx.font = 'bold 10px Arial';
+                    ctx.fillStyle = team.color;
+                    ctx.fillText(values[i], cx + (r - 14) * (values[i] / 100) * Math.cos(angle), cy + (r - 14) * (values[i] / 100) * Math.sin(angle) + 4);
+                    ctx.font = 'bold 11px Arial';
+                    ctx.fillStyle = textFill;
+                });
+                // Center label
+                ctx.font = 'bold 12px Arial';
+                ctx.fillStyle = team.color;
+                ctx.fillText(team.name.split(' ')[1], cx, cy + 4);
+            });
+
+            // 2. Draw Combined H2H Overlay Radar Chart
+            const combinedCanvas = document.getElementById('radar-combined');
+            if (combinedCanvas) {
+                const ctx = combinedCanvas.getContext('2d');
+                const cx = combinedCanvas.width / 2, cy = combinedCanvas.height / 2;
+                const r = Math.min(cx, cy) - 38;
+                const labels = ['Tấn công', 'Phòng thủ', 'Tốc độ', 'Sức mạnh', 'Kỹ thuật', 'Đồng đội'];
+                const n = labels.length;
+                const angleStep = (Math.PI * 2) / n;
+                ctx.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+
+                // Background grid
+                [0.2, 0.4, 0.6, 0.8, 1.0].forEach(scale => {
+                    ctx.beginPath();
+                    labels.forEach((_, i) => {
+                        const angle = i * angleStep - Math.PI / 2;
+                        const x = cx + r * scale * Math.cos(angle);
+                        const y = cy + r * scale * Math.sin(angle);
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.strokeStyle = gridStroke;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+
+                // Spokes
+                labels.forEach((_, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+                    ctx.strokeStyle = gridStroke;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+
+                // Draw each team polygon overlay
+                teams.forEach(team => {
+                    const values = Object.values(team.stats);
+                    ctx.beginPath();
+                    values.forEach((v, i) => {
+                        const angle = i * angleStep - Math.PI / 2;
+                        const x = cx + r * (v / 100) * Math.cos(angle);
+                        const y = cy + r * (v / 100) * Math.sin(angle);
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.fillStyle = team.color + '25';
+                    ctx.fill();
+                    ctx.strokeStyle = team.color;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    values.forEach((v, i) => {
+                        const angle = i * angleStep - Math.PI / 2;
+                        const x = cx + r * (v / 100) * Math.cos(angle);
+                        const y = cy + r * (v / 100) * Math.sin(angle);
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        ctx.fillStyle = team.color;
+                        ctx.fill();
+                    });
+                });
+
+                // Labels
+                ctx.font = 'bold 11px Arial';
+                ctx.fillStyle = textFill;
+                ctx.textAlign = 'center';
+                labels.forEach((label, i) => {
+                    const angle = i * angleStep - Math.PI / 2;
+                    const lx = cx + (r + 22) * Math.cos(angle);
+                    const ly = cy + (r + 22) * Math.sin(angle);
+                    ctx.fillText(label, lx, ly + 4);
+                });
             }
-
-            setTimeout(hideSplashScreen, 800);
-            setTimeout(initReveal, 300);
-        });
-
-            // Smart auto-refresh: 5s during match window (07/08 17:00-21:00), 30s otherwise
-            function getRefreshInterval() {
-                const now = new Date();
-                const matchDay = new Date('2026-08-07T17:00:00+07:00');
-                const matchEnd = new Date('2026-08-07T21:00:00+07:00');
-                return (now >= matchDay && now <= matchEnd) ? 5000 : 30000;
-            }
-            (function scheduleRefresh() {
-                setTimeout(() => {
-                    updateStickyBar();
-                    renderLiveCenter();
-                    scheduleRefresh();
-                }, getRefreshInterval());
-            })();
-            // ============================================================
-            // REGISTER SERVICE WORKER (PWA)
-            // ============================================================
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    console.log('[PTX] Service Worker registered:', reg.scope);
-                }).catch(err => console.warn('[PTX] SW registration failed:', err));
-            }
-
-        // Expose
-        window.openLogin = openLogin;
-        window.closeLogin = closeLogin;
-        window.handleLogin = handleLogin;
-        window.handleLogout = handleLogout;
-        window.checkAdminNavClick = checkAdminNavClick;
-        window.saveContentAdmin = saveContentAdmin;
-        window.updateStatsAdmin = updateStatsAdmin;
-        window.updateStandingsAndResults = updateStandingsAndResults;
-        window.saveHallOfFameAdmin = saveHallOfFameAdmin;
-        window.changeAdminPassword = changeAdminPassword;
-        window.closePlayerModal = closePlayerModal;
-        window.openLightbox = openLightbox;
-        window.showToast = showToast;
-        window.switchAdminTab = switchAdminTab;
-        window.setZeroMatchesState = setZeroMatchesState;
-        window.setDemoScoresState = setDemoScoresState;
-        window.loadAdminPlayerDetail = loadAdminPlayerDetail;
-        window.savePlayerAdminDetail = savePlayerAdminDetail;
-        window.shareResult = shareResult;
-        window.toggleFloatingAdmin = toggleFloatingAdmin;
-        window.quickGoalFromFloat = quickGoalFromFloat;
-
-        // ============================================================
-        // WEB SHARE API
-        // ============================================================
-        function shareResult(title, text) {
-            const shareData = { title: title || 'PTX Summer Cup 2026', text: text || '⚽ PTX Summer Cup 2026 – 07/08/2026 tại 152 Hoàng Hoa Thám, HCM!', url: location.href };
-            if (navigator.share) {
-                navigator.share(shareData).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(shareData.url + '\n' + shareData.text)
-                    .then(() => showToast('✅ Đã sao chép link!', 'success'))
-                    .catch(() => showToast('Link: ' + shareData.url, 'info'));
-            }
-        }
-
-        // ============================================================
-        // FLOATING ADMIN QUICK-SCORE
-        // ============================================================
-        function toggleFloatingAdmin() {
-            const panel = document.getElementById('floatAdminPanel');
-            if (!panel) return;
-            const isOpen = panel.style.display !== 'none';
-            panel.style.display = isOpen ? 'none' : 'block';
-            if (!isOpen) {
-                // Populate match dropdown
-                const sel = document.getElementById('floatMatchSel');
-                if (sel && MATCHES_CONFIG) {
-                    sel.innerHTML = MATCHES_CONFIG.map(m => `<option value="${m.id}">${m.homeLabel} vs ${m.awayLabel}</option>`).join('');
-                }
-                // Populate player datalist
-                const list = document.getElementById('floatPlayerList');
-                if (list && PLAYERS_DATA) {
-                    list.innerHTML = PLAYERS_DATA.map(p => `<option value="${p.name}">`).join('');
+        }lue="${p.name}">`).join('');
                 }
             }
         }
@@ -10830,121 +11437,124 @@ function renderGallery() {
     </div>
 
     <!-- ==================== REFEREE DIGITAL TOOLKIT MODAL ==================== -->
-    <div id="refereeToolkitModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);">
-        <div style="background:#0f172a;border:2px solid #10b981;border-radius:24px;width:100%;max-width:680px;padding:24px;box-shadow:0 25px 60px rgba(16,185,129,0.3);position:relative;max-height:90vh;overflow-y:auto;text-align:center;color:#fff;">
-            <button onclick="closeRefereeToolkit()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;">✕</button>
-            <div style="font-size:22px;font-weight:900;color:#10b981;font-family:var(--font-title);margin-bottom:4px;">🏁 SỔ TAY & CÔNG CỤ TRỌNG TÀI SÂN 5v5</div>
-            <div style="font-size:12px;color:#94a3b8;margin-bottom:14px;">Bộ công cụ giơ thẻ, đếm lỗi tổng hợp & còi điều hành trận đấu</div>
+    <div id="refereeToolkitModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.85);z-index:99999;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(16px);">
+        <div class="ultimate-glass-card" style="background:rgba(15,23,42,0.96);border:1.5px solid #10b981;border-radius:24px;width:100%;max-width:720px;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(16,185,129,0.25);position:relative;max-height:88vh;overflow-y:auto;text-align:center;color:#fff;box-sizing:border-box;">
+            <button onclick="closeRefereeToolkit()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;transition:all 0.2s ease;">✕</button>
+            
+            <div style="font-size:24px;font-weight:900;color:#10b981;font-family:var(--font-title);margin-bottom:4px;letter-spacing:1px;">🏁 SỔ TAY & CÔNG CỤ TRỌNG TÀI SÂN 5v5</div>
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:18px;font-weight:500;">Bộ công cụ giơ thẻ, đếm lỗi tổng hợp, bấm giờ & còi điều hành trận đấu</div>
 
             <!-- Match Selector Bar -->
-            <div style="background:rgba(16,185,129,0.15);border:1px solid #10b981;border-radius:16px;padding:12px;margin-bottom:20px;">
-                <label style="font-size:11px;font-weight:800;color:#10b981;display:block;margin-bottom:6px;letter-spacing:1px;">🏟️ CHỌN TRẬN ĐẤU ĐIỀU HÀNH:</label>
-                <select id="refMatchSelect" onchange="onRefMatchChange()" style="width:100%;background:#0f172a;color:#fff;border:1px solid #10b981;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:800;outline:none;">
+            <div style="background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.4);border-radius:18px;padding:14px;margin-bottom:20px;">
+                <label style="font-size:11px;font-weight:900;color:#10b981;display:block;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;">🏟️ CHỌN TRẬN ĐẤU ĐIỀU HÀNH:</label>
+                <select id="refMatchSelect" onchange="onRefMatchChange()" style="width:100%;background:#0f172a;color:#fff;border:1px solid #10b981;padding:10px 14px;border-radius:12px;font-size:13px;font-weight:800;outline:none;cursor:pointer;">
                     <option value="1">Trận 1: 🦅 TEAM P (PHOENIX) vs 🐯 TEAM T (TIGER)</option>
                     <option value="2">Trận 2: 🐯 TEAM T (TIGER) vs 🐟 TEAM X (XIPHIAS)</option>
                     <option value="3">Trận 3: 🐟 TEAM X (XIPHIAS) vs 🦅 TEAM P (PHOENIX)</option>
                 </select>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:20px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;">
                 <!-- Fullscreen Cards & Player Action -->
-                <div style="background:rgba(15,23,42,0.8);border:1px solid #334155;border-radius:16px;padding:16px;">
-                    <div style="font-size:14px;font-weight:900;color:#fbbf24;margin-bottom:10px;font-family:var(--font-title);">🟨🟥 RÚT THẺ VÀ GIƠ TOÀN MÀN HÌNH</div>
-                    <select id="refPlayerSelect" style="width:100%;background:#1e293b;color:#fff;border:1px solid #334155;padding:8px;border-radius:8px;font-size:12px;margin-bottom:10px;outline:none;">
-                        <!-- Populate dynamically by JS -->
-                    </select>
+                <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:14px;font-weight:900;color:#fbbf24;margin-bottom:10px;font-family:var(--font-title);letter-spacing:0.5px;">🟨🟥 RÚT THẺ VÀ GIƠ TOÀN MÀN HÌNH</div>
+                        <select id="refPlayerSelect" style="width:100%;background:#0f172a;color:#fff;border:1px solid #334155;padding:10px;border-radius:10px;font-size:12.5px;margin-bottom:14px;outline:none;font-weight:700;">
+                            <!-- Populate dynamically by JS -->
+                        </select>
+                    </div>
                     <div style="display:flex;gap:10px;justify-content:center;">
-                        <button onclick="showRefereeCard('YELLOW')" style="flex:1;background:#eab308;color:#000;border:none;padding:12px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(234,179,8,0.4);">
+                        <button onclick="showRefereeCard('YELLOW')" style="flex:1;background:linear-gradient(135deg,#f59e0b,#eab308);color:#000;border:none;padding:12px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(234,179,8,0.35);transition:transform 0.2s ease;">
                             🟨 THẺ VÀNG
                         </button>
-                        <button onclick="showRefereeCard('RED')" style="flex:1;background:#ef4444;color:#fff;border:none;padding:14px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(239,68,68,0.4);">
+                        <button onclick="showRefereeCard('RED')" style="flex:1;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;padding:12px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 6px 20px rgba(239,68,68,0.35);transition:transform 0.2s ease;">
                             🟥 THẺ ĐỎ
                         </button>
                     </div>
                 </div>
 
                 <!-- Coin Toss -->
-                <div style="background:rgba(15,23,42,0.8);border:1px solid #334155;border-radius:16px;padding:16px;">
-                    <div style="font-size:14px;font-weight:900;color:#60a5fa;margin-bottom:12px;font-family:var(--font-title);">🪙 TUNG ĐỒNG XU CHỌN SÂN</div>
-                    <div id="coinTossResult" style="font-size:20px;font-weight:900;margin-bottom:8px;min-height:36px;color:#fff;">🪙</div>
-                    <button onclick="tossRefCoin()" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:800;font-size:12px;cursor:pointer;">
+                <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;">
+                    <div style="font-size:14px;font-weight:900;color:#60a5fa;margin-bottom:8px;font-family:var(--font-title);letter-spacing:0.5px;">🪙 TUNG ĐỒNG XU CHỌN SÂN</div>
+                    <div id="coinTossResult" style="font-size:18px;font-weight:900;margin:10px 0;min-height:40px;color:#fff;display:flex;align-items:center;justify-content:center;">🪙 Bấm để tung đồng xu</div>
+                    <button onclick="tossRefCoin()" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;padding:11px 24px;border-radius:20px;font-weight:800;font-size:12.5px;cursor:pointer;box-shadow:0 6px 20px rgba(59,130,246,0.35);transition:transform 0.2s ease;">
                         🌀 TUNG ĐỒNG XU
                     </button>
                 </div>
             </div>
 
             <!-- Cumulative Foul Counter -->
-            <div style="background:rgba(15,23,42,0.9);border:1.5px solid #f97316;border-radius:16px;padding:16px;margin-bottom:20px;">
-                <div style="font-size:15px;font-weight:900;color:#f97316;margin-bottom:10px;font-family:var(--font-title);">⚠️ LỖI TỔNG HỢP (LUẬT 5v5 - CHẠM 5 LỖI PHẠT ĐỀN 10M)</div>
+            <div style="background:rgba(30,41,59,0.7);border:1.5px solid rgba(249,115,22,0.5);border-radius:18px;padding:18px;margin-bottom:20px;">
+                <div style="font-size:15px;font-weight:900;color:#f97316;margin-bottom:12px;font-family:var(--font-title);letter-spacing:0.5px;">⚠️ LỖI TỔNG HỢP (LUẬT 5v5 - CHẠM 5 LỖI PHẠT ĐỀN 10M)</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;">
-                    <div style="background:rgba(59,130,246,0.15);border:1px solid #3b82f6;border-radius:12px;padding:12px;">
-                        <div id="refHomeTeamLabel" style="font-size:13px;color:#60a5fa;font-weight:900;margin-bottom:4px;">🦅 TEAM P (HOME)</div>
-                        <div id="foulCountHome" style="font-size:36px;font-weight:900;color:#fff;">0</div>
-                        <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;">
-                            <button onclick="changeFoulCount('HOME', 1)" style="background:#3b82f6;color:#fff;border:none;width:32px;height:32px;border-radius:8px;font-weight:900;font-size:16px;cursor:pointer;">+</button>
-                            <button onclick="changeFoulCount('HOME', -1)" style="background:rgba(255,255,255,0.1);color:#fff;border:none;width:32px;height:32px;border-radius:8px;font-weight:900;font-size:16px;cursor:pointer;">-</button>
+                    <div style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.4);border-radius:14px;padding:14px;">
+                        <div id="refHomeTeamLabel" style="font-size:13px;color:#60a5fa;font-weight:900;margin-bottom:6px;">🦅 TEAM P (HOME)</div>
+                        <div id="foulCountHome" style="font-size:42px;font-weight:900;color:#fff;line-height:1;">0</div>
+                        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+                            <button onclick="changeFoulCount('HOME', 1)" style="background:#3b82f6;color:#fff;border:none;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:18px;cursor:pointer;">+</button>
+                            <button onclick="changeFoulCount('HOME', -1)" style="background:rgba(255,255,255,0.1);color:#fff;border:none;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:18px;cursor:pointer;">-</button>
                         </div>
                     </div>
-                    <div style="background:rgba(239,68,68,0.15);border:1px solid #ef4444;border-radius:12px;padding:12px;">
-                        <div id="refAwayTeamLabel" style="font-size:13px;color:#fca5a5;font-weight:900;margin-bottom:4px;">🐯 TEAM T (AWAY)</div>
-                        <div id="foulCountAway" style="font-size:36px;font-weight:900;color:#fff;">0</div>
-                        <div style="display:flex;gap:6px;justify-content:center;margin-top:6px;">
-                            <button onclick="changeFoulCount('AWAY', 1)" style="background:#ef4444;color:#fff;border:none;width:32px;height:32px;border-radius:8px;font-weight:900;font-size:16px;cursor:pointer;">+</button>
-                            <button onclick="changeFoulCount('AWAY', -1)" style="background:rgba(255,255,255,0.1);color:#fff;border:none;width:32px;height:32px;border-radius:8px;font-weight:900;font-size:16px;cursor:pointer;">-</button>
+                    <div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:14px;padding:14px;">
+                        <div id="refAwayTeamLabel" style="font-size:13px;color:#fca5a5;font-weight:900;margin-bottom:6px;">🐯 TEAM T (AWAY)</div>
+                        <div id="foulCountAway" style="font-size:42px;font-weight:900;color:#fff;line-height:1;">0</div>
+                        <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+                            <button onclick="changeFoulCount('AWAY', 1)" style="background:#ef4444;color:#fff;border:none;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:18px;cursor:pointer;">+</button>
+                            <button onclick="changeFoulCount('AWAY', -1)" style="background:rgba(255,255,255,0.1);color:#fff;border:none;width:36px;height:36px;border-radius:10px;font-weight:900;font-size:18px;cursor:pointer;">-</button>
                         </div>
                     </div>
                 </div>
-                <div id="foulWarningMsg" style="font-size:12px;color:#fdba74;margin-top:10px;font-weight:700;display:none;"></div>
+                <div id="foulWarningMsg" style="font-size:12px;color:#fdba74;margin-top:12px;font-weight:800;display:none;background:rgba(239,68,68,0.2);padding:8px;border-radius:8px;border:1px solid #ef4444;"></div>
             </div>
 
             <!-- Stopwatch & Whistles Control -->
-            <div style="background:rgba(15,23,42,0.9);border:1.5px solid #3b82f6;border-radius:16px;padding:16px;margin-bottom:20px;">
-                <div style="font-size:15px;font-weight:900;color:#60a5fa;margin-bottom:8px;font-family:var(--font-title);">⏱️ ĐỒNG HỒ TRỌNG TÀI (02 HIỆP x 15 PHÚT) & CÒI NHANH</div>
-                <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;">
-                    <div id="refStopwatchText" style="font-size:34px;font-weight:900;color:#fbbf24;font-family:monospace;letter-spacing:2px;background:#051329;padding:6px 20px;border-radius:12px;border:1px solid #3b82f6;">15:00</div>
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        <button id="refTimerToggleBtn" onclick="toggleRefStopwatch()" style="background:#10b981;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:900;font-size:12px;cursor:pointer;">▶️ BẮT ĐẦU</button>
-                        <button onclick="resetRefStopwatch()" style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:800;font-size:11px;cursor:pointer;">🔄 RESET</button>
+            <div style="background:rgba(30,41,59,0.7);border:1.5px solid rgba(59,130,246,0.5);border-radius:18px;padding:18px;margin-bottom:20px;">
+                <div style="font-size:15px;font-weight:900;color:#60a5fa;margin-bottom:12px;font-family:var(--font-title);letter-spacing:0.5px;">⏱️ ĐỒNG HỒ TRỌNG TÀI (02 HIỆP x 15 PHÚT) & CÒI NHANH</div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:14px;">
+                    <div id="refStopwatchText" style="font-size:38px;font-weight:900;color:#fbbf24;font-family:'Bebas Neue',monospace;letter-spacing:3px;background:#051329;padding:8px 24px;border-radius:14px;border:1.5px solid #3b82f6;box-shadow:0 0 20px rgba(59,130,246,0.3);">15:00</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button id="refTimerToggleBtn" onclick="toggleRefStopwatch()" style="background:#10b981;color:#fff;border:none;padding:10px 20px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(16,185,129,0.3);">▶️ BẮT ĐẦU</button>
+                        <button onclick="resetRefStopwatch()" style="background:rgba(255,255,255,0.1);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-weight:800;font-size:11px;cursor:pointer;">🔄 RESET</button>
                     </div>
                 </div>
 
-                <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-                    <button onclick="playWhistleSound()" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;padding:8px 14px;border-radius:10px;font-weight:800;font-size:11px;cursor:pointer;">⚽ CÒI GIAO BÓNG</button>
-                    <button onclick="playWhistleSound()" style="background:rgba(234,179,8,0.2);color:#fbbf24;border:1px solid #eab308;padding:8px 14px;border-radius:10px;font-weight:800;font-size:11px;cursor:pointer;">🟨 CÒI PHẠM LỖI</button>
-                    <button onclick="playFinalSirenSound()" style="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid #ef4444;padding:8px 14px;border-radius:10px;font-weight:800;font-size:11px;cursor:pointer;">🏁 CÒI FIFA HẾT GIỜ (3 TIẾNG)</button>
+                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    <button onclick="playWhistleSound()" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;padding:9px 16px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;">⚽ CÒI GIAO BÓNG</button>
+                    <button onclick="playWhistleSound()" style="background:rgba(234,179,8,0.2);color:#fbbf24;border:1px solid #eab308;padding:9px 16px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;">🟨 CÒI PHẠM LỖI</button>
+                    <button onclick="playFinalSirenSound()" style="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid #ef4444;padding:9px 16px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;">🏁 CÒI FIFA HẾT GIỜ (3 TIẾNG)</button>
                 </div>
             </div>
 
             <!-- VAR Check Quick Action Card -->
-            <div style="background:rgba(239,68,68,0.1);border:1.5px solid #ef4444;border-radius:16px;padding:16px;margin-bottom:20px;">
-                <div style="font-size:15px;font-weight:900;color:#ef4444;margin-bottom:10px;font-family:var(--font-title);">🖥️ KÍCH HOẠT QUAY MÀN HÌNH VAR CHECK (WORLD CUP STYLE)</div>
-                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-                    <button onclick="triggerVARReview('GOAL')" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;">
+            <div style="background:rgba(239,68,68,0.1);border:1.5px solid rgba(239,68,68,0.5);border-radius:18px;padding:18px;margin-bottom:20px;">
+                <div style="font-size:15px;font-weight:900;color:#ef4444;margin-bottom:12px;font-family:var(--font-title);letter-spacing:0.5px;">🖥️ KÍCH HOẠT QUAY MÀN HÌNH VAR CHECK (WORLD CUP STYLE)</div>
+                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                    <button onclick="triggerVARReview('GOAL')" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:11px 20px;border-radius:12px;font-weight:800;font-size:12.5px;cursor:pointer;box-shadow:0 6px 18px rgba(16,185,129,0.35);">
                         ⚽ BÀN THẮNG HỢP LỆ (GOAL GIVEN)
                     </button>
-                    <button onclick="triggerVARReview('NO_GOAL')" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;">
+                    <button onclick="triggerVARReview('NO_GOAL')" style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;padding:11px 20px;border-radius:12px;font-weight:800;font-size:12.5px;cursor:pointer;box-shadow:0 6px 18px rgba(239,68,68,0.35);">
                         ❌ KHÔNG CÓ BÀN THẮNG (NO GOAL)
                     </button>
                 </div>
             </div>
 
             <!-- 5v5 Rule Fast Lookup -->
-            <div style="background:rgba(15,23,42,0.9);border:1.5px solid #10b981;border-radius:16px;padding:16px;margin-bottom:20px;text-align:left;">
-                <div style="font-size:15px;font-weight:900;color:#10b981;margin-bottom:10px;font-family:var(--font-title);text-align:center;">📘 TRA CỨU LUẬT THI ĐẤU 5v5 NHANH FOR REFEREE</div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;font-size:12px;line-height:1.5;">
-                    <div style="background:rgba(255,255,255,0.03);border:1px solid #334155;padding:10px;border-radius:10px;">
+            <div style="background:rgba(30,41,59,0.7);border:1.5px solid rgba(16,185,129,0.5);border-radius:18px;padding:18px;margin-bottom:20px;text-align:left;">
+                <div style="font-size:15px;font-weight:900;color:#10b981;margin-bottom:12px;font-family:var(--font-title);text-align:center;letter-spacing:0.5px;">📘 TRA CỨU LUẬT THI ĐẤU 5v5 NHANH FOR REFEREE</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;font-size:12px;line-height:1.5;">
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:12px;">
                         <strong style="color:#fbbf24;">⏱️ 1. Luật Thời Gian PTX:</strong><br>
                         • Mỗi trận <strong>02 hiệp x 15 phút</strong>. Nghỉ giữa 2 hiệp 5 phút. Khống chế <strong>4 giây</strong> cho đá biên/đá phạt/ném bóng gôn.
                     </div>
-                    <div style="background:rgba(255,255,255,0.03);border:1px solid #334155;padding:10px;border-radius:10px;">
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:12px;">
                         <strong style="color:#f97316;">⚠️ 2. Luật Lỗi Tổng Hợp 10m:</strong><br>
                         • Mỗi hiệp tối đa 5 lỗi. Lỗi thứ 6 trở đi ➔ Phạt đền 10m trực tiếp không hàng rào.
                     </div>
-                    <div style="background:rgba(255,255,255,0.03);border:1px solid #334155;padding:10px;border-radius:10px;">
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:12px;">
                         <strong style="color:#ef4444;">🟨 3. Luật Thẻ Phạt & Phạt 3 Phút:</strong><br>
                         • 2 Thẻ vàng = 1 Thẻ đỏ. Cầu thủ bị thẻ đỏ rời sân <strong>phạt 3 phút</strong> trước khi được bổ sung cầu thủ khác.
                     </div>
-                    <div style="background:rgba(255,255,255,0.03);border:1px solid #334155;padding:10px;border-radius:10px;">
+                    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:12px;">
                         <strong style="color:#60a5fa;">⚽ 4. Luật Đá Biên & Thủ Môn:</strong><br>
                         • Bóng đặt chết trên vạch biên. Không ghi bàn trực tiếp từ đá biên. Thủ môn ném bóng bằng tay.
                     </div>
@@ -10952,12 +11562,12 @@ function renderGallery() {
             </div>
 
             <!-- Match Event Timeline Log -->
-            <div style="background:rgba(15,23,42,0.9);border:1.5px solid #64748b;border-radius:16px;padding:16px;text-align:left;">
+            <div style="background:rgba(30,41,59,0.7);border:1.5px solid rgba(100,116,139,0.5);border-radius:18px;padding:18px;text-align:left;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                    <div style="font-size:14px;font-weight:900;color:#e2e8f0;font-family:var(--font-title);">📜 NHẬT KÝ DIỄN BIẾN TRẬN ĐẤU REALTIME</div>
-                    <button onclick="clearRefTimelineLog()" style="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid #ef4444;padding:4px 10px;border-radius:8px;font-size:10px;font-weight:800;cursor:pointer;">🗑️ XÓA NHẬT KÝ</button>
+                    <div style="font-size:14px;font-weight:900;color:#e2e8f0;font-family:var(--font-title);letter-spacing:0.5px;">📜 NHẬT KÝ DIỄN BIẾN TRẬN ĐẤU REALTIME</div>
+                    <button onclick="clearRefTimelineLog()" style="background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid #ef4444;padding:4px 12px;border-radius:8px;font-size:10.5px;font-weight:800;cursor:pointer;">🗑️ XÓA NHẬT KÝ</button>
                 </div>
-                <div id="refEventTimelineList" style="max-height:120px;overflow-y:auto;background:#051329;border:1px solid #334155;border-radius:10px;padding:10px;font-size:12px;color:#94a3b8;line-height:1.8;">
+                <div id="refEventTimelineList" style="max-height:140px;overflow-y:auto;background:#051329;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;font-size:12px;color:#94a3b8;line-height:1.8;">
                     <div style="font-style:italic;color:#64748b;text-align:center;">Chưa có diễn biến nào được ghi nhận...</div>
                 </div>
             </div>
@@ -11111,47 +11721,49 @@ function renderGallery() {
     <!-- ====== PRE-MATCH ALERT NOTIFICATION ====== -->
     <div id="preMatchAlert"></div>
 
-    <!-- ====== FLOATING AI CHATBOT ASSISTANT WIDGET ====== -->
+    <!-- ====== FLOATING AI CHATBOT ASSISTANT WIDGET (100/100 PERFECT EDITION) ====== -->
     <div id="ptxAiChatWidget" style="position:fixed;bottom:25px;right:25px;z-index:99998;">
         <!-- Chat Trigger Button -->
-        <button onclick="togglePTXChatbotWindow()" title="Chat với AI Trợ Lý PTX Cup" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;border:2px solid #c084fc;padding:12px 18px;border-radius:30px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 8px 25px rgba(124,58,237,0.5);font-family:var(--font-title);letter-spacing:0.5px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+        <button id="ptxAiTriggerBtn" onclick="togglePTXChatbotWindow()" title="Chat với AI Trợ Lý PTX Cup" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;border:2px solid #c084fc;padding:12px 18px;border-radius:30px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 8px 25px rgba(124,58,237,0.5);font-family:var(--font-title);letter-spacing:0.5px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             <span style="font-size:18px;">🤖</span> <span>AI TRỢ LÝ</span>
         </button>
 
         <!-- Chat Popup Modal Window -->
-        <div id="ptxAiChatWindow" style="display:none;position:absolute;bottom:60px;right:0;width:350px;max-width:90vw;height:480px;background:#0f172a;border:2px solid #7c3aed;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.8);flex-direction:column;overflow:hidden;backdrop-filter:blur(12px);">
+        <div id="ptxAiChatWindow" style="display:none;position:absolute;bottom:65px;right:0;width:370px;max-width:92vw;height:520px;background:linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);border:2px solid #a855f7;border-radius:24px;box-shadow:0 25px 60px rgba(0,0,0,0.85), 0 0 25px rgba(168,85,247,0.3);flex-direction:column;overflow:hidden;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);">
             <!-- Header -->
-            <div style="background:linear-gradient(135deg,#1e1b4b,#311b92);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(124,58,237,0.3);">
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="width:32px;height:32px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+            <div style="background:linear-gradient(135deg,#1e1b4b 0%,#311b92 50%,#4c1d95 100%);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid rgba(168,85,247,0.4);box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 12px rgba(168,85,247,0.6);border:1px solid #e9d5ff;">🤖</div>
                     <div>
-                        <div style="font-weight:900;color:#fff;font-size:13px;font-family:var(--font-title);">PTX CUP AI ASSISTANT</div>
-                        <div style="font-size:10px;color:#10b981;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block;"></span> Trực tuyến 24/7</div>
+                        <div style="font-weight:900;color:#fff;font-size:14px;font-family:var(--font-title);letter-spacing:0.5px;text-shadow:0 2px 8px rgba(0,0,0,0.4);">PTX CUP AI ASSISTANT</div>
+                        <div style="font-size:11px;color:#34d399;font-weight:700;display:flex;align-items:center;gap:5px;margin-top:2px;">
+                            <span style="width:7px;height:7px;background:#10b981;border-radius:50%;display:inline-block;box-shadow:0 0 8px #10b981;"></span> Trực tuyến 24/7
+                        </div>
                     </div>
                 </div>
-                <button onclick="togglePTXChatbotWindow()" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;">✕</button>
+                <button onclick="togglePTXChatbotWindow()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#cbd5e1;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.3)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.1)';this.style.color='#cbd5e1'">✕</button>
             </div>
 
             <!-- Messages Area -->
-            <div id="ptxAiChatMessages" style="flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;font-size:12px;color:#e2e8f0;background:#0b1329;">
-                <div style="background:#1e293b;border:1px solid #334155;border-radius:12px 12px 12px 2px;padding:10px 12px;max-width:85%;line-height:1.5;">
-                    Xin chào CĐV! ⚽ Mình là **PTX Cup Bot** — Trợ Lý AI của giải đấu **PTX Summer Cup 2026**. Bạn cần mình hỗ trợ thông tin gì nào?
+            <div id="ptxAiChatMessages" style="flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-size:13px;color:#e2e8f0;background:rgba(11,19,41,0.7);">
+                <div style="background:rgba(30,41,59,0.9);border:1px solid rgba(168,85,247,0.3);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:88%;line-height:1.5;box-shadow:0 4px 15px rgba(0,0,0,0.2);color:#f1f5f9;">
+                    Xin chào CĐV! ⚽ Mình là <strong>PTX Cup Bot</strong> — Trợ Lý AI của giải đấu <strong>PTX Summer Cup 2026</strong>. Bạn cần mình hỗ trợ thông tin gì nào?
                 </div>
             </div>
 
-            <!-- Quick Suggestions Chips (Smart 1-Click) -->
-            <div style="padding:8px 12px;background:#0f172a;border-top:1px solid #1e293b;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;">
-                <button onclick="sendPTXChatQuick('🏆 Ai đang dẫn đầu Bảng Xếp Hạng?')" style="background:rgba(124,58,237,0.2);color:#c084fc;border:1px solid rgba(192,132,252,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">🏆 BXH Trực Tiếp?</button>
-                <button onclick="sendPTXChatQuick('👟 Ai dẫn đầu Vua Phá Lưới?')" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">👟 Vua Phá Lưới?</button>
-                <button onclick="sendPTXChatQuick('🔮 AI dự đoán đội nào Vô Địch?')" style="background:rgba(236,72,153,0.2);color:#f472b6;border:1px solid rgba(244,114,182,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">🔮 AI Dự Đoán Vô Địch?</button>
-                <button onclick="sendPTXChatQuick('📅 Lịch thi đấu & Địa điểm?')" style="background:rgba(249,115,22,0.2);color:#fdba74;border:1px solid rgba(253,186,116,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">📅 Lịch Thi Đấu?</button>
-                <button onclick="sendPTXChatQuick('⏱️ Quy định thời gian & Luật 5v5?')" style="background:rgba(16,185,129,0.2);color:#34d399;border:1px solid rgba(52,211,153,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">⏱️ Điều Lệ & Luật 5v5?</button>
+            <!-- Quick Suggestions Chips (Clean No-Scrollbar Track) -->
+            <div class="ptx-ai-chips-scroll" style="padding:10px 12px;background:rgba(15,23,42,0.95);border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:8px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;">
+                <button onclick="sendPTXChatQuick('🏆 Ai đang dẫn đầu Bảng Xếp Hạng?')" style="background:linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.15));color:#d8b4fe;border:1px solid rgba(192,132,252,0.4);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='#7c3aed';this.style.color='#fff'" onmouseout="this.style.background='linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.15))';this.style.color='#d8b4fe'">🏆 BXH Trực Tiếp?</button>
+                <button onclick="sendPTXChatQuick('👟 Ai dẫn đầu Vua Phá Lưới?')" style="background:linear-gradient(135deg,rgba(59,130,246,0.25),rgba(37,99,235,0.15));color:#93c5fd;border:1px solid rgba(147,197,253,0.4);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='#2563eb';this.style.color='#fff'" onmouseout="this.style.background='linear-gradient(135deg,rgba(59,130,246,0.25),rgba(37,99,235,0.15))';this.style.color='#93c5fd'">👟 Vua Phá Lưới?</button>
+                <button onclick="sendPTXChatQuick('🔮 AI dự đoán đội nào Vô Địch?')" style="background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(219,39,119,0.15));color:#fbcfe8;border:1px solid rgba(249,168,212,0.4);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='#db2777';this.style.color='#fff'" onmouseout="this.style.background='linear-gradient(135deg,rgba(236,72,153,0.25),rgba(219,39,119,0.15))';this.style.color='#fbcfe8'">🔮 AI Dự Đoán Vô Địch?</button>
+                <button onclick="sendPTXChatQuick('📅 Lịch thi đấu & Địa điểm?')" style="background:linear-gradient(135deg,rgba(249,115,22,0.25),rgba(2ea,88,12,0.15));color:#ffedd5;border:1px solid rgba(253,186,116,0.4);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='#ea580c';this.style.color='#fff'" onmouseout="this.style.background='linear-gradient(135deg,rgba(249,115,22,0.25),rgba(2ea,88,12,0.15))';this.style.color='#ffedd5'">📅 Lịch Thi Đấu?</button>
+                <button onclick="sendPTXChatQuick('⏱️ Quy định thời gian & Luật 5v5?')" style="background:linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.15));color:#a7f3d0;border:1px solid rgba(110,231,183,0.4);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='#059669';this.style.color='#fff'" onmouseout="this.style.background='linear-gradient(135deg,rgba(16,185,129,0.25),rgba(5,150,105,0.15))';this.style.color='#a7f3d0'">⏱️ Điều Lệ & Luật 5v5?</button>
             </div>
 
             <!-- Input Form -->
-            <div style="padding:10px;background:#0f172a;border-top:1px solid #1e293b;display:flex;gap:8px;">
-                <input id="ptxAiChatInput" type="text" placeholder="Hỏi AI về giải đấu, cầu thủ..." onkeydown="if(event.key==='Enter') sendPTXChatMessage()" style="flex:1;background:#1e293b;color:#fff;border:1px solid #334155;padding:8px 12px;border-radius:20px;font-size:12px;outline:none;">
-                <button onclick="sendPTXChatMessage()" style="background:#7c3aed;color:#fff;border:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;">➤</button>
+            <div style="padding:12px;background:rgba(15,23,42,0.98);border-top:1px solid rgba(255,255,255,0.1);display:flex;gap:10px;align-items:center;">
+                <input id="ptxAiChatInput" type="text" placeholder="Hỏi AI về giải đấu, cầu thủ..." onkeydown="if(event.key==='Enter') sendPTXChatMessage()" style="flex:1;background:rgba(30,41,59,0.9);color:#fff;border:1.5px solid rgba(168,85,247,0.4);padding:10px 14px;border-radius:24px;font-size:13px;outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='#a855f7';this.style.boxShadow='0 0 12px rgba(168,85,247,0.4)'" onblur="this.style.borderColor='rgba(168,85,247,0.4)';this.style.boxShadow='none'">
+                <button onclick="sendPTXChatMessage()" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;box-shadow:0 4px 15px rgba(124,58,237,0.5);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">➤</button>
             </div>
         </div>
     </div>
@@ -11160,10 +11772,10 @@ function renderGallery() {
         // FAN PREDICTION GAME & LEADERBOARD
         // ============================================================
         const SAMPLE_PREDICTIONS = [
-            { name: 'Anh Tuấn (IT)', p1: 2, t1: 1, t2: 2, x2: 1, x3: 1, p3: 3, mvpId: 2, points: 14, ticket: 'PTX-8821' },
-            { name: 'Minh Trang (Kế Toán)', p1: 1, t1: 1, t2: 3, x2: 2, x3: 0, p3: 2, mvpId: 17, points: 12, ticket: 'PTX-4192' },
-            { name: 'Hải Nam (Vận Hành)', p1: 3, t1: 2, t2: 1, x2: 1, x3: 2, p3: 2, mvpId: 11, points: 10, ticket: 'PTX-7530' },
-            { name: 'Hoàng Đức (Kinh Doanh)', p1: 0, t1: 2, t2: 2, x2: 2, x3: 1, p3: 1, mvpId: 4, points: 8, ticket: 'PTX-1048' },
+            { name: 'Anh Tư', p1: 2, t1: 1, t2: 2, x2: 1, x3: 1, p3: 3, mvpId: 2, points: 14, ticket: 'PTX-8821' },
+            { name: 'Nguyễn Sử', p1: 1, t1: 1, t2: 3, x2: 2, x3: 0, p3: 2, mvpId: 17, points: 12, ticket: 'PTX-4192' },
+            { name: 'Hoàng Nam', p1: 3, t1: 2, t2: 1, x2: 1, x3: 2, p3: 2, mvpId: 11, points: 10, ticket: 'PTX-7530' },
+            { name: 'Đình Huy', p1: 0, t1: 2, t2: 2, x2: 2, x3: 1, p3: 1, mvpId: 4, points: 8, ticket: 'PTX-1048' },
         ];
 
         function initFanPredictionForm() {
@@ -11233,6 +11845,7 @@ function renderGallery() {
             localStorage.setItem('ptx_user_prediction', JSON.stringify(userPred));
 
             showToast('🎉 Xác nhận Thẻ Dự Đoán thành công! Mã: ' + ticketCode, 'success');
+            if (window.ptxUltimateUI) window.ptxUltimateUI.triggerConfetti(4000);
             renderMyPredictionTicket();
             renderPredictionLeaderboard();
         }
@@ -11475,13 +12088,14 @@ function renderGallery() {
                         else if ((item.x3 > item.p3 && gX > gP) || (item.x3 < item.p3 && gX < gP) || (item.x3 === item.p3 && gX === gP)) pts += 1;
                     }
                     if (item.mvpId === 1) pts += 5;
+                    item.points = pts;
+                } else if (item.points === undefined) {
+                    item.points = 0;
                 }
-                item.points = isPreMatch ? 0 : pts;
             });
 
-            if (!isPreMatch) {
-                list.sort((a, b) => b.points - a.points);
-            }
+            // Always sort predictions with points at top
+            list.sort((a, b) => (b.points || 0) - (a.points || 0));
 
             // Add clear list action header
             const clearHeader = document.createElement('div');
@@ -11494,7 +12108,8 @@ function renderGallery() {
             container.appendChild(clearHeader);
 
             list.forEach((item, idx) => {
-                const badge = isPreMatch ? `🎟️` : (idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`);
+                const hasPoints = (item.points && item.points > 0);
+                const badge = hasPoints ? (idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`) : `🎟️`;
                 const row = document.createElement('div');
                 row.style.display = 'flex';
                 row.style.alignItems = 'center';
@@ -11504,9 +12119,9 @@ function renderGallery() {
                 row.style.border = item.isUser ? '1.5px solid #f97316' : '1px solid rgba(255,255,255,0.08)';
                 row.style.borderRadius = '12px';
 
-                const rightBadge = isPreMatch 
-                    ? `<span style="font-size:11px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:4px 10px;border-radius:10px;border:1px solid rgba(56,189,248,0.3);">⏳ Chờ kết quả</span>`
-                    : `<span style="font-size:14px;font-weight:900;color:#fbbf24;font-family:var(--font-title);">${item.points} ĐIỂM</span>`;
+                const rightBadge = hasPoints 
+                    ? `<span style="font-size:14px;font-weight:900;color:#d97706;font-family:var(--font-title);">${item.points} ĐIỂM</span>`
+                    : `<span style="font-size:11px;font-weight:800;color:#0284c7;background:rgba(2,132,199,0.12);padding:4px 10px;border-radius:10px;border:1px solid rgba(2,132,199,0.3);">⏳ Chờ kết quả (0đ)</span>`;
 
                 row.innerHTML = `
                     <div style="display:flex;align-items:center;gap:12px;">
@@ -12036,7 +12651,7 @@ function renderGallery() {
             if (!userText) return;
 
             const userBubble = document.createElement('div');
-            userBubble.style.cssText = 'background:#7c3aed;color:#fff;border-radius:12px 12px 2px 12px;padding:8px 12px;align-self:flex-end;max-width:85%;line-height:1.4;';
+            userBubble.style.cssText = 'background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;align-self:flex-end;max-width:85%;line-height:1.4;box-shadow:0 4px 15px rgba(124,58,237,0.3);font-weight:600;';
             userBubble.innerText = userText;
             container.appendChild(userBubble);
 
@@ -12044,16 +12659,20 @@ function renderGallery() {
             container.scrollTop = container.scrollHeight;
 
             const typingBubble = document.createElement('div');
-            typingBubble.style.cssText = 'background:#1e293b;color:#94a3b8;border-radius:12px;padding:6px 12px;align-self:flex-start;font-style:italic;font-size:11px;';
-            typingBubble.innerText = '🤖 PTX Bot đang suy nghĩ...';
+            typingBubble.style.cssText = 'background:rgba(30,41,59,0.9);color:#94a3b8;border:1px solid rgba(168,85,247,0.2);border-radius:14px;padding:8px 14px;align-self:flex-start;font-style:italic;font-size:12px;display:flex;align-items:center;gap:6px;';
+            typingBubble.innerHTML = '<span>🤖 PTX Bot đang suy nghĩ...</span>';
             container.appendChild(typingBubble);
             container.scrollTop = container.scrollHeight;
 
             setTimeout(() => {
                 if (typingBubble.remove) typingBubble.remove(); else if (typingBubble.parentNode) typingBubble.parentNode.removeChild(typingBubble);
-                const botReply = generatePTXBotReply(userText);
+                let botReply = generatePTXBotReply(userText);
+                
+                // PARSE MARKDOWN **BOLD** TO STRONG TAGS
+                botReply = botReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
                 const botBubble = document.createElement('div');
-                botBubble.style.cssText = 'background:#1e293b;border:1px solid #334155;border-radius:12px 12px 12px 2px;padding:10px 12px;align-self:flex-start;max-width:85%;line-height:1.5;';
+                botBubble.style.cssText = 'background:rgba(30,41,59,0.95);border:1px solid rgba(168,85,247,0.3);border-radius:16px 16px 16px 4px;padding:12px 14px;align-self:flex-start;max-width:88%;line-height:1.5;box-shadow:0 4px 15px rgba(0,0,0,0.2);color:#f1f5f9;';
                 botBubble.innerHTML = botReply;
                 container.appendChild(botBubble);
                 container.scrollTop = container.scrollHeight;
@@ -12062,7 +12681,7 @@ function renderGallery() {
                     const cleanText = botReply.replace(/<[^>]*>/g, '').substring(0, 120);
                     speakAIVoice(cleanText);
                 }
-            }, 500);
+            }, 450);
         }
 
         function generatePTXBotReply(q) {
@@ -12290,9 +12909,9 @@ function renderGallery() {
                 const homePlayers = PLAYERS_DATA.filter(p => p.team === matchConf.home);
                 const awayPlayers = PLAYERS_DATA.filter(p => p.team === matchConf.away);
                 let html = '<optgroup label="' + homeTeam.name + '">';
-                homePlayers.forEach(p => { html += `<option value="${p.name}">#${p.number} ${p.jerseyName} (${p.name})</option>`; });
+                homePlayers.forEach(p => { html += `<option value="${p.name}">${p.name} (${p.position})</option>`; });
                 html += '</optgroup><optgroup label="' + awayTeam.name + '">';
-                awayPlayers.forEach(p => { html += `<option value="${p.name}">#${p.number} ${p.jerseyName} (${p.name})</option>`; });
+                awayPlayers.forEach(p => { html += `<option value="${p.name}">${p.name} (${p.position})</option>`; });
                 html += '</optgroup>';
                 playerSel.innerHTML = html;
             }
@@ -12405,17 +13024,18 @@ function renderGallery() {
             const matchConf = MATCHES_CONFIG.find(m => m.id == matchId);
             if (!res || !matchConf) return;
 
-            res.innerText = '🌀 Đang xoay đồng xu...';
+            res.innerHTML = '<span style="display:inline-block;animation:spinCoin 0.6s ease-in-out infinite;font-size:24px;">🪙</span> <span style="color:#60a5fa;font-weight:800;">Đang xoay đồng xu 3D...</span>';
             const homeName = TEAMS_DATA[matchConf.home].fullName;
             const awayName = TEAMS_DATA[matchConf.away].fullName;
 
             setTimeout(() => {
                 const isHome = Math.random() > 0.5;
                 const winnerName = isHome ? homeName : awayName;
-                res.innerHTML = `🪙 Quyền chọn sân: <strong style="color:#fbbf24;">${winnerName}</strong>`;
+                const sideText = isHome ? 'MẶT NGỬA (CHỌN SÂN)' : 'MẶT SẤP (CHỌN BÓNG)';
+                res.innerHTML = `🪙 Quyền chọn: <strong style="color:#fbbf24;margin-left:4px;">${winnerName}</strong> <span style="font-size:11px;color:#34d399;margin-left:6px;background:rgba(52,211,153,0.15);padding:2px 8px;border-radius:6px;">${sideText}</span>`;
                 if (typeof playWhistleSound === 'function') playWhistleSound();
-                showToast(`🪙 Kết quả đồng xu: ${winnerName} thắng!`, 'success');
-            }, 600);
+                showToast(`🪙 Kết quả đồng xu: ${winnerName} (${sideText})`, 'success');
+            }, 800);
         }
 
         window.openRefereeToolkit = openRefereeToolkit;
@@ -12943,7 +13563,104 @@ function renderGallery() {
         window.playFinalSirenSound = playFinalSirenSound;
         window.exportOfficialMatchReport = exportOfficialMatchReport;
 
-        // Show floating admin button & init prediction form
+        // ============================================================
+        // ULTIMATE UI & ULTIMATE EXPERIENCE JS MODULE
+        // ============================================================
+        const ptxUltimateUI = (function() {
+            let canvas, ctx, particles = [], animationId;
+
+            function initCanvas() {
+                canvas = document.getElementById('confettiCanvas');
+                if (!canvas) return;
+                ctx = canvas.getContext('2d');
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+            }
+
+            function resizeCanvas() {
+                if (canvas) {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+            }
+
+            function triggerConfetti(durationMs = 3500) {
+                if (!canvas) initCanvas();
+                if (!ctx) return;
+
+                const colors = ['#F15A24', '#00F2FE', '#FFD700', '#3B82F6', '#EF4444', '#10B981'];
+                particles = [];
+                for (let i = 0; i < 120; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        size: Math.random() * 8 + 4,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: Math.random() * 5 + 3,
+                        rotation: Math.random() * 360,
+                        vRot: (Math.random() - 0.5) * 10
+                    });
+                }
+
+                cancelAnimationFrame(animationId);
+                const startTime = Date.now();
+
+                function render() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let alive = false;
+                    particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.rotation += p.vRot;
+                        if (p.y < canvas.height) alive = true;
+
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    });
+
+                    if (alive && Date.now() - startTime < durationMs) {
+                        animationId = requestAnimationFrame(render);
+                    } else {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    }
+                }
+                render();
+            }
+
+            function init3DTilt() {
+                document.querySelectorAll('.player-card-fifa, .standing-card, .match-card-v3, .ultimate-glass-card').forEach(card => {
+                    card.classList.add('card-3d-tilt');
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left - rect.width / 2;
+                        const y = e.clientY - rect.top - rect.height / 2;
+                        const rx = (y / rect.height) * -12;
+                        const ry = (x / rect.width) * 12;
+                        card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+                    });
+                });
+            }
+
+            return {
+                init: function() {
+                    initCanvas();
+                    setTimeout(init3DTilt, 1000);
+                },
+                triggerConfetti: triggerConfetti
+            };
+        })();
+
+        window.ptxUltimateUI = ptxUltimateUI;
+
+        // Show floating admin button & init prediction form & ultimate UI
         document.addEventListener('DOMContentLoaded', () => {
             function checkFloatBtn() {
                 const isAdmin = localStorage.getItem('ptx_admin_auth') === '1';
@@ -12953,6 +13670,7 @@ function renderGallery() {
             checkFloatBtn();
             setInterval(checkFloatBtn, 3000);
             setTimeout(initFanPredictionForm, 500);
+            ptxUltimateUI.init();
         });
     </script>
 </body>
