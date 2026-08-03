@@ -1,6 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 <!-- CACHE BUSTER & SW UNREGISTER SCRIPT -->
     <script>
         (function() {
@@ -31,12 +37,10 @@
     <link rel="canonical" href="https://ptxsummercup.vn" />
     <!-- Open Graph / Facebook / Zalo -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="PTX Summer Cup 2026 | Giải Bóng Đá PTX Group" />
-    <meta property="og:description" content="Giải bóng đá truyền thống PTX Summer Cup 2026 – 07/08/2026. 3 đội | 24 cầu thủ | Làm hết sức – Chơi hết mình!" />
-    <meta property="og:image" content="https://ptxsummercup.vn/th%C6%B0%20vi%E1%BB%87n/%E1%BA%A3nh%20logo%20-%20banner/Logo%20C%C3%B4ng%20%C4%90o%C3%A0n.webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://ptxsummercup.vn" />
+    <meta property="og:title" content="PTX Summer Cup 2026 | Giải Bóng Đá Công Đoàn PTX Group Việt Nam" />
+    <meta property="og:description" content="Giải bóng đá truyền thống PTX Group Việt Nam – 07/08/2026 tại 152 Hoàng Hoa Thám, TP.HCM" />
+    <meta property="og:image" content="thư viện/ảnh logo - banner/Logo Công Đoàn.webp" />
     <meta property="og:locale" content="vi_VN" />
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -62,6 +66,37 @@
            PTX SPORTS LUXE DESIGN SYSTEM v1.0 — SEMANTIC CONTRACT
            ============================================================ */
         :root {
+            /* Default Base Theme Fallbacks */
+            --theme-surface-page: #0F172A;
+            --theme-surface-primary: #1E293B;
+            --theme-surface-secondary: #182234;
+            --theme-surface-elevated: #243247;
+            --theme-text-primary: #F8FAFC;
+            --theme-text-secondary: #94A3B8;
+            --theme-text-muted: #64748B;
+            --theme-text-inverse: #0F172A;
+            --theme-border-default: rgba(255, 255, 255, 0.08);
+            --theme-border-strong: rgba(255, 255, 255, 0.14);
+            --theme-interactive-primary: #38BDF8;
+            --theme-interactive-hover: #7DD3FC;
+            --theme-interactive-active: #BAE6FD;
+            --theme-focus-ring: rgba(56, 189, 248, 0.40);
+            --theme-live: #F97316;
+            --theme-gold: #F59E0B;
+            --theme-silver: #CBD5E1;
+            --theme-bronze: #FB923C;
+            --theme-ai-accent: #A855F7;
+            --theme-ai-surface: linear-gradient(135deg, #1E1B4B, #0F172A);
+            --theme-ai-border: rgba(168, 85, 247, 0.35);
+            --theme-success: #4ADE80;
+            --theme-warning: #FBBF24;
+            --theme-danger: #F87171;
+            --theme-info: #38BDF8;
+            --theme-win: #4ADE80;
+            --theme-loss: #F87171;
+            --theme-draw: #94A3B8;
+            --theme-upcoming: #38BDF8;
+
             /* Surface */
             --surface-page: var(--theme-surface-page);
             --surface-primary: var(--theme-surface-primary);
