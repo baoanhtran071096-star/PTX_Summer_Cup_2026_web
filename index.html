@@ -11062,6 +11062,18 @@ function renderGallery() {
             localStorage.setItem('ptx_stat_red', '0');
             localStorage.setItem('ptx_seeded_flag', 'true');
 
+            // Force re-render of all core modules
+            if (typeof syncPlayerStatsFromMatches === 'function') syncPlayerStatsFromMatches();
+            if (typeof renderAllMatches === 'function') renderAllMatches();
+            if (typeof renderStandings === 'function') renderStandings();
+            if (typeof renderStandingsPageTable === 'function') renderStandingsPageTable();
+            if (typeof renderPlayerCards === 'function') renderPlayerCards();
+            if (typeof updateDashboard === 'function') updateDashboard();
+
+            showToast('✅ KHÔI PHỤC TOÀN BỘ DỮ LIỆU GỐC HỆ THỐNG THÀNH CÔNG!', 'success');
+        }
+        window.resetSystemDataToOfficialDefaults = resetSystemDataToOfficialDefaults;
+
         function requireToken(styles, token) {
             const val = styles.getPropertyValue(token).trim();
             if (!val) {
@@ -11242,9 +11254,6 @@ function renderGallery() {
                     ctx.fillText(label, lx, ly + 4);
                 });
             }
-        }lue="${p.name}">`).join('');
-                }
-            }
         }
 
         function quickGoalFromFloat() {
@@ -11292,175 +11301,6 @@ function renderGallery() {
             } catch (e) { /* Silently fail if AudioContext not available */ }
         }
 
-        // ============================================================
-        // TEAM RADAR CHART (Canvas API — Individual + Combined H2H)
-        // ============================================================
-        function drawTeamRadarCharts() {
-            const teams = [
-                { id: 'p', name: 'TEAM P (Phoenix)', color: '#3b82f6', stats: { 'Tấn công': 85, 'Phòng thủ': 78, 'Tốc độ': 82, 'Sức mạnh': 84, 'Kỹ thuật': 88, 'Đồng đội': 90 } },
-                { id: 't', name: 'TEAM T (Tiger)', color: '#ef4444', stats: { 'Tấn công': 92, 'Phòng thủ': 70, 'Tốc độ': 94, 'Sức mạnh': 88, 'Kỹ thuật': 81, 'Đồng đội': 82 } },
-                { id: 'x', name: 'TEAM X (Xiphias)', color: '#f59e0b', stats: { 'Tấn công': 78, 'Phòng thủ': 90, 'Tốc độ': 75, 'Sức mạnh': 80, 'Kỹ thuật': 84, 'Đồng đội': 87 } },
-            ];
-
-            // 1. Draw Individual Team Radar Charts
-            teams.forEach(team => {
-                const canvas = document.getElementById('radar-' + team.id);
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                const cx = canvas.width / 2, cy = canvas.height / 2;
-                const r = Math.min(cx, cy) - 30;
-                const labels = Object.keys(team.stats);
-                const values = Object.values(team.stats);
-                const n = labels.length;
-                const angleStep = (Math.PI * 2) / n;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                // Background grid
-                [0.2, 0.4, 0.6, 0.8, 1.0].forEach(scale => {
-                    ctx.beginPath();
-                    labels.forEach((_, i) => {
-                        const angle = i * angleStep - Math.PI / 2;
-                        const x = cx + r * scale * Math.cos(angle);
-                        const y = cy + r * scale * Math.sin(angle);
-                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                    });
-                    ctx.closePath();
-                    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-                // Spokes
-                labels.forEach((_, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-                    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-                // Data polygon
-                ctx.beginPath();
-                values.forEach((v, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    const x = cx + r * (v / 100) * Math.cos(angle);
-                    const y = cy + r * (v / 100) * Math.sin(angle);
-                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                });
-                ctx.closePath();
-                ctx.fillStyle = team.color + '33';
-                ctx.fill();
-                ctx.strokeStyle = team.color;
-                ctx.lineWidth = 2.5;
-                ctx.stroke();
-                // Dots
-                values.forEach((v, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    const x = cx + r * (v / 100) * Math.cos(angle);
-                    const y = cy + r * (v / 100) * Math.sin(angle);
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
-                    ctx.fillStyle = team.color;
-                    ctx.fill();
-                });
-                // Labels
-                ctx.font = 'bold 11px Arial';
-                ctx.fillStyle = '#e2e8f0';
-                ctx.textAlign = 'center';
-                labels.forEach((label, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    const lx = cx + (r + 22) * Math.cos(angle);
-                    const ly = cy + (r + 22) * Math.sin(angle);
-                    ctx.fillText(label, lx, ly + 4);
-                    // Value
-                    ctx.font = 'bold 10px Arial';
-                    ctx.fillStyle = team.color;
-                    ctx.fillText(values[i], cx + (r - 14) * (values[i] / 100) * Math.cos(angle), cy + (r - 14) * (values[i] / 100) * Math.sin(angle) + 4);
-                    ctx.font = 'bold 11px Arial';
-                    ctx.fillStyle = '#e2e8f0';
-                });
-                // Center label
-                ctx.font = 'bold 12px Arial';
-                ctx.fillStyle = team.color;
-                ctx.fillText(team.name.split(' ')[1], cx, cy + 4);
-            });
-
-            // 2. Draw Combined H2H Overlay Radar Chart
-            const combinedCanvas = document.getElementById('radar-combined');
-            if (combinedCanvas) {
-                const ctx = combinedCanvas.getContext('2d');
-                const cx = combinedCanvas.width / 2, cy = combinedCanvas.height / 2;
-                const r = Math.min(cx, cy) - 38;
-                const labels = ['Tấn công', 'Phòng thủ', 'Tốc độ', 'Sức mạnh', 'Kỹ thuật', 'Đồng đội'];
-                const n = labels.length;
-                const angleStep = (Math.PI * 2) / n;
-                ctx.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
-
-                // Background grid
-                [0.2, 0.4, 0.6, 0.8, 1.0].forEach(scale => {
-                    ctx.beginPath();
-                    labels.forEach((_, i) => {
-                        const angle = i * angleStep - Math.PI / 2;
-                        const x = cx + r * scale * Math.cos(angle);
-                        const y = cy + r * scale * Math.sin(angle);
-                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                    });
-                    ctx.closePath();
-                    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-
-                // Spokes
-                labels.forEach((_, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-                    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-
-                // Draw each team polygon overlay
-                teams.forEach(team => {
-                    const values = Object.values(team.stats);
-                    ctx.beginPath();
-                    values.forEach((v, i) => {
-                        const angle = i * angleStep - Math.PI / 2;
-                        const x = cx + r * (v / 100) * Math.cos(angle);
-                        const y = cy + r * (v / 100) * Math.sin(angle);
-                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-                    });
-                    ctx.closePath();
-                    ctx.fillStyle = team.color + '25';
-                    ctx.fill();
-                    ctx.strokeStyle = team.color;
-                    ctx.lineWidth = 2.5;
-                    ctx.stroke();
-
-                    values.forEach((v, i) => {
-                        const angle = i * angleStep - Math.PI / 2;
-                        const x = cx + r * (v / 100) * Math.cos(angle);
-                        const y = cy + r * (v / 100) * Math.sin(angle);
-                        ctx.beginPath();
-                        ctx.arc(x, y, 4, 0, Math.PI * 2);
-                        ctx.fillStyle = team.color;
-                        ctx.fill();
-                    });
-                });
-
-                // Labels
-                ctx.font = 'bold 11px Arial';
-                ctx.fillStyle = '#f8fafc';
-                ctx.textAlign = 'center';
-                labels.forEach((label, i) => {
-                    const angle = i * angleStep - Math.PI / 2;
-                    const lx = cx + (r + 24) * Math.cos(angle);
-                    const ly = cy + (r + 24) * Math.sin(angle);
-                    ctx.fillText(label, lx, ly + 4);
-                });
-            }
-        }
         // Draw on stats page load
         setTimeout(drawTeamRadarCharts, 500);
     </script>
