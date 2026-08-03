@@ -30,6 +30,22 @@ jobs:
       - run: npm run test:unit
       - run: npm run build
 
+  database-migrations:
+    name: Supabase schema — migrations + RLS + seed apply cleanly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase db start
+      - run: supabase db reset --local
+      # `db reset` already applies migrations/*.sql then seed.sql and fails
+      # the step on any SQL error — this is the migration-safety gate
+      # (docs/roadmap Part II §5) that this session's Docker Desktop could
+      # not verify locally (never finished initializing in time).
+      - run: supabase stop
+
   legacy-regression:
     name: R25 legacy regression suite
     runs-on: ubuntu-latest
