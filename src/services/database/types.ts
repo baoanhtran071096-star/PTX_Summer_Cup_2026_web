@@ -100,6 +100,19 @@ export type HallOfFameRow = {
   mvp_player_id: string | null;
 };
 
+export type PredictionPicks = Record<string, { homeScore: number; awayScore: number }>;
+
+export type PredictionRow = {
+  id: string;
+  display_name: string;
+  ticket_code: string;
+  picks: PredictionPicks;
+  mvp_player_id: string | null;
+  golden_boot_player_id: string | null;
+  submitted_by: string | null;
+  created_at: string;
+};
+
 export type TournamentSettingsRow = {
   slogan: string | null;
   message: string | null;
