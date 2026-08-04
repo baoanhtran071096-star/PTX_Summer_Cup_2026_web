@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { ROUTES } from '@/constants/routes';
-import { getTeamColorVar } from '../teamColor';
+import { getTeamColorVar } from '@/constants/teamColors';
 import type { TeamWithSquad } from '../types';
 
 export function TeamCard({ team }: { team: TeamWithSquad }) {

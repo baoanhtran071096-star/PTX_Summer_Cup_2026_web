@@ -14,7 +14,7 @@ export const ROUTES = {
   team: (slug: string) => `/doi/${slug}`,
   players: '/cau-thu',
   playerCompare: '/cau-thu/so-sanh',
-  player: (slug: string) => `/cau-thu/${slug}`,
+  player: (slug: string | number) => `/cau-thu/${slug}`,
   match: (id: string | number) => `/tran-dau/${id}`,
   predictions: '/du-doan',
   livestream: '/livestream',

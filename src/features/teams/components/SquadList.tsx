@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { ROUTES } from '@/constants/routes';
 import type { SquadMember } from '../types';
 
 const POSITION_LABELS: Record<SquadMember['position'], string> = {
@@ -14,21 +16,35 @@ export function SquadList({ squad }: { squad: SquadMember[] }) {
 
   return (
     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 'var(--ptx-space-2)' }}>
-      {squad.map((player) => (
-        <li
-          key={player.id}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            padding: 'var(--ptx-space-2) var(--ptx-space-3)',
-            borderRadius: 'var(--ptx-radius-sm)',
-            background: 'var(--surface-page)',
-          }}
-        >
-          <span>{player.name}</span>
-          <span style={{ color: 'var(--text-muted)' }}>{POSITION_LABELS[player.position]}</span>
-        </li>
-      ))}
+      {squad.map((player) => {
+        const content = (
+          <>
+            <span>{player.name}</span>
+            <span style={{ color: 'var(--text-muted)' }}>{POSITION_LABELS[player.position]}</span>
+          </>
+        );
+        const itemStyle: React.CSSProperties = {
+          display: 'flex',
+          justifyContent: 'space-between',
+          padding: 'var(--ptx-space-2) var(--ptx-space-3)',
+          borderRadius: 'var(--ptx-radius-sm)',
+          background: 'var(--surface-page)',
+          textDecoration: 'none',
+          color: 'inherit',
+        };
+
+        return (
+          <li key={player.id}>
+            {player.legacyId != null ? (
+              <Link href={ROUTES.player(player.legacyId)} style={itemStyle}>
+                {content}
+              </Link>
+            ) : (
+              <div style={itemStyle}>{content}</div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }

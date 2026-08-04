@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { TeamRadar } from './TeamRadar';
 import { SquadList } from './SquadList';
-import { getTeamColorVar } from '../teamColor';
+import { getTeamColorVar } from '@/constants/teamColors';
 import type { TeamWithSquad } from '../types';
 
 export function TeamProfile({ team }: { team: TeamWithSquad }) {

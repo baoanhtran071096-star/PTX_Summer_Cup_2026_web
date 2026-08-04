@@ -42,7 +42,6 @@ export type PlayerRow = {
   team_id: string;
   position: PlayerPosition;
   avatar_path: string | null;
-  rating: number;
   created_at: string;
   updated_at: string;
 };
@@ -62,7 +61,7 @@ export type MatchRow = {
   updated_at: string;
 };
 
-export type MatchEventType = 'goal' | 'own_goal' | 'assist' | 'yellow_card' | 'red_card';
+export type MatchEventType = 'goal' | 'own_goal' | 'assist' | 'yellow_card' | 'red_card' | 'mvp';
 
 export type MatchEventRow = {
   id: string;
@@ -88,6 +87,7 @@ export type PlayerStatsRow = {
   assists: number;
   yellow_cards: number;
   red_cards: number;
+  mvp_count: number;
 };
 
 export type HallOfFameRow = {
