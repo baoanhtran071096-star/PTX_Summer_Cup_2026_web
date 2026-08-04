@@ -47,16 +47,28 @@ Applying this application's `20260804000001_initial_schema.sql` (`create table p
 - `.env.production.local` (containing real production keys) remains on disk, gitignored, not committed, not printed — kept only because further investigation may require it; will be deleted once the identity/data question below is resolved one way or the other.
 - No other artifact was created or modified on the production project.
 
-## Required resolution before this plan may proceed
+## Resolution — CONFIRMED by product owner
 
-This is a genuine open question only the product owner can answer — this agent will not guess:
+The product owner has confirmed: the data found in `wmamuqylqqikvseuqerm` **belongs to a different, unrelated project** and must not be modified, deleted, migrated, reset, truncated, or overwritten under any circumstance.
 
-1. **Is `wmamuqylqqikvseuqerm` actually the correct production target for this application?** The existing data (generic Greek-letter team names, a schema that looks like a quick AI/no-code scaffold, zero real users) is inconsistent with "PTX Summer Cup 2026" being deployed here before — it looks like an unrelated prototype or leftover scaffold that happens to live in the same Supabase organization under a similarly-named project.
-2. **If yes, this is intentional and safe to overwrite:** an explicit instruction to drop/ignore the existing `teams`/`players`/`matches` tables (naming them explicitly, confirming they are disposable scaffold data with no real value) is required before this agent will touch them. This is not implied by the original Production One-Shot Directive, which assumed an empty project.
-3. **If no, a different ref is the real production target:** provide the correct ref and this plan will re-run its full identity/state verification against it before proceeding.
+**Consequence: `wmamuqylqqikvseuqerm` is reclassified as NOT the production target for PTX Summer Cup 2026.** The identity lock recorded in `docs/m13-production-deployment-plan.md` §0.1 (previously "Approved production ref: `wmamuqylqqikvseuqerm`") is **invalidated** — it was based on a name match (`ptx-summer-cup-2026`) that turned out not to reflect actual project ownership/purpose. This project is now **protected**: added to the deployment plan's denylist by ref, permanently, with no PTX command ever permitted to target it (see the updated plan §0.1/§2 for the enforced guard).
+
+**PTX Summer Cup 2026 requires a new, dedicated production Supabase project**, not yet created. Environment map going forward:
+
+| Environment | Project |
+|---|---|
+| Staging | `ptx-summer-cup-2026-staging` (ref `bugqhoktzzdvduzfjctm`) — unchanged, continues to exist post-GO per the deployment plan |
+| Production | **Not yet provisioned** — to be created by the product owner; ref to be supplied and locked before any deployment attempt |
+| Protected / do-not-touch | `wmamuqylqqikvseuqerm` — confirmed to belong to a different project; permanently denylisted from every PTX deployment command |
+
+## Cleanup performed following this resolution
+
+- `.env.production.local` (the credentials fetched for `wmamuqylqqikvseuqerm`) has been **deleted** from disk — there is no legitimate reason for this codebase to hold credentials for a project it must never touch.
+- The Supabase CLI has been **unlinked** (`supabase unlink`) so no local command defaults to targeting `wmamuqylqqikvseuqerm`.
+- No other artifact from this investigation touched the protected project beyond the read-only checks already logged above.
 
 ## Terminal state
 
-**PRODUCTION DEPLOYMENT — BLOCKED/FAILED**
+**PRODUCTION DEPLOYMENT — BLOCKED/FAILED** (identity resolved as invalid; not merely unresolved)
 
-No production mutation occurred. No rollback is needed (nothing was changed). Awaiting explicit resolution of the identity/data-ownership question above before this directive can be re-attempted.
+No production mutation ever occurred against `wmamuqylqqikvseuqerm`, and none ever will — it is now permanently protected. No rollback is needed. This directive cannot proceed until a new production Supabase project is created and its ref is supplied.

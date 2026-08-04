@@ -1,17 +1,20 @@
 # M13 — Production Deployment Plan (NOT YET AUTHORIZED)
 
-> **Status: STOP.** This plan is prepared per the M13 Final Production Requirements directive. Every command below targets the **production** Supabase project. **None of it has been executed.** Passing every gate in this document does not itself authorize execution — that requires a separate, explicit Production GO from the product owner (§15). Bypass/auto-approve permissions this agent may hold in its tooling are **not** a substitute for that human decision and must never be treated as one.
+> **Status: STOP — production project not yet provisioned.** This plan is prepared per the M13 Final Production Requirements directive. Every command below targets the **production** Supabase project — **which does not yet exist / has not yet been identified** (see §0.1). **None of this plan has been executed.** Passing every gate in this document does not itself authorize execution — that requires a separate, explicit Production GO from the product owner (§15). Bypass/auto-approve permissions this agent may hold in its tooling are **not** a substitute for that human decision and must never be treated as one.
 
-Prerequisite reading: `docs/gates/m13-staging-evidence.md` (what was verified on staging and how), `docs/gates/m12.5-evidence.md` (the certified RC baseline this plan deploys), `docs/m13-final-production-requirements-audit.md` (gap audit this version closes).
+Prerequisite reading: `docs/gates/m13-staging-evidence.md` (what was verified on staging and how), `docs/gates/m12.5-evidence.md` (the certified RC baseline this plan deploys), `docs/m13-final-production-requirements-audit.md` (gap audit this version closes), `docs/m13-production-deployment-blocked-incident.md` (why the previously-locked ref was invalidated).
 
-## 0. Decisions — LOCKED by explicit product-owner sign-off
+## 0. Decisions — 3 of 4 LOCKED; production identity REVOKED, pending re-lock
 
-All four decisions below are now locked. Nothing in this section is inferred or assumed — each was explicitly confirmed.
+### 0.1 Production project identity — **REVOKED, not yet re-locked**
 
-### 0.1 Production project identity — LOCKED
-
-- **Approved production ref: `wmamuqylqqikvseuqerm`** (name `ptx-summer-cup-2026`, org `dpgiiwquogbgskyjeetv`) — explicitly confirmed by the product owner.
-- **Known-wrong refs, hardcoded as a blocklist for every guard check in this plan** (never valid targets for any command below): `bugqhoktzzdvduzfjctm` (staging — `ptx-summer-cup-2026-staging`), `dbnsaqczauxcriibwubg` (unrelated inactive project).
+- **`wmamuqylqqikvseuqerm` (name `ptx-summer-cup-2026`) is NOT the production target.** It was provisionally confirmed by name match, then found on identity/state verification to already contain a live, unrelated dataset (different schema, different team/player names, no relationship to this application). The product owner confirmed this data belongs to a different project and must never be touched. **This ref is now permanently protected — see the denylist below.**
+- **No new production ref has been provided yet.** PTX Summer Cup 2026 requires a new, dedicated Supabase project, to be created by the product owner. §1–§17 below cannot execute until a real ref is supplied here and locked the same way §0.1 was locked before (explicit product-owner confirmation, independently re-verified via `supabase projects list` and a fresh identity/state check — the exact process that caught the previous project being wrong must run again for whatever ref is supplied next).
+- **Permanent denylist — these refs must NEVER be a target of any PTX command, under any circumstance, regardless of what production ref is eventually supplied:**
+  - `wmamuqylqqikvseuqerm` — **PROTECTED.** Confirmed by the product owner to belong to a different, unrelated project. Not staging, not a spare/inactive project — an actively-owned project belonging to someone/something else. No migration, seed, reset, truncate, delete, or any other mutating command may ever target this ref.
+  - `bugqhoktzzdvduzfjctm` — this project's own staging environment (`ptx-summer-cup-2026-staging`); valid for staging commands only, never for a production command.
+  - `dbnsaqczauxcriibwubg` — unrelated inactive project, no known relationship to this work.
+- **Every guard block in this plan checks the target ref against this denylist in addition to matching the (currently unset) approved production ref** — a name match alone (as happened with `wmamuqylqqikvseuqerm`) is insufficient and must never be trusted again without also independently checking the project's actual current data/schema state before any mutation, exactly as §1 row 3 below requires.
 
 ### 0.2 Backup & Disaster Recovery — LOCKED (alternative strategy, no PITR)
 
@@ -48,29 +51,30 @@ Verified factually against the current `supabase/seed.sql` (not asserted):
 | # | Check | Command / method | Pass condition |
 |---|---|---|---|
 | 1 | Git state matches an approved, reviewed commit | `git status --short` (must be empty or only expected untracked docs), `git log -1 --format=%H` (record the SHA being deployed) | Working tree clean; SHA recorded in this plan before proceeding |
-| 2 | Production ref confirmed and not on the blocklist | `npx supabase projects list`, compare against §0.1's confirmed ref, verify it is NOT `bugqhoktzzdvduzfjctm` or `dbnsaqczauxcriibwubg` | Exact match to §0.1's confirmed ref; blocklist check passes |
-| 3 | Migration history is exactly what's expected | `npx supabase migration list --linked` (after linking in §2) compared against `ls supabase/migrations/` | Remote has either 0 migrations (fresh project) or a strict prefix of the local list — never a migration locally that isn't in the committed history, and never a remote migration absent locally |
-| 4 | Environment variables present and correctly scoped | Confirm `.env.production.local` exists, is gitignored (`git check-ignore`), and is **not** the same file/values as `.env` or `.env.staging.local` | All three conditions true |
-| 5 | Secret scan clean | `npm run verify:secrets` | 0 findings |
-| 6 | Fresh pre-deployment backup taken and integrity-verified | Per §0.2's locked policy: take a dump, timestamp it, store it outside the production project, verify it's non-empty and restorable | Dump exists, timestamped, integrity check passes — **if this fails, STOP; do not proceed to step 2 under any circumstance** |
-| 7 | Rollback prerequisites available | Confirm the restore procedure from the §0.2 backup is documented and the exact commands/tooling for it (e.g. your dump tool's restore command) are available on the machine that would perform a restore | Commands confirmed to exist and match this plan's usage |
+| 2 | Production ref confirmed by name AND not on the permanent denylist | `npx supabase projects list`, compare against §0.1's confirmed ref, verify it is NOT `wmamuqylqqikvseuqerm`, `bugqhoktzzdvduzfjctm`, or `dbnsaqczauxcriibwubg` | Exact match to §0.1's confirmed ref; denylist check passes. **A name match is not sufficient on its own** — row 3 below must also pass before this row can be considered satisfied |
+| 3 | Current database state independently verified to be empty/owned by this project — not just a name match | Read-only REST checks (service-role key) against `teams`, `players`, `matches`, `profiles`, and any other table this app's migrations would create; also check row counts and sample content, not just existence | Either 0 rows in every table (fresh project) or, if rows exist, they are verifiably this application's own previously-deployed data (schema and content match `docs/migration/r25-extracted.json`) — **any unexpected data or schema, no matter how plausible-looking, is an automatic STOP** (this is exactly the check that caught `wmamuqylqqikvseuqerm`) |
+| 4 | Migration history is exactly what's expected | `npx supabase migration list --linked` (after linking in §2) compared against `ls supabase/migrations/` | Remote has either 0 migrations (fresh project) or a strict prefix of the local list — never a migration locally that isn't in the committed history, and never a remote migration absent locally |
+| 5 | Environment variables present and correctly scoped | Confirm `.env.production.local` exists, is gitignored (`git check-ignore`), and is **not** the same file/values as `.env` or `.env.staging.local` | All three conditions true |
+| 6 | Secret scan clean | `npm run verify:secrets` | 0 findings |
+| 7 | Fresh pre-deployment backup taken and integrity-verified | Per §0.2's locked policy: take a dump, timestamp it, store it outside the production project, verify it's non-empty and restorable | Dump exists, timestamped, integrity check passes — **if this fails, STOP; do not proceed to step 2 under any circumstance** |
+| 8 | Rollback prerequisites available | Confirm the restore procedure from the §0.2 backup is documented and the exact commands/tooling for it (e.g. your dump tool's restore command) are available on the machine that would perform a restore | Commands confirmed to exist and match this plan's usage |
 
 **If any row fails: STOP. Do not proceed to step 2.**
 
-## 2. Link to production (identity-guarded)
+## 2. Link to production (identity-guarded — cannot run until §0.1 has a real ref)
 
 ```bash
 npx supabase link --project-ref <CONFIRMED_PRODUCTION_REF> --yes
 LINKED=$(cat supabase/.temp/project-ref)
-if [ "$LINKED" != "<CONFIRMED_PRODUCTION_REF>" ] || [ "$LINKED" = "bugqhoktzzdvduzfjctm" ] || [ "$LINKED" = "dbnsaqczauxcriibwubg" ]; then
+if [ "$LINKED" != "<CONFIRMED_PRODUCTION_REF>" ] || [ "$LINKED" = "wmamuqylqqikvseuqerm" ] || [ "$LINKED" = "bugqhoktzzdvduzfjctm" ] || [ "$LINKED" = "dbnsaqczauxcriibwubg" ]; then
   echo "ABORT: linked ref ($LINKED) failed identity guard"; exit 1
 fi
 ```
-Re-run this exact guard block (re-reading `supabase/.temp/project-ref`, re-checking against both the allowlist-of-one and the blocklist) immediately before every subsequent mutating command in this plan — not just once here. This mirrors the discipline already used and proven in the staging phase (`docs/gates/m13-staging-evidence.md` §0).
+Re-run this exact guard block (re-reading `supabase/.temp/project-ref`, re-checking against both the confirmed ref and the full permanent denylist above, **including `wmamuqylqqikvseuqerm`**) immediately before every subsequent mutating command in this plan — not just once here. This mirrors the discipline already used and proven in the staging phase (`docs/gates/m13-staging-evidence.md` §0), strengthened after the incident recorded in `docs/m13-production-deployment-blocked-incident.md`: a name match is necessary but not sufficient — §1 row 3's independent data/schema check must also pass, every time, for whatever ref is linked.
 
 ## 3. Mandatory pre-migration backup (per the locked §0.2 policy — blocking, not optional)
 
-Take a fresh dump **immediately before** running any migration, even if the Preflight Gate's dump (§1, row 6) was recent — migrations are exactly the "controlled deployment" scenario §0.2 targets for ≈0 RPO. Verify its integrity the same way as §1 row 6. **If this backup or its verification fails, STOP — do not proceed to §4.**
+Take a fresh dump **immediately before** running any migration, even if the Preflight Gate's dump (§1, row 7) was recent — migrations are exactly the "controlled deployment" scenario §0.2 targets for ≈0 RPO. Verify its integrity the same way as §1 row 7. **If this backup or its verification fails, STOP — do not proceed to §4.**
 
 ## 4. Migrate schema
 
@@ -188,8 +192,9 @@ Check, and record findings for, each of:
 
 Any of the following, at any point during this plan's execution, means **stop immediately, do not proceed to the next step, and do not declare success**:
 
-- Linked project ref does not exactly match §0.1's confirmed ref, or matches anything on the blocklist.
-- The mandatory pre-deployment or pre-migration backup (§1 row 6, §3), or its integrity verification, fails.
+- Linked project ref does not exactly match §0.1's confirmed ref, or matches anything on the permanent denylist — **`wmamuqylqqikvseuqerm` above all**, confirmed to belong to a different project; no exception, no override, ever.
+- Any table this application would create already contains data or a schema that doesn't match this application (§1 row 3) — regardless of how plausible the project's name looks.
+- The mandatory pre-deployment or pre-migration backup (§1 row 7, §3), or its integrity verification, fails.
 - Any migration fails to apply.
 - `verify-data-parity.js` reports any mismatch.
 - Any RLS/anon-write check succeeds when it should have been denied (a security regression).
@@ -215,7 +220,7 @@ Everything in this plan is a deployment/operations procedure. It is **not** grou
 | Trigger | Exact response |
 |---|---|
 | Migration fails partway through §4 | `supabase migration list --linked` to see exactly which landed. **Correction from an earlier draft of this plan, verified by grepping all 11 files, not assumed:** 2 of the 11 migrations do contain destructive statements — `20260804000004_drop_unused_player_rating_column.sql` (`alter table players drop column rating`) and `20260804000006_drop_stored_prediction_points.sql` (`alter table predictions drop column points`). Both are safe **specifically because this is a first-time deployment to an empty production project** — the column is created earlier in the same 11-migration batch and dropped before any real row could ever populate it, so zero real data is lost. This reasoning stops applying the moment production has real data: any *future* migration must never `DROP COLUMN`/`DROP TABLE` against a table with real rows without an explicit, separately-authorized add→backfill→drop-in-a-later-release sequence (§5's rule). The other 9 migrations are additive only. Fix the failing migration file, re-run `db push --linked` to continue; a partial application is not catastrophic because nothing already-applied is destroyed. |
-| Data-correctness problem found after go-live | Restore from the most recent valid dump — either the mandatory pre-migration dump (§3) if the problem stems from the deployment itself (≈0 data loss, since that dump was taken immediately before), or the most recent daily dump for anything unrelated to this deployment (accept up to 24h data loss per the locked §0.2 risk acceptance). Use the dump tool's documented restore procedure (confirmed available per Preflight §1 row 7 — read its actual current usage/flags before running, never assumed from memory). After restore: re-run the full §11 "safe after deploy" gate set to confirm the restored state is healthy, and re-run `verify-data-parity.js`. |
+| Data-correctness problem found after go-live | Restore from the most recent valid dump — either the mandatory pre-migration dump (§3) if the problem stems from the deployment itself (≈0 data loss, since that dump was taken immediately before), or the most recent daily dump for anything unrelated to this deployment (accept up to 24h data loss per the locked §0.2 risk acceptance). Use the dump tool's documented restore procedure (confirmed available per Preflight §1 row 8 — read its actual current usage/flags before running, never assumed from memory). After restore: re-run the full §11 "safe after deploy" gate set to confirm the restored state is healthy, and re-run `verify-data-parity.js`. |
 | A migration itself is found to be destructive and not safely reversible (relevant to any *future* release once production holds real data) | **Do not deploy it.** Redesign it as a non-destructive, additive change (e.g., add-then-backfill-then-later-drop as three separate migrations across releases, not one), or explicitly escalate for a fresh risk-acceptance decision before this plan may include it. |
 | Storage upload partially fails | `scripts/upload-r25-media.js` uses `upsert: true` per file and reports `uploaded/failed` counts — safe to re-run, never duplicates or corrupts already-succeeded files. |
 | Application (Next.js) needs to roll back independent of the database | Hosting-platform rollback (e.g., Vercel's instant rollback to the previous deployment) — depends on §0.5's hosting decision, out of scope for this Supabase-focused plan. |
@@ -225,4 +230,11 @@ Everything in this plan is a deployment/operations procedure. It is **not** grou
 
 ## Explicit stop
 
-This plan is **prepared, not executed.** No command in it has been run against any production project in this session. Resuming from here requires: (a) all of §0's decisions locked with real answers, (b) a fresh Preflight Gate pass (§1), and (c) an explicit, separate Production GO authorization.
+This plan is **prepared, not executed.** No command in it has ever mutated any production project. §0.1's production identity was locked once, then **revoked** after identity/state verification found the confirmed-by-name project already belonged to someone else (`docs/m13-production-deployment-blocked-incident.md`) — that project is now permanently protected and this plan cannot execute until:
+
+1. **A new, dedicated Supabase project is created for PTX Summer Cup 2026** (by the product owner — this agent cannot create Supabase projects/accounts/billing on the product owner's behalf).
+2. Its ref is supplied and locked in §0.1 the same explicit way as before.
+3. §1's full Preflight Gate — **including row 3's independent data/schema check**, not just a name match — passes against that new ref.
+4. A fresh, explicit, separate Production GO authorization is given.
+
+Staging (`ptx-summer-cup-2026-staging`) is unaffected and remains available for continued verification in the meantime.
