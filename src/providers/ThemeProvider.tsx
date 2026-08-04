@@ -12,14 +12,30 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-function readInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light';
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  return stored === 'light' || stored === 'dark' || stored === 'summer' ? stored : 'light';
+function isValidTheme(value: string | null): value is Theme {
+  return value === 'light' || value === 'dark' || value === 'summer';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(readInitialTheme);
+  // Always 'light' on both the server render and the client's FIRST
+  // render — reading localStorage in a useState lazy initializer would
+  // make that first client render differ from the server's HTML,
+  // which React silently fails to reconcile for some attributes
+  // (a real bug found via E2E: a theme button's aria-pressed got stuck
+  // permanently wrong after reload). Applying the persisted theme in
+  // an effect, after mount, keeps hydration consistent — the real
+  // theme applies via a normal state update microseconds later
+  // instead of during hydration itself.
+  const [theme, setThemeState] = useState<Theme>('light');
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    // Justified exception: syncing from an external system (localStorage)
+    // that's genuinely unavailable during SSR — there's no synchronous
+    // alternative that keeps the first client render matching the server.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (isValidTheme(stored)) setThemeState(stored);
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

@@ -11,14 +11,18 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
+    "test:e2e": "playwright test",
     "verify:architecture": "node scripts/verify-architecture.js",
     "verify:design-tokens": "node scripts/audit-colors.js",
+    "verify:secrets": "node scripts/scan-secrets.js",
     "test:legacy": "node tests/run-tests.js",
     "test": "node tests/run-tests.js",
     "serve": "node .claude/dev-server.js"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@eslint/eslintrc": "^3.3.6",
+    "@playwright/test": "^1.62.1",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^6.0.5",

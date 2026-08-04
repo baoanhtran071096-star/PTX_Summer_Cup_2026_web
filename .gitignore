@@ -19,3 +19,8 @@ next-env.d.ts
 out/
 .vercel/
 *.tsbuildinfo
+
+# Playwright (new Next.js E2E suite)
+/test-results/
+/playwright-report/
+/blob-report/

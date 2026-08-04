@@ -33,7 +33,7 @@ export default function AdminMediaPage() {
         </label>
         <button
           type="submit"
-          style={{ background: 'var(--interactive-primary)', color: 'var(--ptx-white)', border: 'none', borderRadius: 'var(--ptx-radius-sm)', padding: 'var(--ptx-space-2) var(--ptx-space-4)' }}
+          style={{ background: 'var(--interactive-primary)', color: 'var(--text-on-interactive-primary)', border: 'none', borderRadius: 'var(--ptx-radius-sm)', padding: 'var(--ptx-space-2) var(--ptx-space-4)' }}
         >
           Tải lên
         </button>

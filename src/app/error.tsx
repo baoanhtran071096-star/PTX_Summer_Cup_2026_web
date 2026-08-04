@@ -22,7 +22,7 @@ export default function RouteError({
         onClick={reset}
         style={{
           background: 'var(--interactive-primary)',
-          color: 'var(--ptx-white)',
+          color: 'var(--text-on-interactive-primary)',
           border: 'none',
           borderRadius: 'var(--ptx-radius-sm)',
           padding: 'var(--ptx-space-2) var(--ptx-space-4)',

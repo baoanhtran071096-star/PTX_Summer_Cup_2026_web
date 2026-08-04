@@ -44,7 +44,7 @@ export default async function AdminTeamsPage() {
             </div>
             <button
               type="submit"
-              style={{ justifySelf: 'start', background: 'var(--interactive-primary)', color: 'var(--ptx-white)', border: 'none', borderRadius: 'var(--ptx-radius-sm)', padding: 'var(--ptx-space-2) var(--ptx-space-4)' }}
+              style={{ justifySelf: 'start', background: 'var(--interactive-primary)', color: 'var(--text-on-interactive-primary)', border: 'none', borderRadius: 'var(--ptx-radius-sm)', padding: 'var(--ptx-space-2) var(--ptx-space-4)' }}
             >
               Lưu
             </button>

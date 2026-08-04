@@ -9,7 +9,7 @@ export function PlayerRating({ rating }: { rating: number }) {
         height: '2.5rem',
         borderRadius: '50%',
         background: 'var(--prestige-accent)',
-        color: 'var(--ptx-white)',
+        color: 'var(--text-on-prestige-accent)',
         fontWeight: 700,
         fontFamily: 'var(--ptx-font-title)',
       }}
