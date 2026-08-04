@@ -28,5 +28,15 @@
 ## What this audit does NOT do
 
 - Does not touch production or staging in any mutating way (staging's known-good state from the prior phase is unchanged).
-- Does not decide the 4 items that are genuinely the product owner's call (see the questions in this turn): the exact confirmed production ref, the Backup/PITR strategy, final sign-off on the seed policy as drafted, and reconfirmation of the Team T/X asset decision.
-- Does not authorize a "Production One-Shot Directive" — per your own stated sequencing, that comes only after the 4 decisions are locked.
+- Does not itself authorize a "Production One-Shot Directive" — per the stated sequencing, that is a separate, subsequent step.
+
+## All 4 decisions — now LOCKED
+
+| Decision | Locked answer |
+|---|---|
+| Production ref | `wmamuqylqqikvseuqerm` (name `ptx-summer-cup-2026`) — explicitly confirmed |
+| Backup/DR strategy | Alternative strategy (no PITR): daily automated dump + mandatory pre-deployment/pre-migration dump + mandatory pre-bulk-admin-change dump. RPO ≤24h normal / ≈0 for controlled changes. RTO ≤2h. Integrity-checked, stored outside the production DB, periodically restore-tested. Deployment is blocked if the pre-deployment backup or its verification fails. Risk formally accepted by the product owner. |
+| Production Seed Policy | Accepted as-is — the allowlist/blocklist verified against the real `seed.sql` in this audit |
+| Team T/X lost assets | No change from M12.5 — still `SOURCE_LOST_PENDING_REPLACEMENT`, launch without them |
+
+See `docs/m13-production-deployment-plan.md` §0 for the full locked record with rationale. With all 4 locked, the plan is ready for a Production One-Shot Directive whenever the product owner chooses to issue one — this audit does not issue that directive itself.
