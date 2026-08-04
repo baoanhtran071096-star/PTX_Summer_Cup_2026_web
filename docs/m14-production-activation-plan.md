@@ -1,6 +1,13 @@
-# M14 — Production Activation & Operational Readiness Plan (AUDIT + PLAN ONLY — NOT EXECUTED)
+# M14 — Production Activation & Operational Readiness Plan
 
-> **Status: NOT STARTED.** This document is the audit and plan requested before any M14 execution. No hosting has been created, no Auth configuration has been changed, no real admin has been created, and no public launch has occurred. M13's certified production baseline (`ptx-summer-cup-2026-production`, ref `tqdsvtuspehavhcygipf`, commit `296b905` deployed, certified at `3999c83`) was re-verified read-only during this audit and confirmed **unchanged** — see §0.
+> **Status: 4 decisions LOCKED by the product owner; hosting project/repo connection not yet created — see §1's exact next gate.** No hosting project has been created, no Auth configuration has been changed, no real admin has been created, and no public launch has occurred. M13's certified production baseline (`ptx-summer-cup-2026-production`, ref `tqdsvtuspehavhcygipf`, commit `296b905` deployed, certified at `3999c83`) remains unchanged.
+
+## Locked decisions (product owner, this phase)
+
+1. **Hosting:** Vercel. A Vercel-provided HTTPS URL is an acceptable initial canonical production URL — a custom domain is deferred, not a blocker, and will be its own separately-verified change later.
+2. **First admin:** a real, product-owner-approved identity — never invented, seeded, or fabricated by this agent.
+3. **Backups:** automated via a scheduled GitHub Actions workflow. Dumps are never committed to Git history; backup credentials live only in the appropriate secret store; storage destination must be private/off-site with explicit retention and integrity verification.
+4. **Log review:** manual Supabase Dashboard Logs Explorer review by the product owner is the accepted human verification gate for service logs this agent cannot retrieve independently. This gate is not claimed PASS until the product owner explicitly confirms it.
 
 ## 0. Audit findings (real checks performed, not assumed)
 
@@ -22,14 +29,24 @@
 | Team T/X assets | Unchanged — still `SOURCE_LOST_PENDING_REPLACEMENT`, no fabrication |
 | Legacy regression | Unchanged — still 15/16, the one known pre-existing baseline artifact from M-01, not independently re-investigated or "fixed" for this audit |
 
-## 1. Canonical production hosting/domain — **PO decision required, blocks everything below it**
+## 1. Canonical production hosting/domain — **LOCKED: Vercel; one exact gate remains**
 
-Nothing else in this plan (§2, §3, §5) can be executed until this is answered. Options, not a recommendation to act on any of them without confirmation:
-- **Vercel** (typical default for Next.js; zero-config for the App Router, but is a new account/billing relationship this agent cannot create)
-- **Another platform** (Netlify, Fly.io, a self-managed VPS, etc.) — each has different env-var and build-config mechanics
-- **Domain:** a real custom domain (e.g. `ptxsummercup2026.com`) vs. the hosting platform's default subdomain (e.g. `ptx-summer-cup-2026.vercel.app`) — affects §3's exact redirect URL value and whether DNS/SSL setup is a separate task
+**Decision:** Vercel, with its default HTTPS URL as the initial canonical production URL. Custom domain deferred to a later, separately-verified change.
 
-**This agent cannot create hosting accounts, purchase domains, or bind billing** (matches the same constraint already applied to Supabase project creation in M13). The product owner needs to either create the hosting project themselves and hand over deploy access, or explicitly direct which existing account/project to use.
+**Finding from this session's environment (not assumed — checked directly):** `npx vercel whoami` succeeded without this agent supplying any credentials — the environment already held a valid Vercel session, authenticated as **`baoanhtran071096-star`** (team `baoanhtran071096-stars-projects`). `npx vercel projects ls` (read-only) confirms this is a real, pre-existing account with 2 unrelated projects (`drive-master-ai`, `drive-master-ai-h9np`) and **no PTX Summer Cup project yet**. Nothing was created or modified by these two read-only checks.
+
+**Exact next gate — the "external account authorization, repository connection" this plan was told to stop for, not bypass:**
+
+| | |
+|---|---|
+| **Operation** | Create a new Vercel project for this repository and connect it to GitHub (`vercel link` + `vercel git connect`, or the equivalent via the Vercel dashboard's "Import Git Repository" flow) |
+| **Target** | Vercel account/team `baoanhtran071096-stars-projects` |
+| **Expected effect** | A new Vercel project is created (consumes one project slot on whatever plan this account is on); Vercel's GitHub App gets repository read access to `PTX_Summer_Cup_2026_web_R25` in order to build on every push; a first deployment builds automatically once connected |
+| **Rollback** | Delete the Vercel project (Vercel dashboard → Project Settings → Delete), and/or revoke the GitHub App's repository access from GitHub's own Settings → Applications — both fully reversible, no data loss (this is a hosting/build pipeline, not the Supabase backend) |
+| **Verification** | After connecting: confirm a production deployment builds successfully and serves the app at the assigned `*.vercel.app` URL, with `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` set correctly (§2) |
+| **Product Owner action required** | **Confirm explicitly that `baoanhtran071096-stars-projects` is the correct account to use, and authorize this agent to run `vercel link`/`vercel git connect` (or state you'll do the Import Git Repository step yourself via the Vercel dashboard instead).** Connecting GitHub's side of this (the Vercel GitHub App installation) may itself prompt a GitHub-side authorization screen the first time — if the CLI flow surfaces that prompt, this agent will stop and report it rather than attempting to click through it blindly. |
+
+Nothing in §2, §3, §5, §6 can execute until this specific gate is resolved.
 
 ## 2. Production environment binding
 
@@ -44,11 +61,19 @@ Once §1 is answered:
 - `additional_redirect_urls` needs the real domain's auth callback path.
 - **Cannot be finalized before §1.** Placeholder value only until then.
 
-## 4. First real production administrator
+## 4. First real production administrator — **LOCKED policy; exact procedure prepared, execution waits on §1**
 
-- A real person (the product owner or their designated admin) signs up **through the real, publicly-hosted app** (not the Admin API shortcut used for M13's disposable verification account) — this is a genuine, permanent account, not something this agent fabricates.
-- The one-time service-role promotion PATCH (`profiles.role = 'admin'`) should be run once by whoever holds the production service-role key at that time, mirroring the exact bootstrap mechanism already proven working in M13 §7/§8 — this agent can perform it if asked, but the account itself must belong to a real person, decided by the product owner, not invented.
-- **PO decision needed:** who is this person, and what email should be used?
+**Decision:** the identity is the product owner's to name — never invented, seeded, or fabricated by this agent. This agent will not create, guess, or select an email/identity on its own.
+
+**Exact onboarding + RBAC verification procedure (ready to run once §1's app is live):**
+
+1. **Product owner action:** visit the real public production URL's `/dang-nhap` (login) page and sign up with the real email address they want to use as the first admin, choosing their own real password. This agent will not ask the product owner to paste that password anywhere — signup happens directly in their own browser session.
+2. **This agent verifies (read-only):** the `profiles` row auto-created by the trigger shows the new user with `role = 'viewer'` — confirms the same trigger already proven in M13 fired correctly for a real user, not a synthetic one.
+3. **This agent performs the one-time promotion:** a single service-role `PATCH` setting that specific real user's `profiles.role = 'admin'` — the same, already-proven bootstrap mechanism from M13 §7/§8. This is the only point a service-role credential touches a real user record, run once, not scripted into anything re-runnable by accident.
+4. **This agent verifies (through the real app, not raw REST):** log out; ask the product owner to log back in with their own credentials (this agent does not hold or request their password); confirm the admin UI (`/admin`) is reachable for that account and a real, idempotent admin action (e.g. viewing `/admin/teams`) succeeds.
+5. **Stop condition:** if step 4 requires entering the product owner's password into any field this agent controls, this agent stops and asks the product owner to perform that specific interactive step themselves, exactly as password entry is always handled per this agent's standing rules.
+
+No disposable/test account is created for this step — unlike M13's verification account (which existed solely to prove the mechanism and was fully deleted), this one is the real, permanent first admin and is meant to persist.
 
 ## 5. Public-URL browser/E2E/accessibility verification
 
@@ -62,17 +87,20 @@ Once §1–§4 are resolved, this agent will:
 - Re-confirm real image delivery (avatar/logo) renders correctly when fetched by the actual public app, not just via direct `curl` (already proven in M13, but doing it once more through the real hosted app closes the loop end-to-end).
 - Re-confirm Realtime updates propagate to a real browser session hitting the public URL (e.g. open the public schedule page, trigger a controlled, reverted match-status change server-side, confirm the open browser tab updates live) — a stronger proof than the Node-script-only test done in M13.
 
-## 7. Observability / log review
+## 7. Observability / log review — **LOCKED: manual PO Dashboard review is the accepted gate**
 
-- **Real limitation, stated plainly:** this agent has no CLI/API path to Auth/API/Storage/Realtime request-level logs — only Supabase Dashboard access has that. `supabase inspect db *` gives DB-performance diagnostics (locks, bloat, slow queries, cache hit rates) which this agent *can* run and will include as a baseline health check, but it is not a substitute for the Dashboard's Logs Explorer.
-- **Proposed protocol:** either (a) the product owner reviews the Dashboard's Logs Explorer directly after go-live and reports findings back, or (b) the product owner grants this agent session dashboard-level access (outside this agent's current tooling — not something achievable via the CLI used so far). Recommend (a) as the default, ongoing operational practice, not a one-time M14 gate.
+- **Real limitation, stated plainly:** this agent has no CLI/API path to Auth/API/Storage/Realtime request-level logs — only Supabase Dashboard access has that. `supabase inspect db *` gives DB-performance diagnostics (locks, bloat, slow queries, cache hit rates), which this agent will still run as a baseline health check, but it is not a substitute for the Dashboard's Logs Explorer.
+- **Accepted protocol:** the product owner reviews the Dashboard's Logs Explorer directly, using the exact checklist in `docs/m14-log-review-checklist.md` (created this phase), and explicitly confirms completion. **This agent will not claim this gate PASS on the product owner's behalf** — it stays open until that explicit confirmation arrives, at which point it's recorded verbatim in the final certification report.
 
-## 8. Backup scheduling, retention, and operational restore readiness
+## 8. Backup scheduling, retention, and operational restore readiness — **LOCKED: GitHub Actions; architecture prepared, one PO decision remains**
 
-- **Gap:** the locked §0.2 policy (daily automated dump + pre-deployment/pre-migration/pre-bulk-change dumps) has never been automated — only manual one-offs exist so far.
-- **Proposed design:** a new scheduled GitHub Actions workflow (e.g. `.github/workflows/production-backup.yml`) running `supabase db dump --linked` daily against the production ref, using a `SUPABASE_ACCESS_TOKEN` + `SUPABASE_PROJECT_REF` stored as GitHub Actions secrets (never committed), uploading the resulting `.sql` file to a durable, access-controlled destination.
-- **PO decision needed:** where should the actual dump files land? Options: a private cloud storage bucket (S3/GCS/Azure Blob — needs an account/credentials this agent doesn't have), a private GitHub Actions artifact (has a retention-days limit, not ideal for long-term retention), or another destination the product owner specifies. This agent can author the workflow once the destination and its credentials are decided, but cannot itself provision cloud storage or its billing.
-- **Restore procedure:** the mechanism (`psql -f <dump>` against a target) is already proven end-to-end (M13, disposable Docker scratch container) — the same procedure applies to any future dump, automated or manual.
+**Decision:** automated via a scheduled GitHub Actions workflow. Dumps are never committed to Git history. Credentials live only in GitHub Actions Secrets. Storage destination must be private/off-site with explicit retention and integrity verification.
+
+Full architecture, exact secrets, retention policy, and restore procedure: `docs/m14-backup-architecture.md` (created this phase). Summary:
+
+- **Workflow authored** at `.github/workflows/production-backup.yml.draft` (kept as `.draft` — not an active, scheduled workflow yet; see below for why).
+- **One PO decision remains, blocking activation:** where the dump files actually land. This agent cannot provision cloud storage or its billing itself (same constraint as hosting/Supabase project creation). See `docs/m14-backup-architecture.md` §"Storage destination decision" for the options and exact action needed.
+- **Why the workflow file is a `.draft`, not live:** a committed `.yml` workflow with a `schedule:` trigger goes live the moment it lands on the default branch, if GitHub Actions is enabled for the repo — before the destination credentials exist, every run would fail with a clear, harmless "secret not found" error, which is noisy but not damaging. Per this phase's instruction ("before enabling the workflow, return the exact architecture... and any PO action required"), this agent is presenting the design for approval before flipping it live, not enabling it silently.
 
 ## 9. Production security and secret verification
 
@@ -108,14 +136,15 @@ Only after §1–§9 are each closed with real evidence (not configuration inspe
 - Any RLS/anon-write check that should be denied instead succeeds.
 - Any hard gate in §1–§9 fails and cannot be immediately, safely remediated within the already-authorized scope.
 
-## GO / NO-GO prerequisites — what's needed from the Product Owner before M14 execution can begin
+## GO / NO-GO prerequisites — remaining, after this phase's 4 decisions
 
-1. **Hosting platform + domain decision** (§1) — the single blocking item; nothing else can start without it.
-2. **Confirm who the first real admin is** (§4) — a real identity, not something this agent invents.
-3. **Confirm backup-destination decision** (§8) — where automated dumps should be stored long-term, and provide/authorize the credentials for it.
-4. **Acknowledge the observability limitation** (§7) — confirm the proposed protocol (PO reviews Dashboard Logs Explorer directly) is acceptable, or state an alternative.
-5. Explicit authorization to proceed once 1–4 are answered — this plan does not execute anything on its own per your instruction.
+All 4 policy decisions are locked (see top of document). Two concrete actions remain before execution can proceed past preparation:
+
+1. **§1 exact gate:** confirm the Vercel account (`baoanhtran071096-stars-projects`) and authorize creating the project + connecting the GitHub repo (or state you'll do the Import Git Repository step yourself).
+2. **§8 exact gate:** decide where automated backup dumps should be stored (see `docs/m14-backup-architecture.md`) and provide/authorize the credentials for that destination.
+
+Everything else authorized by this phase's decisions (admin-onboarding procedure prep, backup-workflow authoring as a draft, log-review checklist) is complete and does not need further sign-off to exist as prepared artifacts — only to go live.
 
 ## Current recommendation
 
-**NO-GO for now — not due to any defect, but because §1 (hosting/domain) has no decision yet, and everything downstream depends on it.** The certified M13 backend remains healthy, verified, and untouched. This plan is ready to execute the moment the four items above are answered.
+**NO-GO for public launch still, but the blocking surface has narrowed to exactly two concrete actions (§1, §8) instead of an open-ended "no decision yet."** The certified M13 backend remains healthy, verified, and untouched throughout this phase's preparation work.
