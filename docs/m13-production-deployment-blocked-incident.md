@@ -53,13 +53,13 @@ The product owner has confirmed: the data found in `wmamuqylqqikvseuqerm` **belo
 
 **Consequence: `wmamuqylqqikvseuqerm` is reclassified as NOT the production target for PTX Summer Cup 2026.** The identity lock recorded in `docs/m13-production-deployment-plan.md` §0.1 (previously "Approved production ref: `wmamuqylqqikvseuqerm`") is **invalidated** — it was based on a name match (`ptx-summer-cup-2026`) that turned out not to reflect actual project ownership/purpose. This project is now **protected**: added to the deployment plan's denylist by ref, permanently, with no PTX command ever permitted to target it (see the updated plan §0.1/§2 for the enforced guard).
 
-**PTX Summer Cup 2026 requires a new, dedicated production Supabase project**, not yet created. Environment map going forward:
+**PTX Summer Cup 2026 required a new, dedicated production Supabase project.** Update: the product owner has since created one. Final environment map:
 
 | Environment | Project |
 |---|---|
 | Staging | `ptx-summer-cup-2026-staging` (ref `bugqhoktzzdvduzfjctm`) — unchanged, continues to exist post-GO per the deployment plan |
-| Production | **Not yet provisioned** — to be created by the product owner; ref to be supplied and locked before any deployment attempt |
-| Protected / do-not-touch | `wmamuqylqqikvseuqerm` — confirmed to belong to a different project; permanently denylisted from every PTX deployment command |
+| Production | `ptx-summer-cup-2026-production` (ref `tqdsvtuspehavhcygjpf`, region Southeast Asia/Singapore) — newly created, dedicated to this application, re-locked in `docs/m13-production-deployment-plan.md` §0.1 |
+| Protected / do-not-touch | `wmamuqylqqikvseuqerm` — confirmed to belong to a different project; permanently denylisted from every PTX deployment command, independent of anything else that happens in this project's lifecycle |
 
 ## Cleanup performed following this resolution
 

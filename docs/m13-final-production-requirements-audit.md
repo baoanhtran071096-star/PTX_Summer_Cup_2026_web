@@ -34,7 +34,7 @@
 
 | Decision | Locked answer |
 |---|---|
-| Production ref | ~~`wmamuqylqqikvseuqerm`~~ — **REVOKED.** Identity/state verification found this name-matched project already belongs to a different, unrelated project (confirmed by the product owner). It is now permanently denylisted (`docs/m13-production-deployment-plan.md` §0.1). A new, dedicated production project must be created; see `docs/m13-production-deployment-blocked-incident.md` for the full incident record. |
+| Production ref | ~~`wmamuqylqqikvseuqerm`~~ — **REVOKED** (belonged to a different, unrelated project; now permanently denylisted). **Re-locked: `tqdsvtuspehavhcygjpf`** (`ptx-summer-cup-2026-production`) — a newly-created, dedicated project, confirmed by the product owner. See `docs/m13-production-deployment-blocked-incident.md` for the full incident record and `docs/m13-production-deployment-plan.md` §0.1 for the current lock. |
 | Backup/DR strategy | Alternative strategy (no PITR): daily automated dump + mandatory pre-deployment/pre-migration dump + mandatory pre-bulk-admin-change dump. RPO ≤24h normal / ≈0 for controlled changes. RTO ≤2h. Integrity-checked, stored outside the production DB, periodically restore-tested. Deployment is blocked if the pre-deployment backup or its verification fails. Risk formally accepted by the product owner. |
 | Production Seed Policy | Accepted as-is — the allowlist/blocklist verified against the real `seed.sql` in this audit |
 | Team T/X lost assets | No change from M12.5 — still `SOURCE_LOST_PENDING_REPLACEMENT`, launch without them |
