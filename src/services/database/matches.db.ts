@@ -14,6 +14,13 @@ export async function getMatchById(client: SupabaseClient, id: string): Promise<
   return data as MatchRow | null;
 }
 
+/** legacy_id is used as the public URL slug — stable, human-readable, avoids uuid-in-URL. */
+export async function getMatchByLegacyId(client: SupabaseClient, legacyId: number): Promise<MatchRow | null> {
+  const { data, error } = await client.from('matches').select('*').eq('legacy_id', legacyId).maybeSingle();
+  if (error) throw new InfrastructureError(`Failed to get match legacy_id=${legacyId}: ${error.message}`, error);
+  return data as MatchRow | null;
+}
+
 export async function listMatchEvents(client: SupabaseClient, matchId: string): Promise<MatchEventRow[]> {
   const { data, error } = await client
     .from('match_events')
