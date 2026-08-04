@@ -3,11 +3,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { TeamRadar } from './TeamRadar';
 import { SquadList } from './SquadList';
-import { getTeamColorVar } from '@/constants/teamColors';
+import { getTeamColorVar, getTeamTextColorVar } from '@/constants/teamColors';
 import type { TeamWithSquad } from '../types';
 
 export function TeamProfile({ team }: { team: TeamWithSquad }) {
   const color = getTeamColorVar(team.id);
+  const textColor = getTeamTextColorVar(team.id);
 
   return (
     <div style={{ display: 'grid', gap: 'var(--ptx-space-6)' }}>
@@ -16,7 +17,7 @@ export function TeamProfile({ team }: { team: TeamWithSquad }) {
         <h1 style={{ fontFamily: 'var(--ptx-font-logo)', margin: 0 }}>
           {team.icon} {team.name}
         </h1>
-        <Badge accentColor={color}>OVR {team.ovr}</Badge>
+        <Badge accentColor={color} textColor={textColor}>OVR {team.ovr}</Badge>
       </div>
       <p style={{ color: 'var(--text-muted)' }}>
         {team.fullName} · Đội trưởng: {team.captainName ?? 'Chưa xác định'}

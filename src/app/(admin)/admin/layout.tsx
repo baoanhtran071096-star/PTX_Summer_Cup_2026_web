@@ -14,6 +14,7 @@ const ADMIN_NAV = [
   { href: '/admin/predictions', label: 'Dự đoán' },
   { href: '/admin/media', label: 'Media' },
   { href: '/admin/users', label: 'Người dùng' },
+  { href: '/admin/audit-log', label: 'Nhật ký hoạt động' },
 ];
 
 // Every admin route is per-request/authenticated — never statically

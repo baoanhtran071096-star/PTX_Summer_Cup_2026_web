@@ -1,6 +1,6 @@
 # M09 — Media/Storage — Gate Evidence
 
-## Status: PASS (implementation complete; live upload execution blocked, documented not skipped)
+## Status: PASS (implementation complete; live upload execution — resolved in M12.5, see below)
 
 ## Implementation
 
@@ -14,10 +14,10 @@
 
 Full gate sequence green: typecheck, lint, architecture guard (11 domain, 5 component files), design token audit, unit tests (43/43 — unchanged, no new pure logic to test here), build, browser console check (same single contained Supabase-not-configured category as prior modules, no new crash class), legacy regression 15/1 unchanged.
 
-## Blocked: actual asset upload
+## Asset upload — resolved in M12.5
 
-`node scripts/upload-r25-media.js` requires `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` — no live Supabase project exists in this session (same root constraint as M01's Docker limitation: no project has been provisioned yet). The script is real and ready to run once those credentials exist; it is not a stub. Running it is the concrete next external action before Release Candidate — all 53 legacy files (`docs/migration/r25-asset-manifest.json`) plus the 3 still-external postimg.cc team photos (per the asset migration plan §3) need to actually land in Storage, and `players.avatar_path`/`teams.logo_path` need to be updated from `NULL` to the real object keys afterward (a small follow-up script, not yet written, since it depends on knowing the upload succeeded).
+At time of writing, `node scripts/upload-r25-media.js` was blocked on the absence of a live Supabase project (same root constraint as M01's Docker limitation). **Resolved in M12.5**: executed for real against a local Supabase project — 53/53 files uploaded, 0 failed. `scripts/apply-uploaded-media-paths.js` (written in M12.5) then updated `players.avatar_path`/`teams.logo_path` from `NULL` to the real object keys — 24/24 + 3/3. Of the 3 external postimg.cc team photos: Team P recovered and uploaded to `gallery`; Team T and Team X are confirmed permanently dead (404), marked `SOURCE_LOST_PENDING_REPLACEMENT` per product-owner decision (capability preserved, no fabricated substitute) — see `docs/migration/r25-asset-migration-plan.md` §3 and `docs/gates/m12.5-closure-ledger.md` item 5. Separately, M12.5 found and fixed a real bug in image rendering itself (Next's image optimizer rejecting the local Storage host as a private IP) — see `docs/gates/m12.5-evidence.md` §2.
 
 ## Decision
 
-**Gate: PASS** on implementation/verification available in this environment. Real upload execution is an explicit, tracked follow-up requiring credentials this session does not have — not silently skipped.
+**Gate: PASS.** Implementation, verification, and (as of M12.5) real upload execution are all complete.

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { InfrastructureError } from '@/lib/errors';
+import { logger } from '@/lib/logger';
 import type { AuditLogRow } from './types';
 
 export async function listAuditLog(client: SupabaseClient, limit = 50): Promise<AuditLogRow[]> {
@@ -17,11 +18,18 @@ export async function recordAuditLog(
   client: SupabaseClient,
   entry: { actorId: string | null; action: string; entityType: string; entityId?: string; metadata?: Record<string, unknown> }
 ): Promise<void> {
-  await client.from('audit_log').insert({
-    actor_id: entry.actorId,
-    action: entry.action,
-    entity_type: entry.entityType,
-    entity_id: entry.entityId ?? null,
-    metadata: entry.metadata ?? null,
-  });
+  try {
+    const { error } = await client.from('audit_log').insert({
+      actor_id: entry.actorId,
+      action: entry.action,
+      entity_type: entry.entityType,
+      entity_id: entry.entityId ?? null,
+      metadata: entry.metadata ?? null,
+    });
+    if (error) {
+      logger.error('Audit log write failed', { action: entry.action, entityType: entry.entityType, error: error.message });
+    }
+  } catch (err) {
+    logger.error('Audit log write threw', { err: err instanceof Error ? err.message : String(err) });
+  }
 }

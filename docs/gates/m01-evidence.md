@@ -20,7 +20,7 @@
 | `npm run verify:design-tokens` | PASS |
 | `npm run build` | PASS |
 | Manual SQL review (schema, FK ordering, RLS policy logic) | Reviewed line-by-line — see below |
-| **Live migration apply against local Postgres (`supabase db reset`)** | **BLOCKED — see Environment Limitation** |
+| **Live migration apply against local Postgres (`supabase db reset`)** | **BLOCKED at time of writing — see Environment Limitation.** Resolved in M12.5 once Docker became available: all 11 migrations (9 at that time + 2 added in M12.5) + seed apply cleanly and reproducibly; see `docs/gates/m12.5-evidence.md` §1/§3. |
 
 ## Environment limitation (per directive §19 — documented, not silently skipped)
 
@@ -36,7 +36,7 @@
 
 1. `src/services/database/types.ts` is hand-authored to match the SQL exactly — regenerate via `npx supabase gen types typescript --local` once Docker/local Supabase is confirmed working, and diff against the hand-authored version.
 2. Hall of Fame `golden_boot`/`mvp` (player names, unresolved to `players.id`) — left as TODO comments in `seed.sql`; needs a real admin-panel assignment flow in M11, or a one-off manual resolution before Release Candidate.
-3. Player id 18 name mismatch (`r25-data-reconciliation-plan.md` §2) is still unresolved — seed currently uses the live `index.html` display name ("Xuân Sử") as the least-surprising default, pending product-owner confirmation.
+3. Player id 18 name mismatch (`r25-data-reconciliation-plan.md` §2) — **resolved in M12.5**: product owner confirmed "Xuân Sử" is correct; the asset filename was the error, not the display name.
 
 ## Decision
 

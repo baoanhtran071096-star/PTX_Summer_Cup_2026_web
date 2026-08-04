@@ -3,11 +3,12 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { ROUTES } from '@/constants/routes';
-import { getTeamColorVar } from '@/constants/teamColors';
+import { getTeamColorVar, getTeamTextColorVar } from '@/constants/teamColors';
 import type { TeamWithSquad } from '../types';
 
 export function TeamCard({ team }: { team: TeamWithSquad }) {
   const color = getTeamColorVar(team.id);
+  const textColor = getTeamTextColorVar(team.id);
 
   return (
     <Link href={ROUTES.team(team.id)} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -22,7 +23,7 @@ export function TeamCard({ team }: { team: TeamWithSquad }) {
               <p style={{ color: 'var(--text-muted)', margin: 0 }}>{team.fullName}</p>
             </div>
           </div>
-          <Badge accentColor={color}>OVR {team.ovr}</Badge>
+          <Badge accentColor={color} textColor={textColor}>OVR {team.ovr}</Badge>
         </div>
         <p style={{ color: 'var(--text-muted)', marginBottom: 0 }}>
           Đội trưởng: {team.captainName ?? 'Chưa xác định'} · {team.squad.length} cầu thủ

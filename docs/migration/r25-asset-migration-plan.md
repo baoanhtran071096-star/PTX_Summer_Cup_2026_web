@@ -23,12 +23,19 @@ Bucket naming/count may be simplified during M09 implementation (e.g. a single `
 
 ## 3. External dependency resolution (blocking item, tracked from M-01)
 
-**3 team group-lineup photos (Team P/T/X) still hotlink from `postimg.cc`**, not present as local files. Required action before Release Candidate:
-1. Download the 3 images from their current `postimg.cc` URLs (confirm URLs are still live — hotlinked content on a free host can disappear at any time, which is itself a latent legacy risk this migration removes).
-2. Verify visual quality/resolution is acceptable (these were never localized/optimized to WebP like the rest of the asset set).
-3. Upload into the `team-logos` or `gallery` bucket (whichever the design intends — likely `team-logos` since these are described as "team lineup photos," but confirm against actual usage context in the live UI before finalizing).
-4. Update any remaining hardcoded `postimg.cc` reference in the new codebase to the Storage URL.
-5. If the images cannot be recovered (link dead), this becomes an Approved Deprecation Registry entry with impact analysis, not a silent drop — escalate to product owner for replacement photos if needed.
+**Status (M12.5): resolved for Team P, source-lost for Team T/X — see below.**
+
+**3 team group-lineup photos (Team P/T/X) still hotlink from `postimg.cc`**, not present as local files.
+
+- **Team P**: source URL still live (HTTP 200), downloaded and uploaded to the `gallery` bucket in M12.5.
+- **Team T** and **Team X**: source URLs return HTTP 404 — confirmed dead, not a transient failure (re-checked). No other copy of these images exists anywhere in the legacy asset inventory (`docs/legacy/r25-asset-inventory.md`) or extraction manifest.
+
+Per product-owner decision (M12.5): these are **not** an Approved Deprecation Registry entry — the team group-lineup photo capability is **preserved** as an approved product capability, not dropped. Team T/X are instead marked with an explicit status:
+
+**`SOURCE_LOST_PENDING_REPLACEMENT`** — the legacy source asset is unrecoverable; a replacement photo may be supplied later by the product owner and uploaded via the existing `scripts/upload-r25-media.js` / admin media-upload path into the `gallery` bucket. Until a replacement is supplied:
+- Do **not** fabricate, generate, or substitute a placeholder/stock photo in its place.
+- Any future UI that renders team group-lineup photos (none exists yet — see `docs/gates/m09-evidence.md`, which scoped M09 to avatar/logo wiring only, not a public gallery display) **must** degrade gracefully when no verified image exists for a team (e.g. omit the slot / show an explicit "photo not yet available" state) — never a broken `<img>` or a fabricated image.
+- This gap must never be represented as "migrated" or "0 broken/orphan" in any integrity check (§4 below) until a real replacement is uploaded.
 
 Same applies to the `gallery_2025` postimg.cc URL found in `ptx_migration_data.json` (§1 of the reconciliation plan) — re-verify against the live/current gallery override before cutover, since it may have already been localized since the snapshot was taken.
 

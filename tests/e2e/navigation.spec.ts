@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Only the homepage is Supabase-independent — every other route needs
- * a live project (see docs/gates/m12-evidence.md). These specs assert
- * what's actually achievable here: the nav shell renders and points
- * to the right places, without following through to pages that need data.
+ * Nav-shell-only coverage (renders and points to the right places).
+ * Coverage of the data-driven pages themselves — now that a live local
+ * Supabase project exists (M12.5) — lives in live-data.spec.ts and
+ * accessibility.spec.ts.
  */
 
 test('homepage renders with correct title and content', async ({ page }) => {

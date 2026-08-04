@@ -52,7 +52,7 @@
 | Stadium DJ Soundboard | **PRESERVE** | Low risk, purely client-side fun feature, part of matchday identity. |
 | Official Match Report Exporter | **PRESERVE** | |
 | Live Stream Broadcast Hub + "AI Press Release" | **PRESERVE** (broadcast hub) + **MODERNIZE** (press-release generation becomes a real `services/ai/`-backed feature in M10 instead of a canned/simulated one, if scoped for v1 — else PRESERVE as a simple template tool) | |
-| Live Chat (fan cheering) | **DEPRECATE (as currently implemented) or scope as new REPLACE feature in M08/M11** | Never actually functional (ephemeral, non-persisted, no real backend) — presenting it as-is in the new product would be replicating a non-functional mock. Recommend: either build a real lightweight persisted chat (REPLACE, explicit new scope decision) or remove the UI entirely (DEPRECATE) rather than silently porting a fake feature. **Requires product-owner decision** — flagged as an open item, not resolved unilaterally here. |
+| Live Chat (fan cheering) | **DEPRECATE (mock, resolved M12.5)** + **approved future backlog (REPLACE, out of current scope)** | Never actually functional (ephemeral, non-persisted, no real backend). Product-owner decision (M12.5): deprecate and remove the non-functional mock with no data migration (nothing to migrate); a genuine authenticated, persistent, moderated Realtime-backed chat is preserved as an approved future capability, not built in this release, not blocking M12.5/M13. See `docs/migration/r25-approved-deprecation-registry.md` entry #3. |
 | PTX AI Chatbot (rule-based) | **MODERNIZE** | Product intent (an assistant that explains standings/stats/rules) preserved; implementation becomes a real `features/ai/` + `services/ai/` boundary per Architecture v1.3 §15, backed by verified domain data — not a bigger rule-based matcher. |
 | AI Tactical Match Predictor (simulated) | **MODERNIZE** | Same rationale — real AI explains verified data rather than generating canned copy. AI must not become authoritative for match outcomes (Architecture v1.3 §15/§16). |
 | AI Voice Commentator (browser TTS) | **PRESERVE** | Legitimately just Web Speech API, not misrepresented as "AI decision-making" — fine to keep as-is. |
@@ -85,12 +85,12 @@
 | Summer theme/identity | **New work, not classified as legacy parity** | Does not exist in R25; required net-new by Architecture v1.3, designed to strengthen (not replace) the existing brand per the directive's Design System Contract. |
 | `lightbox2`/`plyr` CDN dependencies | **REPLACE** | Generic third-party libraries, not brand identity — swap for actively maintained equivalents in the new stack. |
 
-## 4. Open items requiring explicit product-owner decision (not resolved unilaterally by this audit)
+## 4. Open items requiring explicit product-owner decision
 
-1. **Live Chat** — deprecate the non-functional mock, or invest in building it for real in v1? (see §2)
-2. **Player id 18 name** — "Xuân Sử" or "Nguyễn Sử"? (see reconciliation plan §2)
-3. **Fan predictions historical data** — does any real prior-event data exist on the organizer's device that should be preserved? (see reconciliation plan §4)
-4. **Operations-media gallery** (referee/medical/comms team photos) — public gallery content or admin/internal only? (affects RLS policy in M09)
-5. **AI Press Release generator** — real AI-backed in v1, or keep as a simple template tool for now (defer AI investment to chatbot/tactical-analysis only)?
+1. **Live Chat** — ✅ **Resolved M12.5**: deprecate the non-functional mock (no migration), preserve a real implementation as approved future backlog, not in current scope. See deprecation registry entry #3.
+2. **Player id 18 name** — ✅ **Resolved M12.5**: "Xuân Sử" confirmed correct. See deprecation registry entry #7.
+3. **Fan predictions historical data** — ✅ **Resolved M12.5**: confirmed no real historical data exists to preserve; clean-slate launch.
+4. **Operations-media gallery** (referee/medical/comms team photos) — public gallery content or admin/internal only? Implemented as **public-read** by default (`operations-media` bucket, `public = true` in `supabase/config.toml`, M09) since no restriction was explicitly requested and the legacy site displayed these photos openly on the public site. Revisit if the product owner wants this restricted.
+5. **AI Press Release generator** — not built as a separate feature in M10; only the general-purpose chatbot (verified-data-only) was implemented. The "AI Press Release" capability specifically remains unbuilt — tracked as backlog, not silently claimed as done.
 
-These are tracked as open items; M00-M05 implementation work is not blocked by them (they affect M07/M08/M10/M11 scope, not foundation/schema), but they must be resolved before those modules' Gates.
+Items 1-3 are closed as of M12.5 Production Readiness Closure (`docs/gates/m12.5-evidence.md`). Items 4-5 are default/implicit resolutions taken during implementation, documented here for transparency rather than re-litigated without a specific reason to.
