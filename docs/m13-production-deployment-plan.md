@@ -1,6 +1,6 @@
 # M13 — Production Deployment Plan (NOT YET AUTHORIZED)
 
-> **Status: STOP — awaiting explicit Production GO.** This plan is prepared per the M13 Final Production Requirements directive. Every command below targets the **production** Supabase project `ptx-summer-cup-2026-production` (ref `tqdsvtuspehavhcygjpf`). **None of this plan has been executed.** Passing every gate in this document does not itself authorize execution — that requires a separate, explicit Production GO from the product owner (§15). Bypass/auto-approve permissions this agent may hold in its tooling are **not** a substitute for that human decision and must never be treated as one.
+> **Status: STOP — awaiting explicit Production GO.** This plan is prepared per the M13 Final Production Requirements directive. Every command below targets the **production** Supabase project `ptx-summer-cup-2026-production` (ref `tqdsvtuspehavhcygipf`). **None of this plan has been executed.** Passing every gate in this document does not itself authorize execution — that requires a separate, explicit Production GO from the product owner (§15). Bypass/auto-approve permissions this agent may hold in its tooling are **not** a substitute for that human decision and must never be treated as one.
 
 Prerequisite reading: `docs/gates/m13-staging-evidence.md` (what was verified on staging and how), `docs/gates/m12.5-evidence.md` (the certified RC baseline this plan deploys), `docs/m13-final-production-requirements-audit.md` (gap audit this version closes), `docs/m13-production-deployment-blocked-incident.md` (why the first candidate ref was invalidated and replaced).
 
@@ -8,12 +8,13 @@ Prerequisite reading: `docs/gates/m13-staging-evidence.md` (what was verified on
 
 ### 0.1 Production project identity — **LOCKED (re-locked after the prior ref was revoked)**
 
-- **Approved production ref: `tqdsvtuspehavhcygjpf`** (name `ptx-summer-cup-2026-production`, region Southeast Asia/Singapore) — explicitly confirmed by the product owner as a newly-created, dedicated project for this application, after the first candidate (`wmamuqylqqikvseuqerm`, matched only by a similar name) was found to belong to someone else.
+- **Approved production ref: `tqdsvtuspehavhcygipf`** (name `ptx-summer-cup-2026-production`, region Southeast Asia/Singapore) — explicitly confirmed by the product owner as a newly-created, dedicated project for this application, after the first candidate (`wmamuqylqqikvseuqerm`, matched only by a similar name) was found to belong to someone else.
+- **Transcription correction on record:** the product owner's message first stated the ref as `tqdsvtuspehavhcygjpf` (one character off — `j` vs `i`). This was caught by comparing it character-for-character against the actual `supabase projects list` output rather than accepting it on trust, flagged back to the product owner, and explicitly corrected. **`tqdsvtuspehavhcygjpf` (with a `j`) does not correspond to any real project and must never be used** — it is neither the production ref nor on the denylist, it simply doesn't exist; any command that would target it should fail to resolve rather than silently hitting something unintended.
 - **Permanent denylist — these refs must NEVER be a target of any PTX command, under any circumstance:**
   - `wmamuqylqqikvseuqerm` — **PROTECTED, permanently out of scope.** Confirmed by the product owner to belong to a different, unrelated project. No migration, seed, reset, truncate, delete, or any other mutating command may ever target this ref, regardless of what its name suggests.
   - `bugqhoktzzdvduzfjctm` — this project's own staging environment (`ptx-summer-cup-2026-staging`); valid for staging commands only, never for a production command.
   - `dbnsaqczauxcriibwubg` — unrelated inactive project, no known relationship to this work.
-- **Every guard block in this plan checks the target ref against both the confirmed production ref AND this denylist.** A name match alone is not sufficient — the incident that revoked the first candidate ref happened precisely because a plausible name was trusted without independently checking the project's actual data/schema state. §1 row 3 (independent data/schema verification) is mandatory for `tqdsvtuspehavhcygjpf` too, not skipped just because it's newly created and reported empty.
+- **Every guard block in this plan checks the target ref against both the confirmed production ref AND this denylist.** A name match alone is not sufficient — the incident that revoked the first candidate ref happened precisely because a plausible name was trusted without independently checking the project's actual data/schema state. §1 row 3 (independent data/schema verification) is mandatory for `tqdsvtuspehavhcygipf` too, not skipped just because it's newly created and reported empty.
 
 ### 0.2 Backup & Disaster Recovery — LOCKED (alternative strategy, no PITR)
 
@@ -63,9 +64,9 @@ Verified factually against the current `supabase/seed.sql` (not asserted):
 ## 2. Link to production (identity-guarded)
 
 ```bash
-npx supabase link --project-ref tqdsvtuspehavhcygjpf --yes
+npx supabase link --project-ref tqdsvtuspehavhcygipf --yes
 LINKED=$(cat supabase/.temp/project-ref)
-if [ "$LINKED" != "tqdsvtuspehavhcygjpf" ] || [ "$LINKED" = "wmamuqylqqikvseuqerm" ] || [ "$LINKED" = "bugqhoktzzdvduzfjctm" ] || [ "$LINKED" = "dbnsaqczauxcriibwubg" ]; then
+if [ "$LINKED" != "tqdsvtuspehavhcygipf" ] || [ "$LINKED" = "wmamuqylqqikvseuqerm" ] || [ "$LINKED" = "bugqhoktzzdvduzfjctm" ] || [ "$LINKED" = "dbnsaqczauxcriibwubg" ]; then
   echo "ABORT: linked ref ($LINKED) failed identity guard"; exit 1
 fi
 ```
@@ -111,8 +112,8 @@ node --env-file=.env.production.local scripts/apply-uploaded-media-paths.js
 Then **actually fetch** at least one real object per bucket type used (not just trust the upload count):
 
 ```bash
-curl -s -o /dev/null -w "%{http_code} %{content_type}\n" "https://tqdsvtuspehavhcygjpf.supabase.co/storage/v1/object/public/player-avatars/xuan-su.webp"
-curl -s -o /dev/null -w "%{http_code} %{content_type}\n" "https://tqdsvtuspehavhcygjpf.supabase.co/storage/v1/object/public/team-logos/bieu-tuong-doi-p-phoenix-.webp"
+curl -s -o /dev/null -w "%{http_code} %{content_type}\n" "https://tqdsvtuspehavhcygipf.supabase.co/storage/v1/object/public/player-avatars/xuan-su.webp"
+curl -s -o /dev/null -w "%{http_code} %{content_type}\n" "https://tqdsvtuspehavhcygipf.supabase.co/storage/v1/object/public/team-logos/bieu-tuong-doi-p-phoenix-.webp"
 ```
 Both must return `200` with the correct `content_type`. Also confirm bucket public/private access matches `config.toml` (all 5 buckets are `public = true`, read-only for anon — verify no bucket is accidentally left private or accidentally writable by anon).
 
@@ -229,11 +230,11 @@ Everything in this plan is a deployment/operations procedure. It is **not** grou
 
 ## Explicit stop
 
-This plan is **prepared, not executed.** No command in it has ever mutated any production project. §0.1's production identity was locked once against `wmamuqylqqikvseuqerm`, **revoked** after identity/state verification found that project already belonged to someone else (`docs/m13-production-deployment-blocked-incident.md`), and **re-locked** against a newly-created, dedicated project: `tqdsvtuspehavhcygjpf` (`ptx-summer-cup-2026-production`).
+This plan is **prepared, not executed.** No command in it has ever mutated any production project. §0.1's production identity was locked once against `wmamuqylqqikvseuqerm`, **revoked** after identity/state verification found that project already belonged to someone else (`docs/m13-production-deployment-blocked-incident.md`), and **re-locked** against a newly-created, dedicated project: `tqdsvtuspehavhcygipf` (`ptx-summer-cup-2026-production`).
 
 Resuming past this point still requires:
 
-1. §1's full Preflight Gate — **including row 3's independent data/schema check** against `tqdsvtuspehavhcygjpf`, not just trusting that it's newly created — to pass in full.
+1. §1's full Preflight Gate — **including row 3's independent data/schema check** against `tqdsvtuspehavhcygipf`, not just trusting that it's newly created — to pass in full.
 2. A fresh, explicit, separate Production GO authorization from the product owner, given after reviewing the Preflight Gate results.
 
 Staging (`ptx-summer-cup-2026-staging`) is unaffected and remains available for continued verification in the meantime. `wmamuqylqqikvseuqerm` remains permanently denylisted and out of scope regardless of any future instruction that doesn't explicitly and separately re-authorize touching it.

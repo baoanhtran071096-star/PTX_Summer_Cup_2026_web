@@ -58,7 +58,7 @@ The product owner has confirmed: the data found in `wmamuqylqqikvseuqerm` **belo
 | Environment | Project |
 |---|---|
 | Staging | `ptx-summer-cup-2026-staging` (ref `bugqhoktzzdvduzfjctm`) — unchanged, continues to exist post-GO per the deployment plan |
-| Production | `ptx-summer-cup-2026-production` (ref `tqdsvtuspehavhcygjpf`, region Southeast Asia/Singapore) — newly created, dedicated to this application, re-locked in `docs/m13-production-deployment-plan.md` §0.1 |
+| Production | `ptx-summer-cup-2026-production` (ref `tqdsvtuspehavhcygipf`, region Southeast Asia/Singapore) — newly created, dedicated to this application, re-locked in `docs/m13-production-deployment-plan.md` §0.1 |
 | Protected / do-not-touch | `wmamuqylqqikvseuqerm` — confirmed to belong to a different project; permanently denylisted from every PTX deployment command, independent of anything else that happens in this project's lifecycle |
 
 ## Cleanup performed following this resolution
