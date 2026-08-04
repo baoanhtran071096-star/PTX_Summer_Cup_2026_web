@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from '@/services/database/client-server';
-import { InfrastructureError } from '@/lib/errors';
+import { InfrastructureError, BusinessError } from '@/lib/errors';
 import type { ProfileRow } from '@/services/database/types';
 
 /**
@@ -23,4 +23,11 @@ export async function getCurrentProfile(): Promise<ProfileRow | null> {
 export async function isCurrentUserAdmin(): Promise<boolean> {
   const profile = await getCurrentProfile();
   return profile?.role === 'admin';
+}
+
+/** Throws a clear BusinessError instead of a raw RLS rejection; returns the admin's id for audit logging. */
+export async function requireAdminUserId(message = 'Chỉ quản trị viên mới có thể thực hiện thao tác này.'): Promise<string> {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role !== 'admin') throw new BusinessError(message);
+  return profile.id;
 }

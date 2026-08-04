@@ -113,6 +113,16 @@ export type PredictionRow = {
   created_at: string;
 };
 
+export type AuditLogRow = {
+  id: string;
+  actor_id: string | null;
+  action: string;
+  entity_type: string;
+  entity_id: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+};
+
 export type TournamentSettingsRow = {
   slogan: string | null;
   message: string | null;

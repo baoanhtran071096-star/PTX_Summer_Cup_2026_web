@@ -33,3 +33,8 @@ export async function insertPrediction(
   });
   if (error) throw new InfrastructureError(`Failed to submit prediction: ${error.message}`, error);
 }
+
+export async function deletePrediction(client: SupabaseClient, id: string): Promise<void> {
+  const { error } = await client.from('predictions').delete().eq('id', id);
+  if (error) throw new InfrastructureError(`Failed to delete prediction ${id}: ${error.message}`, error);
+}

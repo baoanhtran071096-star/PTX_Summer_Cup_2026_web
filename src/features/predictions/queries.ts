@@ -6,6 +6,7 @@ import { scorePrediction } from '@/domain/prediction/scoring-rules';
 import type { PredictionRow } from '@/services/database/types';
 
 export type LeaderboardEntry = {
+  id: string;
   displayName: string;
   ticketCode: string;
   points: number;
@@ -67,6 +68,7 @@ export async function getPredictionLeaderboard(): Promise<LeaderboardEntry[]> {
 
   return predictions
     .map((p) => ({
+      id: p.id,
       displayName: p.display_name,
       ticketCode: p.ticket_code,
       points: calculatePoints(p, resultsByLegacyId, actualGoldenBootId, actualMvpId),

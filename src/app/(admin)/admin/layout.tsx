@@ -1,8 +1,20 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { getCurrentProfile } from '@/services/auth/session';
 import { signOutAction } from '@/features/auth/actions';
 import { ROUTES } from '@/constants/routes';
 import { isSupabaseConfigured } from '@/lib/env';
+
+const ADMIN_NAV = [
+  { href: '/admin', label: 'Tổng quan' },
+  { href: '/admin/settings', label: 'Cài đặt giải đấu' },
+  { href: '/admin/teams', label: 'Đội bóng' },
+  { href: '/admin/players', label: 'Cầu thủ' },
+  { href: '/admin/matches', label: 'Trận đấu' },
+  { href: '/admin/predictions', label: 'Dự đoán' },
+  { href: '/admin/media', label: 'Media' },
+  { href: '/admin/users', label: 'Người dùng' },
+];
 
 // Every admin route is per-request/authenticated — never statically
 // prerenderable, regardless of whether env vars happen to be present
@@ -67,7 +79,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </button>
         </form>
       </header>
-      <main style={{ padding: 'var(--ptx-space-8)' }}>{children}</main>
+      <div style={{ display: 'flex' }}>
+        <nav
+          style={{
+            width: '200px',
+            padding: 'var(--ptx-space-4)',
+            borderRight: '1px solid var(--border-color)',
+            display: 'grid',
+            gap: 'var(--ptx-space-1)',
+            alignContent: 'start',
+          }}
+        >
+          {ADMIN_NAV.map((item) => (
+            <Link key={item.href} href={item.href} style={{ color: 'inherit', padding: 'var(--ptx-space-2)' }}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <main style={{ padding: 'var(--ptx-space-8)', flex: 1 }}>{children}</main>
+      </div>
     </div>
   );
 }

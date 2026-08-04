@@ -17,3 +17,15 @@ export async function getTeamById(client: SupabaseClient, id: string): Promise<T
   if (error) throw new InfrastructureError(`Failed to get team ${id}: ${error.message}`, error);
   return data as TeamRow | null;
 }
+
+export async function updateTeam(
+  client: SupabaseClient,
+  id: string,
+  input: { captainName: string | null; stats: TeamRow['stats'] }
+): Promise<void> {
+  const { error } = await client
+    .from('teams')
+    .update({ captain_name: input.captainName, stats: input.stats })
+    .eq('id', id);
+  if (error) throw new InfrastructureError(`Failed to update team ${id}: ${error.message}`, error);
+}

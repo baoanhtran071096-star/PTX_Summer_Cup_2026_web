@@ -23,6 +23,18 @@ export async function getPlayerByLegacyId(client: SupabaseClient, legacyId: numb
   return data as PlayerRow | null;
 }
 
+export async function updatePlayer(
+  client: SupabaseClient,
+  id: string,
+  input: { name: string; teamId: string; position: PlayerRow['position'] }
+): Promise<void> {
+  const { error } = await client
+    .from('players')
+    .update({ name: input.name, team_id: input.teamId, position: input.position })
+    .eq('id', id);
+  if (error) throw new InfrastructureError(`Failed to update player ${id}: ${error.message}`, error);
+}
+
 /** Reads the always-derived v_player_stats view — never independently editable. */
 export async function listPlayerStats(client: SupabaseClient): Promise<PlayerStatsRow[]> {
   const { data, error } = await client.from('v_player_stats').select('*');

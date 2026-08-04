@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServerClient } from '@/services/database/client-server';
 import { getMatchById } from '@/services/database/matches.db';
-import { isCurrentUserAdmin } from '@/services/auth/session';
+import { requireAdminUserId } from '@/services/auth/session';
+import { recordAuditLog } from '@/services/database/audit.db';
 import { isValidEventMinute, eventTypeRequiresPlayer } from '@/domain/match/match-event';
 import { canTransitionMatchStatus } from '@/domain/match/match-status';
 import { BusinessError, ValidationError } from '@/lib/errors';
@@ -14,16 +15,14 @@ import { ROUTES } from '@/constants/routes';
  * Core match-engine write capability. The admin UI that calls this
  * (forms, quick-goal buttons, etc.) is M11's responsibility — this
  * function is the actual engine logic, reusable from any admin
- * surface. RLS (M01) is the real enforcement layer; the isCurrentUserAdmin()
- * check here only exists to fail with a clear message instead of a
- * raw Postgres RLS error (defense in depth, docs/architecture §9).
+ * surface. RLS (M01) is the real enforcement layer; requireAdminUserId()
+ * here only exists to fail with a clear message instead of a raw
+ * Postgres RLS error (defense in depth, docs/architecture §9).
  */
-export async function recordMatchEventAction(input: unknown) {
-  if (!(await isCurrentUserAdmin())) {
-    throw new BusinessError('Chỉ quản trị viên mới có thể ghi nhận sự kiện trận đấu.');
-  }
+export async function recordMatchEventAction(formData: FormData) {
+  const actorId = await requireAdminUserId('Chỉ quản trị viên mới có thể ghi nhận sự kiện trận đấu.');
 
-  const parsed = recordMatchEventSchema.parse(input);
+  const parsed = recordMatchEventSchema.parse(Object.fromEntries(formData.entries()));
 
   if (!isValidEventMinute(parsed.minute)) {
     throw new ValidationError('Phút ghi nhận không hợp lệ (0-120).');
@@ -39,19 +38,26 @@ export async function recordMatchEventAction(input: unknown) {
     player_id: parsed.playerId,
     event_type: parsed.eventType,
     minute: parsed.minute,
+    created_by: actorId,
   });
   if (error) throw new BusinessError(`Không thể ghi nhận sự kiện: ${error.message}`, error);
+
+  await recordAuditLog(supabase, {
+    actorId,
+    action: 'record_event',
+    entityType: 'match_event',
+    entityId: parsed.matchId,
+    metadata: { eventType: parsed.eventType, minute: parsed.minute, playerId: parsed.playerId },
+  });
 
   revalidatePath(ROUTES.schedule);
   revalidatePath(ROUTES.results);
 }
 
-export async function setMatchStatusAction(input: unknown) {
-  if (!(await isCurrentUserAdmin())) {
-    throw new BusinessError('Chỉ quản trị viên mới có thể thay đổi trạng thái trận đấu.');
-  }
+export async function setMatchStatusAction(formData: FormData) {
+  const actorId = await requireAdminUserId('Chỉ quản trị viên mới có thể thay đổi trạng thái trận đấu.');
 
-  const parsed = setMatchStatusSchema.parse(input);
+  const parsed = setMatchStatusSchema.parse(Object.fromEntries(formData.entries()));
   const supabase = await createSupabaseServerClient();
 
   const current = await getMatchById(supabase, parsed.matchId);
@@ -65,6 +71,14 @@ export async function setMatchStatusAction(input: unknown) {
     .update({ status: parsed.status })
     .eq('id', parsed.matchId);
   if (error) throw new BusinessError(`Không thể cập nhật trạng thái: ${error.message}`, error);
+
+  await recordAuditLog(supabase, {
+    actorId,
+    action: 'set_status',
+    entityType: 'match',
+    entityId: parsed.matchId,
+    metadata: { from: current.status, to: parsed.status },
+  });
 
   revalidatePath(ROUTES.schedule);
   revalidatePath(ROUTES.results);
