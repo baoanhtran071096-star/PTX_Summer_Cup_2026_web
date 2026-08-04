@@ -4,4 +4,6 @@ export type PlayerWithStats = Player & {
   teamName: string;
   stats: PlayerPerformanceStats;
   rating: number;
+  /** Resolved Supabase Storage public URL — null until M09 upload runs. */
+  avatarUrl: string | null;
 };

@@ -117,11 +117,33 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
-# Uncomment to configure local storage buckets
-# [storage.buckets.images]
-# public = false
-# file_size_limit = "50MiB"
-# allowed_mime_types = ["image/png", "image/jpeg"]
+# M09 — local storage buckets matching docs/migration/r25-asset-migration-plan.md §1.
+# All public-read (RLS-equivalent write restriction is enforced via
+# storage.objects RLS policies in the M09 migration, not bucket ACLs).
+[storage.buckets.team-logos]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/webp", "image/png", "image/jpeg"]
+
+[storage.buckets.player-avatars]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/webp", "image/png", "image/jpeg"]
+
+[storage.buckets.gallery]
+public = true
+file_size_limit = "50MiB"
+allowed_mime_types = ["image/webp", "image/png", "image/jpeg", "video/mp4"]
+
+[storage.buckets.operations-media]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/webp", "image/png", "image/jpeg"]
+
+[storage.buckets.branding]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["image/webp", "image/png", "image/jpeg"]
 # objects_path = "./images"
 
 # Allow connections via S3 compatible clients

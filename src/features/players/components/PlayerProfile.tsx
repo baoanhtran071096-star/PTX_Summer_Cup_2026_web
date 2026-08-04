@@ -1,4 +1,5 @@
 import { Card } from '@/components/ui/Card';
+import { Avatar } from '@/components/ui/Avatar';
 import { getTeamColorVar } from '@/constants/teamColors';
 import { PlayerRating } from './PlayerRating';
 import { PlayerStats } from './PlayerStats';
@@ -24,6 +25,7 @@ export function PlayerProfile({
   return (
     <div style={{ display: 'grid', gap: 'var(--ptx-space-6)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ptx-space-4)' }}>
+        <Avatar src={player.avatarUrl} name={player.name} size={72} />
         <h1 style={{ fontFamily: 'var(--ptx-font-logo)', margin: 0 }}>{player.name}</h1>
         <PlayerRating rating={player.rating} />
       </div>

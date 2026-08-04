@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/services/database/client-server';
 import { listPlayers, getPlayerByLegacyId, listPlayerStats } from '@/services/database/players.db';
 import { listTeams } from '@/services/database/teams.db';
+import { getPublicMediaUrl } from '@/services/storage/media';
 import { calculatePlayerRating } from '@/domain/player/rating.value';
 import type { PlayerRow, PlayerStatsRow, TeamRow } from '@/services/database/types';
 import type { PlayerWithStats } from './types';
@@ -15,7 +17,12 @@ const EMPTY_STATS: PlayerStatsRow = {
   mvp_count: 0,
 };
 
-function toPlayerWithStats(row: PlayerRow, statsRow: PlayerStatsRow | undefined, teamsById: Map<string, TeamRow>): PlayerWithStats {
+function toPlayerWithStats(
+  client: SupabaseClient,
+  row: PlayerRow,
+  statsRow: PlayerStatsRow | undefined,
+  teamsById: Map<string, TeamRow>
+): PlayerWithStats {
   const stats = {
     goals: statsRow?.goals ?? EMPTY_STATS.goals,
     assists: statsRow?.assists ?? EMPTY_STATS.assists,
@@ -31,6 +38,7 @@ function toPlayerWithStats(row: PlayerRow, statsRow: PlayerStatsRow | undefined,
     teamId: row.team_id,
     position: row.position,
     avatarPath: row.avatar_path,
+    avatarUrl: row.avatar_path ? getPublicMediaUrl(client, 'player-avatars', row.avatar_path) : null,
     teamName: teamsById.get(row.team_id)?.name ?? row.team_id,
     stats,
     rating: calculatePlayerRating(stats),
@@ -48,7 +56,7 @@ export async function getAllPlayersWithStats(): Promise<PlayerWithStats[]> {
   const statsByPlayerId = new Map(statsRows.map((s) => [s.player_id, s]));
   const teamsById = new Map(teams.map((t) => [t.id, t]));
 
-  return players.map((p) => toPlayerWithStats(p, statsByPlayerId.get(p.id), teamsById));
+  return players.map((p) => toPlayerWithStats(supabase, p, statsByPlayerId.get(p.id), teamsById));
 }
 
 export async function getPlayerByLegacySlug(legacySlug: string): Promise<PlayerWithStats> {
@@ -63,7 +71,7 @@ export async function getPlayerByLegacySlug(legacySlug: string): Promise<PlayerW
   const statsByPlayerId = new Map(statsRows.map((s) => [s.player_id, s]));
   const teamsById = new Map(teams.map((t) => [t.id, t]));
 
-  return toPlayerWithStats(player, statsByPlayerId.get(player.id), teamsById);
+  return toPlayerWithStats(supabase, player, statsByPlayerId.get(player.id), teamsById);
 }
 
 /** For the compare page — accepts up to a handful of legacy-id slugs (order preserved, unknowns skipped). */

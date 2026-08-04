@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Avatar } from '@/components/ui/Avatar';
 import { TeamRadar } from './TeamRadar';
 import { SquadList } from './SquadList';
 import { getTeamColorVar } from '@/constants/teamColors';
@@ -11,6 +12,7 @@ export function TeamProfile({ team }: { team: TeamWithSquad }) {
   return (
     <div style={{ display: 'grid', gap: 'var(--ptx-space-6)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ptx-space-4)' }}>
+        <Avatar src={team.logoUrl} name={team.icon ?? team.name} size={72} />
         <h1 style={{ fontFamily: 'var(--ptx-font-logo)', margin: 0 }}>
           {team.icon} {team.name}
         </h1>
