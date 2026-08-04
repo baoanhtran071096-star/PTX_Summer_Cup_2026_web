@@ -4,15 +4,16 @@
 # This file uses a .yml.draft extension specifically so GitHub Actions
 # does NOT pick it up (Actions only reads .yml/.yaml in this directory).
 # It will not run until:
-#   1. The storage-destination decision (docs/m14-backup-architecture.md)
-#      is made and its upload step below is filled in accordingly.
-#   2. SUPABASE_ACCESS_TOKEN and the storage destination's credentials
-#      are added to GitHub Secrets (Settings > Secrets and variables > Actions).
+#   1. This repository exists on GitHub and is set to PRIVATE (required —
+#      see docs/m14-backup-architecture.md: private repos get a 400-day
+#      artifact retention ceiling, public repos are capped at 90 days).
+#   2. SUPABASE_ACCESS_TOKEN is added to GitHub Secrets
+#      (Settings > Secrets and variables > Actions).
 #   3. This file is renamed to production-backup.yml and committed.
 #
-# Do not skip steps 1-2 and just rename the file — every run would fail
-# on missing secrets, which is harmless but noisy, and the upload step
-# is a placeholder until the destination is chosen.
+# No external storage account is needed — private GitHub Actions
+# artifacts satisfy the locked retention policy on their own (verified
+# against GitHub's own docs, see docs/m14-backup-architecture.md).
 # ============================================================
 
 name: Production Database Backup
@@ -67,25 +68,16 @@ jobs:
           fi
           echo "Backup integrity check passed: $FILE ($COUNT extension statements found)"
 
-      # ------------------------------------------------------------
-      # TODO (blocked on the storage-destination decision, see
-      # docs/m14-backup-architecture.md): replace this placeholder
-      # with the real upload step once a destination is chosen, e.g.:
-      #
-      #   - name: Upload to S3-compatible storage
-      #     env:
-      #       AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_STORAGE_ACCESS_KEY }}
-      #       AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_STORAGE_SECRET_KEY }}
-      #     run: |
-      #       aws s3 cp "$BACKUP_FILE" "s3://<bucket-name>/production-backups/$BACKUP_FILE"
-      #
-      # Never upload to a public bucket, and never commit the dump to
-      # this repository — both violate the locked backup policy.
-      # ------------------------------------------------------------
-      - name: Upload backup (PLACEHOLDER — destination not yet decided)
-        run: |
-          echo "No storage destination configured yet — see docs/m14-backup-architecture.md."
-          echo "This step intentionally does nothing until that decision is made."
+      - name: Upload backup as a private GitHub Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-backup-${{ github.run_id }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 90
+          # Artifacts are only downloadable by accounts with read access
+          # to this repository — requires the repo to be PRIVATE (see
+          # docs/m14-backup-architecture.md). A public repo would make
+          # every backup, including production data, publicly downloadable.
 
       - name: Clean up local dump file (never leave it on the runner or commit it)
         if: always()

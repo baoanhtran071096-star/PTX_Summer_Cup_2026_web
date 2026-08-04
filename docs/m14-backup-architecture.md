@@ -1,6 +1,19 @@
 # M14 — Automated Production Backup Architecture
 
-> **Status: designed, workflow authored as a draft, not yet enabled.** Activation requires the one storage-destination decision below.
+> **Status: GitHub Actions artifacts evaluated and found sufficient — see the finding below. Workflow authored as a draft; blocked only on the repository actually existing on GitHub (same blocker as the Vercel Git connection) and two secrets requiring the product owner's own accounts.**
+
+## Finding: do private GitHub Actions artifacts satisfy the locked policy? — **Yes, verified against GitHub's own documentation, not assumed**
+
+Fetched directly from GitHub's docs (`configuring-the-retention-period-for-github-actions-artifacts-and-logs`), not recalled from memory:
+
+- **Default artifact retention: 90 days.**
+- **Maximum configurable retention: 90 days for public repositories, but up to 400 days for private repositories.**
+
+This changes the original proposal. A private repo's 400-day ceiling **exceeds** the locked policy's longest requirement (1-year / 365-day weekly retention) with room to spare, and comfortably covers the 30-day daily tier too. Access control for artifacts follows GitHub's standard repository-permission model — on a private repo, only accounts with read access to the repo can download them, which is a reasonable, sufficient access-control boundary for this use case (the same trust boundary already relied on for the source code itself).
+
+**Conclusion: private GitHub Actions artifacts alone satisfy the locked retention/security requirements. External object storage (S3/GCS/etc.) is not required to close this gate — it remains a reasonable future enhancement (e.g. for redundancy independent of GitHub itself), never a blocker.**
+
+**One condition this finding depends on:** the GitHub repository for this project must be **private**, not public. This is not yet decided — see "What's authored now vs. what's pending" below.
 
 ## Architecture
 
@@ -11,7 +24,9 @@ GitHub Actions (scheduled, daily + manual dispatch)
         │
         ├─ integrity check (non-empty, valid SQL header, extension markers present)
         │
-        └─ upload to <STORAGE DESTINATION — see decision below>, never to Git
+        └─ upload as a GitHub Actions artifact, retention-days: 90
+           (well within the private-repo 400-day ceiling; raise later if a
+           longer single-tier window is wanted — no external storage needed)
 ```
 
 The workflow authenticates to Supabase using a **Personal Access Token** (not the database password), the same mechanism this session's CLI has used throughout M13/M14 — `supabase link --project-ref <ref>` plus `SUPABASE_ACCESS_TOKEN` in the environment, no direct Postgres connection string needed. This mirrors exactly how every `db push`/`db dump` in M13 already worked.
@@ -22,25 +37,13 @@ The workflow authenticates to Supabase using a **Personal Access Token** (not th
 |---|---|---|
 | `SUPABASE_ACCESS_TOKEN` | A Supabase **Personal Access Token** scoped to this account, generated via the Supabase Dashboard (Account → Access Tokens) | This agent cannot generate this on the product owner's behalf — it requires interactive dashboard access under the product owner's own Supabase account identity |
 | `SUPABASE_PROJECT_REF` | `tqdsvtuspehavhcygipf` | Not secret by itself, but stored as a secret/variable for single-source-of-truth consistency with the workflow |
-| `<STORAGE DESTINATION credentials>` | Depends on the decision below | e.g. an S3-compatible bucket needs an access key + secret key; see options |
 
-**None of these secrets will ever be requested in chat or written to any tracked file** — they are entered directly into GitHub's own Secrets UI by whoever has repo admin access, the same discipline already used for every Supabase/Vercel credential in this project.
+**No external storage credentials are needed** — the finding above removes that requirement. **These secrets will never be requested in chat or written to any tracked file** — entered directly into GitHub's own Secrets UI by whoever has repo admin access.
 
-## Storage destination decision — **blocks activation, PO decision required**
+## Retention policy (revised, using the verified 400-day private-repo ceiling)
 
-The dump file itself must land somewhere private, off-site, and durable. Options, none of which this agent can provision on its own (each needs an account/billing relationship):
-
-1. **A private cloud storage bucket** (S3, Google Cloud Storage, Azure Blob, Backblaze B2, or Cloudflare R2) — the most standard choice for this exact purpose. Needs: an account, a bucket created with public access disabled, and an access key/secret pair added to GitHub Secrets.
-2. **A private GitHub repository's release assets or a separate private backup repo** — no new external account needed (reuses GitHub, which is already in use), but GitHub's own storage isn't purpose-built for this and has practical size/retention caveats worth being aware of before committing to it long-term.
-3. **Another destination the product owner already has** (e.g. existing cloud storage, a NAS with an accessible upload endpoint, etc.) — this agent will adapt the workflow's upload step to whatever is specified.
-
-**Exact PO action needed:** state which option (or a specific alternative), and either provide the resulting credentials directly into GitHub Secrets yourself, or confirm this agent should walk through provisioning it together (still requires the product owner to hold the account/billing relationship — this agent cannot create the storage account itself).
-
-## Retention policy (proposed, matching the locked §0.2 policy from M13)
-
-- Daily dumps retained for **30 days** rolling (delete anything older automatically as part of the workflow, or via the storage provider's own lifecycle rules if it supports them — e.g. S3 lifecycle policies).
-- **Weekly** dumps (e.g. every Sunday's daily dump) retained for **1 year**, for longer-horizon recovery scenarios.
-- This is a proposed default, adjustable — confirm or adjust once the storage destination is chosen (retention mechanics differ slightly by provider).
+- Single tier: daily dumps as GitHub Actions artifacts, `retention-days: 90` (a safe, generous default well inside the private-repo maximum) — no separate long-term/short-term split needed, since 90 days already exceeds the originally-proposed 30-day short tier, and the private-repo ceiling (400 days) is available to extend to a full year later with a one-line change if wanted.
+- This is a proposed default, adjustable at any time by editing `retention-days` in the workflow — no infrastructure change required, unlike an external-storage lifecycle policy would need.
 
 ## Integrity verification (per run)
 
@@ -75,9 +78,9 @@ For an actual production disaster-recovery restore (not a drill), the destinatio
 
 ## What's authored now vs. what's pending
 
-- ✅ `.github/workflows/production-backup.yml.draft` — the workflow logic, ready to rename to `.yml` and enable once secrets exist.
-- ⏳ Storage destination decision (above) — blocks activation.
-- ⏳ `SUPABASE_ACCESS_TOKEN` generation — requires the product owner's own Supabase Dashboard access.
-- ⏳ Storage destination credentials — requires the product owner's own account for whichever option is chosen.
+- ✅ **Storage destination — resolved.** Private GitHub Actions artifacts, no external account/billing needed.
+- ✅ `.github/workflows/production-backup.yml.draft` — updated to upload as an artifact directly (`actions/upload-artifact`, `retention-days: 90`), no placeholder upload step needed anymore.
+- ⏳ **The GitHub repository itself must exist and be private** — same blocker already reported for the Vercel Git connection (no `git remote` configured yet, no `gh` CLI available in this environment). This single blocker now covers both the Vercel Git integration and this backup workflow.
+- ⏳ `SUPABASE_ACCESS_TOKEN` generation — requires the product owner's own Supabase Dashboard access (Account → Access Tokens); this agent cannot generate it.
 
-Once these three are resolved, this agent will: rename the `.draft` file to `.yml`, confirm the first scheduled/manual run succeeds, and verify a real dump lands at the chosen destination and passes integrity checks — closing this gate with real evidence, not configuration inspection alone.
+Once the repository exists (private) and the token is added to GitHub Secrets, this agent will: rename the `.draft` file to `.yml`, confirm the first scheduled/manual run succeeds, and verify a real artifact is produced and passes integrity checks — closing this gate with real evidence, not configuration inspection alone.
