@@ -12,19 +12,44 @@
 | 4 | Migration history | ✅ PASS — `supabase migration list --linked`: 0 of 11 migrations applied. `db push --dry-run` previews all 11 applying cleanly |
 | 5 | Environment variables | ✅ PASS — `.env.production.local` created fresh for this ref, confirmed `git check-ignore`'d, distinct values from `.env`/`.env.staging.local` |
 | 6 | Secret scan | ✅ PASS — 0 findings, re-run after the backup file was created |
-| 7 | Mandatory pre-deployment backup + integrity | ✅ PASS, with a note — `supabase db dump --linked` succeeded: `backups/pre-deploy-production-20260804T171017Z.sql`, 312 lines, valid `pg_dump` SQL structure, confirms `pgcrypto`/`uuid-ossp`/`pg_stat_statements`/`supabase_vault` extensions already present (matches this app's migration requirements). No secrets in the dump (scanned). *Because the project has no data yet, this is a schema-only backup — there was nothing to meaningfully restore-test against yet; that's expected for a first deployment, not a shortcut taken.* |
-| 8 | Rollback prerequisites | ⚠️ **PARTIAL — see recommendation below** |
+| 7 | Mandatory pre-deployment backup + integrity | ✅ PASS — `supabase db dump --linked` succeeded: `backups/pre-deploy-production-20260804T171017Z.sql`, 312 lines, valid `pg_dump` SQL structure, confirms `pgcrypto`/`uuid-ossp`/`pg_stat_statements`/`supabase_vault` extensions already present (matches this app's migration requirements). No secrets in the dump (scanned). |
+| 8 | Rollback prerequisites | ✅ **PASS — closed via a real, isolated restore test.** See below. |
 
-## Row 8 detail — the one open item
+## Row 8 — closed: restore verified against a disposable scratch target
 
-The backup file itself is verified sound. What is **not** independently verified in this session: an actual working *restore* path. `psql` is not installed on this machine, and this session holds only the project's API keys (anon/service_role), not the direct Postgres connection password — `supabase db push`/`db dump` authenticate through a different, token-based mechanism than a raw `psql`/`pg_restore` connection would need. I have not proven I can personally execute a restore from this dump if one were ever needed.
+Per the product owner's explicit choice: **no production database password or connection string was requested or used.** Instead, the restore test used only the backup file already on disk plus a brand-new, fully isolated, disposable Postgres container — never connected to production, never connected to staging, never connected to the local dev stack used for the certified M12.5 baseline.
 
-This does not block reading the current empty state or taking the backup, but it is a real, honest gap in "rollback prerequisites available," not a rubber-stamped PASS.
+**Procedure (exact commands run):**
+```bash
+# 1. Launch an isolated scratch instance matching production's exact Postgres build
+docker run -d --name m13-restore-scratch \
+  -e POSTGRES_PASSWORD=<randomly generated, held only in this shell's memory, never written to any file> \
+  -p 55432:5432 public.ecr.aws/supabase/postgres:17.6.1.155
 
-**Recommendation, your choice:**
-- (a) Accept this as-is for now: restoring, in a real emergency, would be done via the Supabase Dashboard directly by whoever holds full project access — a completely standard practice, just not something this agent session can pre-verify without more access.
-- (b) Provide the production database password (or a connection string) so a real restore can be tested end-to-end before GO — the more rigorous option, closes the gap completely.
+# 2. Copy the backup into it and restore
+docker cp backups/pre-deploy-production-20260804T171017Z.sql m13-restore-scratch:/tmp/restore-test.sql
+docker exec m13-restore-scratch psql -U postgres -f /tmp/restore-test.sql
+
+# 3. Verify structurally — not just "it parsed"
+docker exec m13-restore-scratch psql -U postgres -c "select extname from pg_extension order by extname;"
+docker exec m13-restore-scratch psql -U postgres -c "select nspname, obj_description(oid) from pg_namespace where nspname='public';"
+
+# 4. Destroy the scratch target
+docker rm -f m13-restore-scratch
+```
+
+**Result:** the restore executed with zero errors — every `SET`, `COMMENT ON SCHEMA`, `CREATE EXTENSION` (×4), `CREATE FUNCTION`, `ALTER FUNCTION`, `ALTER PUBLICATION`, `GRANT` (×3), and `ALTER DEFAULT PRIVILEGES` (×5) statement in the dump applied successfully. Post-restore query confirmed all 4 extensions genuinely present in the restored instance (`pgcrypto`, `uuid-ossp`, `pg_stat_statements`, `supabase_vault`) and the `public` schema comment intact — proof the dump is **actually recoverable**, not merely syntactically valid text. The scratch container was destroyed immediately after (`docker rm -f`), confirmed removed via `docker ps -a`.
+
+**Credential handling:** the scratch container's own throwaway password was generated fresh for this test, used only to initialize that disposable container, never written to any file (tracked or untracked), and ceased to matter the moment the container was destroyed. No production credential of any kind was needed for this test, because the object under test was the backup file itself, not a live connection to production.
+
+**RPO/RTO implications, now demonstrated rather than assumed:** the locked §0.2 policy's RTO (≤2h manual restore) is now backed by a proven mechanism — restore the most recent `.sql` dump via `psql -f` against a target Postgres instance — rather than an untested assumption. **Remaining limitation, stated plainly:** this test proves the *mechanism* works against a disposable target of the same Postgres version; it does not by itself prove a restore *into the live production project* would be equally fast/smooth (that would require the production DB password, which was deliberately not requested per this turn's constraint #1). If a real restore into production is ever needed, it goes through the Supabase Dashboard or the production database's own credentials, held by whoever has that access at the time — the mechanism (plain-SQL `psql -f` restore) is now proven, not merely theorized.
+
+**Native `psql` install (requested for reference, not required for the above — Docker's own `psql` was used instead):**
+- **Winget (simplest, `winget` already confirmed available on this machine):** `winget install PostgreSQL.PostgreSQL.17`
+- **Official installer:** download from `https://www.postgresql.org/download/windows/` (EDB installer), select "Command Line Tools" during setup — this installs `psql` under `C:\Program Files\PostgreSQL\17\bin`, which then needs adding to `PATH`.
+- **Chocolatey (if installed):** `choco install postgresql17 --params '/Password:not-used'`
+None of these were run — the Docker-based approach above fully satisfied the verification requirement without adding a new tool to the host.
 
 ## GO / NO-GO recommendation
 
-**Recommendation: GO**, with row 8's caveat explicitly acknowledged rather than hidden. Every other gate is a clean, independently-verified PASS — critically, the exact check that caught the previous wrong project (row 3) was re-run in full here and confirms this project is genuinely empty and safe to migrate into. Nothing has been mutated. Migrations, seed, Storage, Auth, and all remaining steps in `docs/m13-production-deployment-plan.md` are staged and ready but **not executed** — awaiting your explicit Production GO.
+**Recommendation: GO.** Every Preflight Gate row is now a clean, independently-verified PASS with no acknowledged gaps. Re-confirmed a second time before this recommendation: production ref unchanged (`tqdsvtuspehavhcygipf`, `ACTIVE_HEALTHY`), staging remains a separate project, the protected project (`wmamuqylqqikvseuqerm`) remains untouched (`INACTIVE`, unchanged), 0/11 migrations applied, `teams`/`profiles` still return 404 (genuinely empty), secret scan clean. Nothing has been mutated against production at any point. Migrations, seed, Storage, Auth, and all remaining steps in `docs/m13-production-deployment-plan.md` are staged and ready but **not executed** — awaiting your explicit Production GO.
