@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { createSupabaseBrowserClient } from '@/services/database/client-browser';
+import { isSupabaseConfigured } from '@/lib/env';
 
 type AuthContextValue = {
   user: User | null;
@@ -13,9 +14,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Nothing to load if Supabase isn't configured yet — computed once at
+  // render time so the "not configured" path never needs to call
+  // setState from inside the effect at all.
+  const [loading, setLoading] = useState(() => isSupabaseConfigured());
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+
     const supabase = createSupabaseBrowserClient();
 
     supabase.auth.getUser().then(({ data }) => {

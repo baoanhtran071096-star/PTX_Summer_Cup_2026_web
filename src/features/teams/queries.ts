@@ -1,0 +1,49 @@
+import { notFound } from 'next/navigation';
+import { createSupabaseServerClient } from '@/services/database/client-server';
+import { listTeams, getTeamById } from '@/services/database/teams.db';
+import { listPlayers } from '@/services/database/players.db';
+import { calculateTeamOvr } from '@/domain/team/rules';
+import type { TeamWithSquad } from './types';
+import type { TeamRow } from '@/services/database/types';
+
+function toTeamWithSquad(row: TeamRow, squad: TeamWithSquad['squad']): TeamWithSquad {
+  return {
+    id: row.id,
+    name: row.name,
+    fullName: row.full_name,
+    icon: row.icon,
+    color: row.color,
+    captainName: row.captain_name,
+    stats: row.stats,
+    // Domain-derived, not the raw stored column — see domain/team/rules.ts.
+    ovr: calculateTeamOvr(row.stats),
+    logoPath: row.logo_path,
+    squad,
+  };
+}
+
+export async function getAllTeamsWithSquads(): Promise<TeamWithSquad[]> {
+  const supabase = await createSupabaseServerClient();
+  const [teams, players] = await Promise.all([listTeams(supabase), listPlayers(supabase)]);
+
+  return teams.map((team) =>
+    toTeamWithSquad(
+      team,
+      players
+        .filter((p) => p.team_id === team.id)
+        .map((p) => ({ id: p.id, name: p.name, position: p.position, avatarPath: p.avatar_path }))
+    )
+  );
+}
+
+export async function getTeamBySlug(slug: string): Promise<TeamWithSquad> {
+  const supabase = await createSupabaseServerClient();
+  const team = await getTeamById(supabase, slug);
+  if (!team) notFound();
+
+  const squad = await listPlayers(supabase, slug);
+  return toTeamWithSquad(
+    team,
+    squad.map((p) => ({ id: p.id, name: p.name, position: p.position, avatarPath: p.avatar_path }))
+  );
+}
