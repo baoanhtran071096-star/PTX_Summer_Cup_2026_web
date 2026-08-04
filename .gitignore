@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Database backups — may contain real production data, never commit
+/backups/
+
 # Dependencies
 node_modules/
 
