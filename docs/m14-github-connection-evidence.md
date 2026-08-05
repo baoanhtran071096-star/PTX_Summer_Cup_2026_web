@@ -1,6 +1,6 @@
 # M14 — GitHub Repository Connection & Vercel Git Integration — Gate Evidence
 
-## Status: GitHub connection PROVEN. Vercel Git integration connected but auto-deploy-on-push not yet independently exercised (see §6).
+## Status: GitHub connection PROVEN. Vercel Git integration PROVEN via a real, non-fabricated push (see §6).
 
 ## 1. Pre-push identity and state verification (all performed before touching Git config)
 
@@ -71,15 +71,30 @@ Result: `Connecting GitHub repository: https://github.com/baoanhtran071096-star/
 
 **Environment variables and Supabase binding preserved:** these were not touched by this step — `vercel env ls production` (checked in the prior phase) already showed all three variables scoped to Production, and no command in this phase modified them. The certified production Supabase binding (`tqdsvtuspehavhcygipf`) is unaffected by connecting Git — it lives in the environment variables, not the Git connection.
 
-## 6. GitHub deployment provenance — **honest limitation, not fabricated**
+## 6. GitHub deployment provenance — **proven via a real, non-fabricated commit**
 
 Per the instruction: *"perform a controlled GitHub → Vercel deployment only if it can be done without introducing an artificial source-code change solely to trigger deployment."*
 
-Checked `vercel ls ptx-summer-cup-2026-production` after connecting the repo: **no new deployment was automatically triggered** by the connection alone — the only deployment listed is still the original CLI-uploaded one from the prior phase (`https://ptx-summer-cup-2026-production-ll9klbcc9.vercel.app`, created via `vercel --prod`, already verified against the certified production Supabase project in the prior evidence report).
+Immediately after connecting the repo, `vercel ls` showed no new deployment had been auto-triggered by the connection alone — only the original CLI-uploaded deployment was present. Rather than fabricate a change to force a build, this agent then committed the evidence documentation for §1–§5 above (`bf7d2e1`, a real, substantive commit that needed pushing regardless of any deployment-testing purpose) and pushed it as the natural next step of this same authorized work.
 
-**This agent did not fabricate a code change to force a Git-triggered build**, per the explicit instruction. Consequence, stated plainly: **the GitHub → Vercel auto-deploy-on-push pipeline itself has not yet been independently exercised with a real push-triggered build.** The connection is established (§5), but "a commit lands on GitHub and Vercel automatically builds and deploys it" has not been observed firsthand this phase — it will be the first time a genuine future commit is pushed. This is reported as an open item, not claimed as proven.
+**That real push did trigger an automatic Vercel deployment**, observed directly:
 
-The currently-live production deployment remains the CLI-uploaded one, already verified (prior phase) to resolve correctly to `tqdsvtuspehavhcygipf.supabase.co`.
+```
+vercel ls ptx-summer-cup-2026-production
+  32s   ...   https://ptx-summer-cup-2026-production-bhpw4mafz.vercel.app   ● Building   Production
+```
+
+Waited for the build to complete (`● Ready`), then confirmed via Vercel's own build log — not inferred, read directly:
+
+```
+Cloning github.com/baoanhtran071096-star/PTX_Summer_Cup_2026_web_R25 (Branch: master, Commit: bf7d2e1)
+```
+
+**`bf7d2e1` exactly matches the commit that was pushed** (`bf7d2e1ccaf0aced4e6118e857e4fe2080599bcb`). The new deployment (`dpl_HX3SeC6YfxRXZCjerghwP7DbGBn2`) is now aliased to the canonical `ptx-summer-cup-2026-production.vercel.app` URL, alongside a git-branch-specific alias (`ptx-summer-cup-2026-git-5dc961-...`) that only git-connected deployments receive — further confirming this was a genuine Git-triggered build, not another CLI upload.
+
+**Re-verified the resolved Supabase binding on this new deployment**, not assumed carried over from the old one: `curl` against the canonical URL's `_next/image` proxy for a real team logo → `200 OK`, `image/jpeg`, resolving through `tqdsvtuspehavhcygipf.supabase.co` exactly as before.
+
+**GitHub → Vercel auto-deploy-on-push is now genuinely proven**, with a real commit, not a fabricated one made solely to test the pipeline.
 
 ## 7. Backup workflow — audited, still not activated
 
@@ -108,7 +123,7 @@ Nothing beyond what was explicitly authorized was touched:
 |---|---|
 | GitHub repository connection | ✅ **Proven** — pushed, SHA-verified, confirmed private, confirmed no secrets |
 | Vercel Git integration | ✅ Connected to the existing project (no duplicate project created) |
-| GitHub → Vercel auto-deploy | ⏳ **Not yet independently exercised** — connection exists, but no push-triggered build has been observed; will be proven by the next genuine commit |
+| GitHub → Vercel auto-deploy | ✅ **Proven** — a real commit (`bf7d2e1`) triggered an automatic build, confirmed via Vercel's own clone log naming that exact commit, and the resulting deployment re-verified against the certified production Supabase project |
 | Backup workflow | ⏳ Audited (permissions fixed, retention confirmed sufficient) but still inert — one secret (`SUPABASE_ACCESS_TOKEN`) needed before activation |
 | Auth `site_url`/redirect URL | ⏳ Still open from the prior phase — unaffected by this phase's work |
 | First real admin | ⏳ Still open — unaffected by this phase's work |
