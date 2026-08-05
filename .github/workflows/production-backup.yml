@@ -1,19 +1,17 @@
 # ============================================================
-# M14 — Automated production backup (DRAFT, NOT ACTIVE)
+# M14 — Automated production backup (ACTIVE)
 #
-# This file uses a .yml.draft extension specifically so GitHub Actions
-# does NOT pick it up (Actions only reads .yml/.yaml in this directory).
-# It will not run until:
-#   1. This repository exists on GitHub and is set to PRIVATE (required —
-#      see docs/m14-backup-architecture.md: private repos get a 400-day
-#      artifact retention ceiling, public repos are capped at 90 days).
-#   2. SUPABASE_ACCESS_TOKEN is added to GitHub Secrets
-#      (Settings > Secrets and variables > Actions).
-#   3. This file is renamed to production-backup.yml and committed.
+# Runs daily at 02:00 UTC against the production Supabase project only
+# (ref tqdsvtuspehavhcygipf, guarded below), plus manual dispatch.
+# Requires SUPABASE_ACCESS_TOKEN in this repository's Actions secrets
+# (Settings > Secrets and variables > Actions) — provisioned directly
+# by the product owner; this agent has never seen its value.
 #
 # No external storage account is needed — private GitHub Actions
 # artifacts satisfy the locked retention policy on their own (verified
-# against GitHub's own docs, see docs/m14-backup-architecture.md).
+# against GitHub's own docs; see docs/m14-backup-architecture.md for
+# the retention-days and artifact-storage-quota findings, and the
+# pre-execution audit this workflow passed before activation).
 # ============================================================
 
 name: Production Database Backup
