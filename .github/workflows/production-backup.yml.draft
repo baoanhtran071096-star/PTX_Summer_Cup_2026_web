@@ -25,6 +25,14 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch: {}
 
+# Least-privilege: this workflow only reads the repo (to check out the
+# migrations directory Supabase CLI needs) and uploads an artifact —
+# it never writes back to the repository. Explicit here rather than
+# relying on whatever default GITHUB_TOKEN permissions this repo/org
+# happens to have configured (found during the M14 pre-activation audit).
+permissions:
+  contents: read
+
 jobs:
   backup:
     name: Dump + verify + upload production backup

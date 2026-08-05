@@ -79,8 +79,9 @@ For an actual production disaster-recovery restore (not a drill), the destinatio
 ## What's authored now vs. what's pending
 
 - ✅ **Storage destination — resolved.** Private GitHub Actions artifacts, no external account/billing needed.
-- ✅ `.github/workflows/production-backup.yml.draft` — updated to upload as an artifact directly (`actions/upload-artifact`, `retention-days: 90`), no placeholder upload step needed anymore.
-- ⏳ **The GitHub repository itself must exist and be private** — same blocker already reported for the Vercel Git connection (no `git remote` configured yet, no `gh` CLI available in this environment). This single blocker now covers both the Vercel Git integration and this backup workflow.
-- ⏳ `SUPABASE_ACCESS_TOKEN` generation — requires the product owner's own Supabase Dashboard access (Account → Access Tokens); this agent cannot generate it.
+- ✅ **Repository now exists and is confirmed private** — `baoanhtran071096-star/PTX_Summer_Cup_2026_web_R25`, pushed and verified this phase (unauthenticated API access returns 404). The 400-day retention ceiling this design relies on applies.
+- ✅ `.github/workflows/production-backup.yml.draft` — updated to upload as an artifact directly (`actions/upload-artifact`, `retention-days: 90`).
+- ✅ **Permissions audited** (per this phase's explicit instruction, before considering activation): the workflow had no explicit `permissions:` block, meaning it would have inherited whatever default `GITHUB_TOKEN` scope the repo/org happens to have — not a least-privilege posture for a workflow that only needs to read the repo and upload an artifact. Added an explicit `permissions: contents: read` block.
+- ⏳ **One blocker remains:** `SUPABASE_ACCESS_TOKEN` — requires the product owner's own Supabase Dashboard access (Account → Access Tokens) to generate; this agent cannot generate it.
 
-Once the repository exists (private) and the token is added to GitHub Secrets, this agent will: rename the `.draft` file to `.yml`, confirm the first scheduled/manual run succeeds, and verify a real artifact is produced and passes integrity checks — closing this gate with real evidence, not configuration inspection alone.
+Once the token is added to GitHub Secrets, this agent will: rename the `.draft` file to `.yml`, confirm the first scheduled/manual run succeeds, and verify a real artifact is produced and passes integrity checks — closing this gate with real evidence, not configuration inspection alone.
