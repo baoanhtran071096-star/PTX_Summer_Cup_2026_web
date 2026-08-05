@@ -28,7 +28,7 @@
 |---|---|
 | Exact Production ref | `tqdsvtuspehavhcygipf` — re-confirmed this phase via `supabase projects list` (`ACTIVE_HEALTHY`) and via the live app's own resolved image URLs (`tqdsvtuspehavhcygipf.supabase.co`, `200 image/jpeg`) |
 | Environment binding verification | `vercel env ls production`: all 3 vars (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) scoped **exclusively** to Production, `Encrypted`. No staging credential present. `SUPABASE_SERVICE_ROLE_KEY` has no `NEXT_PUBLIC_` prefix — server-only by construction |
-| Auth URL status | ⏳ **Not resolved.** `site_url` remains the local-dev default. `supabase config push` was tested against staging (not production) in the prior phase and found to silently disable required email confirmation, loosen the email rate limit, and disable MFA alongside the intended change — a real security regression not authorized. Staging was fully reverted. **This gate remains open — see "Remaining Product Owner Actions" below** |
+| Auth URL status | ✅ **Closed — Product Owner Dashboard evidence (not independently agent-verified).** PO reports directly inspecting Supabase Dashboard → `ptx-summer-cup-2026-production` → Authentication → URL Configuration: **Site URL** = `https://ptx-summer-cup-2026-production.vercel.app`, **redirect allow-list** = `https://ptx-summer-cup-2026-production.vercel.app/**`. This is recorded as PO-attested evidence because no safe independent verification path exists: `supabase config` has no read/pull subcommand (push-only, and `config push` was already proven this project to silently regress unrelated Auth security settings — never used against production), no Management API token is available to this agent, and a full source scan confirms the app has no password-reset/OAuth/email-confirmation flow that would exercise this setting functionally. **No CLI/API push was performed to "re-prove" this state, per instruction.** |
 | Storage | Re-verified this phase against the current live deployment: player avatar and team logo both `200 image/jpeg` through the real `_next/image` proxy |
 | Realtime | Re-verified this phase against the current live deployment, through a real open browser tab: a controlled `matches.status` change (`scheduled → live → scheduled`) on `legacy_id=1` updated the tab live with no manual refresh in both directions; confirmed reverted via REST afterward |
 | Auth/RBAC/RLS | RLS matrix re-verified this phase: anon read `teams` → 200/3 rows; anon write `teams` (attempted `ovr:1`) → 0 rows changed, confirmed `ovr` still `89`; anon read `audit_log` → `[]` (admin-only enforced). Full Auth→Profile→RBAC chain (signup→trigger→login→promote→admin write→audit log) was proven end-to-end in the prior GO phase using a disposable account that was then **completely deleted** — no synthetic identity persists as a real admin |
@@ -62,29 +62,28 @@
 
 | Item | Status |
 |---|---|
-| First-real-admin status | ⏳ **Not created.** No synthetic M13/M14 test-admin identity has been retained as a real administrator — the one disposable verification account created during the M13 GO phase was fully deleted (audit_log rows + auth user, cascading to profile), independently re-confirmed at the time (`profiles` empty, `audit_log` empty, 0 auth users). **Awaiting the product owner's real identity** — see below |
+| First-real-admin status | ✅ **PASS.** Real identity created by the PO via Supabase Dashboard; 8-point pre-promotion gate passed; one-time `viewer→admin` PATCH performed and 8-point post-promotion verification passed; PO logged in personally (session/password never seen by this agent); full runtime chain proven — `/admin` authorization, one real controlled Server Action (with a reported two-Save-attempts deviation, preserved exactly, entries for two different team entity IDs `x` and `p`), correctly-attributed `audit_log` entries, no RLS/RBAC/data regression. Full detail: `docs/m14-first-admin-promotion-evidence.md` |
+| Production backup status | ⏳ **Audited, not yet executed.** Workflow (`production-backup.yml.draft`) passed a 10-point pre-execution audit (target guard, staging/denylist isolation, no dump in Git, least-privilege permissions, no secret echo, artifact scoped to one file, retention within verified quota, no-mutation-on-failure, manual dispatch present). GitHub Free-plan quotas re-verified via GitHub's own docs (not assumed): 500 MB artifact storage / 2,000 min/month — real dump size ≈4 KB, 90 days of daily retention ≈270 KB, ~1,800x under quota. **Blocked on `SUPABASE_ACCESS_TOKEN`**, an account-level secret only the PO can generate and provision. Full detail: `docs/m14-backup-architecture.md` |
 | Production log-review status | ⏳ **Not completed.** Checklist ready at `docs/m14-log-review-checklist.md`. This agent has no CLI/API path to Auth/API/Storage/Realtime request-level logs; only the Supabase Dashboard's Logs Explorer has them. **This gate cannot be marked PASS without the product owner's explicit confirmation, per the checklist's own stated evidence requirement** |
 | Remaining Product Owner actions | See below |
 
 ## Remaining Product Owner actions (exact, minimum)
 
-1. **Auth Site URL / redirect config** — via Supabase Dashboard → `ptx-summer-cup-2026-production` → Authentication → URL Configuration: set **Site URL** to `https://ptx-summer-cup-2026-production.vercel.app`, add that same URL to the redirect allow-list. Two fields, no other setting needs to change. (Doing this yourself avoids the blast-radius risk `config push` demonstrated in the prior phase.)
-2. **First real admin identity** — sign up through the real public app (`https://ptx-summer-cup-2026-production.vercel.app/dang-nhap`) with your own real email/password. This agent will then verify the trigger fired and perform the one-time promotion PATCH, without ever seeing or requesting your password.
-3. **`SUPABASE_ACCESS_TOKEN` for the backup workflow** — generate via Supabase Dashboard → Account → Access Tokens, add it to GitHub repo Settings → Secrets and variables → Actions. Once present, this agent will rename `production-backup.yml.draft` → `.yml`, trigger one manual run, and verify a real artifact is produced.
-4. **Log review** — after the app has real traffic (or immediately, as a first pass), review the Supabase Dashboard's Logs Explorer per `docs/m14-log-review-checklist.md` and confirm explicitly.
+1. ~~Auth Site URL / redirect config~~ — **done**, confirmed via Dashboard inspection (see Supabase table above).
+2. ~~First real admin identity~~ — **done**, gate PASS (see Operations table above).
+3. **`SUPABASE_ACCESS_TOKEN` for the backup workflow** — generate via Supabase Dashboard → Account → Access Tokens, add it to GitHub repo Settings → Secrets and variables → Actions, named exactly `SUPABASE_ACCESS_TOKEN`. Confirm to this agent once added — it has not yet been confirmed as provisioned.
+4. **Log review** — review the Supabase Dashboard's Logs Explorer per `docs/m14-log-review-checklist.md` (Postgres/API/Auth/Storage/Realtime) and report findings, distinguishing expected test/4xx/RLS-denial activity from unexplained errors.
 
 ## Certification Rule Applied
 
-Per the explicit instruction, M14 is **not** declared certified merely because GitHub, Vercel, and the backup architecture are individually sound. Three gates remain open with real, stated blockers (Auth URL, first admin, log review), and the backup workflow remains unexecuted pending one secret only the product owner can generate. None of these are fabricated as PASS.
+Per the explicit instruction, M14 is **not** declared certified merely because GitHub, Vercel, Auth, and first-admin are individually sound. Two gates remain open with real, stated blockers (backup execution, log review). None of these are fabricated as PASS.
 
 ## Terminal State
 
 # M14 PRODUCTION ACTIVATION — NOT YET CERTIFIED
 
 **Remaining blockers, exactly:**
-1. Supabase Auth `site_url`/redirect URL still points at the local-dev default, not the canonical production origin.
-2. No real first administrator exists in production yet.
-3. Production log review has not been performed/confirmed by the product owner.
-4. Backup workflow is fully designed, audited, and ready, but has never executed — blocked on one GitHub Secret (`SUPABASE_ACCESS_TOKEN`) requiring product-owner action.
+1. Backup workflow is fully designed and audited, but has never executed — blocked on one GitHub Secret (`SUPABASE_ACCESS_TOKEN`) requiring product-owner action, not yet confirmed as provisioned.
+2. Production log review has not been performed/confirmed by the product owner.
 
-Everything else in this report — GitHub connection, Vercel Git integration (proven twice with real commits), Supabase production binding, Storage, Realtime, RLS, E2E, accessibility, static/build gates, and the backup architecture/audit — has real, independently-verified evidence and is not blocking further progress once the four items above are resolved.
+Everything else in this report — GitHub connection, Vercel Git integration (proven twice with real commits), Supabase production binding, Auth URL (PO-attested), First Real Admin (PASS), Storage, Realtime, RLS, E2E, accessibility, static/build gates, and the backup architecture/audit — has real, evidence-backed status and is not blocking further progress once the two items above are resolved.

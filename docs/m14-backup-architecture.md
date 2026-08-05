@@ -13,6 +13,14 @@ This changes the original proposal. A private repo's 400-day ceiling **exceeds**
 
 **Conclusion: private GitHub Actions artifacts alone satisfy the locked retention/security requirements. External object storage (S3/GCS/etc.) is not required to close this gate — it remains a reasonable future enhancement (e.g. for redundancy independent of GitHub itself), never a blocker.**
 
+### Follow-up finding (M14 continuation phase): the 500 MB Free-plan artifact *storage* quota — checked, not assumed
+
+The prior finding verified retention **days** only. It did not check the separate **storage size** quota GitHub applies to Actions artifacts on the Free plan for private repositories. Re-fetched directly from GitHub's docs (`actions/reference/limits`) this phase:
+
+- **GitHub Free plan, private repos: 500 MB total Actions artifact storage**, 2,000 included minutes/month, 10 GB Actions cache, 20 concurrent jobs, 6h per-job / 35-day per-workflow-run ceiling.
+
+This is a real quota this design must fit inside, so it was checked against the actual dump size rather than assumed safe. Both existing local dump files from the M13 restore-test phase (`backups/pre-deploy-production-....sql`, `backups/pre-migration-production-....sql`) are **~4 KB each** — consistent with the current production data volume (3 teams, 24 players, 3 matches, 1 settings row). At that size, 90 days of daily dumps retained simultaneously total **≈ 270 KB** — roughly 0.05% of the 500 MB cap. **The storage quota is not a constraint at the current data scale**, with over 1,800x headroom before it would need reconsideration. If the dataset grows by orders of magnitude in the future, this should be re-checked; it is not a concern today.
+
 **One condition this finding depends on:** the GitHub repository for this project must be **private**, not public. This is not yet decided — see "What's authored now vs. what's pending" below.
 
 ## Architecture
@@ -85,3 +93,20 @@ For an actual production disaster-recovery restore (not a drill), the destinatio
 - ⏳ **One blocker remains:** `SUPABASE_ACCESS_TOKEN` — requires the product owner's own Supabase Dashboard access (Account → Access Tokens) to generate; this agent cannot generate it.
 
 Once the token is added to GitHub Secrets, this agent will: rename the `.draft` file to `.yml`, confirm the first scheduled/manual run succeeds, and verify a real artifact is produced and passes integrity checks — closing this gate with real evidence, not configuration inspection alone.
+
+## Pre-execution audit (read-only inspection of the current draft, this phase)
+
+| # | Check | Result |
+|---|---|---|
+| 1 | Target is exactly `tqdsvtuspehavhcygipf` | Hardcoded in the `Link to production` step; the step aborts (`exit 1`) if the linked ref differs |
+| 2 | Staging not targeted | No other ref appears anywhere in the workflow |
+| 3 | Denylisted project cannot be targeted | Same guard as #1 — only one ref is ever referenced or possible |
+| 4 | Dumps cannot enter Git history | Workflow never runs `git add`/`commit`/`push`; the dump exists only in the ephemeral runner workspace and is explicitly `rm -f`'d in a final `if: always()` step |
+| 5 | Least-privilege permissions | Explicit `permissions: contents: read` at workflow level — no write, no other scope |
+| 6 | Secrets cannot be echoed | `SUPABASE_ACCESS_TOKEN` only ever appears in `env:` blocks passed to the Supabase CLI, never interpolated into an `echo`/printed string; GitHub's built-in log redaction is a backstop, not the only control |
+| 7 | Artifact cannot contain unnecessary credentials | `upload-artifact` `path:` is scoped to exactly one file (`$BACKUP_FILE`) — not a directory, so no risk of `supabase/.temp/` or other CLI state being swept in |
+| 8 | Retention satisfies verified policy | `retention-days: 90` — within the 400-day private-repo ceiling and, per the storage-quota finding above, ≈270 KB of real total artifact storage at 90 days of daily dumps vs. the 500 MB Free-plan cap |
+| 9 | Failure cannot mutate Production | Every Supabase CLI call in this workflow is read-only (`link`, `db dump`) — there is no `db push`/migration/write command anywhere in the file |
+| 10 | Appropriate for manual first execution | `workflow_dispatch: {}` is present alongside the cron schedule |
+
+**All 10 checks pass on static inspection.** This is a configuration/design audit, not execution evidence — per the locked policy, the Backup Gate cannot be marked PASS from this alone; a real run producing a real, verified artifact is still required (see "What's authored now vs. what's pending" above).
