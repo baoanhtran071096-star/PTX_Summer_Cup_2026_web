@@ -5866,7 +5866,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                 <!-- FEATURE ACTION BUTTONS -->
                 <li>
-                    <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link nav-pill-btn prediction-btn">
+                    <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link nav-pill-btn prediction-btn" data-i18n="nav_prediction">
                         🎯 DỰ ĐOÁN
                     </a>
                 </li>
@@ -5876,7 +5876,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link nav-pill-btn vip-btn">
+                    <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link nav-pill-btn vip-btn" data-i18n="nav_vip">
                         🎟️ VÉ VIP
                     </a>
                 </li>
@@ -5990,13 +5990,13 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <div id="globalTournamentStatusBar" style="background:rgba(8,13,26,0.95);border-top:1px solid rgba(255,255,255,0.06);padding:6px 24px;font-size:11px;font-weight:700;color:#94a3b8;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;">
             <div style="display:flex;align-items:center;gap:10px;">
                 <span id="statusBarDot" style="width:8px;height:8px;background:#38bdf8;border-radius:50%;display:inline-block;box-shadow:0 0 8px #38bdf8;"></span>
-                <span id="statusBarStateText" style="color:#38bdf8;font-weight:900;letter-spacing:0.5px;">● CHƯA KHỞI TRANH</span>
+                <span id="statusBarStateText" style="color:#38bdf8;font-weight:900;letter-spacing:0.5px;" data-i18n="sb_not_started">● CHƯA KHỞI TRANH</span>
                 <span style="color:rgba(255,255,255,0.2);">|</span>
                 <span style="color:#cbd5e1;">PTX SUMMER CUP 2026 • SÂN BÓNG HOÀNG HOA THÁM (SÂN SỐ 1)</span>
             </div>
             <div style="display:flex;align-items:center;gap:12px;">
-                <span id="statusBarMatchInfo" style="color:#fbbf24;font-weight:900;">0 / 3 TRẬN ĐÃ THI ĐẤU</span>
-                <a href="#schedule" onclick="navigateToPage('schedule'); return false;" style="color:#f97316;text-decoration:none;font-weight:900;font-size:10px;background:rgba(249,115,22,0.15);padding:2px 8px;border-radius:6px;border:1px solid rgba(249,115,22,0.3);">LỊCH THI ĐẤU →</a>
+                <span id="statusBarMatchInfo" style="color:#fbbf24;font-weight:900;" data-i18n="sb_matches_played">0 / 3 TRẬN ĐÃ THI ĐẤU</span>
+                <a href="#schedule" onclick="navigateToPage('schedule'); return false;" style="color:#f97316;text-decoration:none;font-weight:900;font-size:10px;background:rgba(249,115,22,0.15);padding:2px 8px;border-radius:6px;border:1px solid rgba(249,115,22,0.3);" data-i18n="sb_schedule_link">LỊCH THI ĐẤU →</a>
             </div>
         </div>
     </div>
@@ -8559,6 +8559,19 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 cmp_title: '⚔️ SO SÁNH 2 CẦU THỦ (HEAD TO HEAD)',
                 share_title: '📣 Chia sẻ trang',
                 hof_top_scorer: 'Vua phá lưới',
+                nav_vip: '🎟️ VÉ VIP',
+                sb_not_started: '● CHƯA KHỞI TRANH',
+                sb_matches_played: '0 / 3 TRẬN ĐÃ THI ĐẤU',
+                sb_schedule_link: 'LỊCH THI ĐẤU →',
+                st_undetermined: 'Chưa xác định',
+                st_no_finished: 'Chưa có trận nào kết thúc',
+                st_no_goals: 'Chưa có bàn thắng nào',
+                st_no_award: 'Chưa trao danh hiệu',
+                st_no_data: 'Chưa có dữ liệu',
+                stat_attack: 'Tấn công',
+                stat_defense: 'Phòng thủ',
+                stat_speed: 'Tốc độ',
+                stat_power: 'Sức mạnh',
                 live_none: 'Chưa có trận đấu nào đang diễn ra',
                 live_none_sub: 'Hãy quay lại đúng giờ để theo dõi trực tiếp!'
             },
@@ -8793,6 +8806,19 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 cmp_title: '⚔️ COMPARE TWO PLAYERS (HEAD TO HEAD)',
                 share_title: '📣 Share this page',
                 hof_top_scorer: 'Top scorer',
+                nav_vip: '🎟️ VIP TICKET',
+                sb_not_started: '● NOT STARTED',
+                sb_matches_played: '0 / 3 MATCHES PLAYED',
+                sb_schedule_link: 'SCHEDULE →',
+                st_undetermined: 'Not determined',
+                st_no_finished: 'No match finished yet',
+                st_no_goals: 'No goals yet',
+                st_no_award: 'Not awarded yet',
+                st_no_data: 'No data yet',
+                stat_attack: 'Attack',
+                stat_defense: 'Defense',
+                stat_speed: 'Speed',
+                stat_power: 'Power',
                 live_none: 'No match is currently live',
                 live_none_sub: 'Check back at kick-off to follow it live!'
             }
@@ -9991,37 +10017,37 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             const items = [
                 {
                     icon: '🏆',
-                    value: leader ? leader.label : 'Chưa xác định',
+                    value: leader ? leader.label : '<span data-i18n="st_undetermined">Chưa xác định</span>',
                     labelKey: 'leader_label',
                     labelTitle: 'Đội dẫn đầu',
-                    sub: leader ? leader.obj.pts + ' điểm • Hạng 1' : 'Chưa có trận nào kết thúc',
+                    sub: leader ? leader.obj.pts + ' điểm • Hạng 1' : '<span data-i18n="st_no_finished">Chưa có trận nào kết thúc</span>',
                     borderColor: '#fbbf24',
                     avatar: leader ? leader.logo : null
                 },
                 {
                     icon: '👟',
-                    value: topScorerValid ? topScorerValid.name : 'Chưa xác định',
+                    value: topScorerValid ? topScorerValid.name : '<span data-i18n="st_undetermined">Chưa xác định</span>',
                     labelKey: 'top_scorer_label',
                     labelTitle: 'Vua phá lưới',
-                    sub: topScorerValid ? topScorerValid.goals + ' bàn thắng' : 'Chưa có bàn thắng nào',
+                    sub: topScorerValid ? topScorerValid.goals + ' bàn thắng' : '<span data-i18n="st_no_goals">Chưa có bàn thắng nào</span>',
                     borderColor: '#f97316',
                     avatar: topScorerValid ? topScorerValid.avatar : null
                 },
                 {
                     icon: '⭐',
-                    value: topMVPValid ? topMVPValid.name : 'Chưa xác định',
+                    value: topMVPValid ? topMVPValid.name : '<span data-i18n="st_undetermined">Chưa xác định</span>',
                     labelKey: 'mvp_label',
                     labelTitle: 'Ngôi sao MVP',
-                    sub: topMVPValid ? topMVPValid.mvp + ' danh hiệu MVP' : 'Chưa trao danh hiệu',
+                    sub: topMVPValid ? topMVPValid.mvp + ' danh hiệu MVP' : '<span data-i18n="st_no_award">Chưa trao danh hiệu</span>',
                     borderColor: '#c084fc',
                     avatar: topMVPValid ? topMVPValid.avatar : null
                 },
                 {
                     icon: '🧤',
-                    value: bestGKValid ? bestGKValid.name : 'Chưa xác định',
+                    value: bestGKValid ? bestGKValid.name : '<span data-i18n="st_undetermined">Chưa xác định</span>',
                     labelKey: 'best_gk_label',
                     labelTitle: 'Thủ môn xuất sắc',
-                    sub: bestGKValid ? bestGKValid.cleanSheets + ' lần giữ sạch lưới' : 'Chưa có dữ liệu',
+                    sub: bestGKValid ? bestGKValid.cleanSheets + ' lần giữ sạch lưới' : '<span data-i18n="st_no_data">Chưa có dữ liệu</span>',
                     borderColor: '#38bdf8',
                     avatar: bestGKValid ? bestGKValid.avatar : null
                 }
@@ -10128,7 +10154,12 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             const container = document.getElementById('teamStatsGrid');
             if (!container) return;
             container.innerHTML = '';
-            const statLabels = { attack: 'Tấn công', defense: 'Phòng thủ', speed: 'Tốc độ', power: 'Sức mạnh' };
+            const statLabels = {
+                attack: '<span data-i18n="stat_attack">Tấn công</span>',
+                defense: '<span data-i18n="stat_defense">Phòng thủ</span>',
+                speed: '<span data-i18n="stat_speed">Tốc độ</span>',
+                power: '<span data-i18n="stat_power">Sức mạnh</span>'
+            };
             Object.values(TEAMS_DATA).forEach(team => {
                 const card = document.createElement('div');
                 card.className = `team-stat-card team-${team.id} reveal`;
