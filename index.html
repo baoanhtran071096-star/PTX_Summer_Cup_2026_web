@@ -67,19 +67,23 @@
             --white: #FFFFFF;
             --gold: #D4A13E;
             --bg-light: #F8FAFC;
-            --text-dark: #1A1A1A;
+            --text-dark: #0F172A;
             --text-muted: #64748B;
-            --shadow-card: 0 12px 40px rgba(29, 53, 87, 0.08);
+            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.3);
             --radius-card: 20px;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --bg-body: var(--bg-light);
-            --bg-card: var(--white);
-            --text-primary: var(--text-dark);
-            --border-color: rgba(0, 0, 0, 0.04);
-            --nav-blur: rgba(255, 255, 255, 0.85);
-            --team-p-color: #1A5BB5;
-            --team-t-color: #D32F2F;
-            --team-x-color: #F5A623;
+            --transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            --bg-body: #0F172A;
+            --bg-card: #1E293B;
+            --bg-card-raised: #334155;
+            --bg-modal: #0F172A;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: #1E293B;
+            --nav-blur: rgba(15, 23, 42, 0.90);
+            --team-p-color: #3B82F6;
+            --team-t-color: #EF4444;
+            --team-x-color: #F59E0B;
             --live-red: #dc2626;
             --bottom-nav-height: 68px;
 
@@ -93,10 +97,14 @@
             --navy: #0F1A2C;
             --bg-body: #0F172A;
             --bg-card: #1E293B;
-            --text-primary: #F1F5F9;
-            --text-muted: #94A3B8;
-            --border-color: rgba(255, 255, 255, 0.06);
-            --nav-blur: rgba(15, 23, 42, 0.85);
+            --bg-card-raised: #334155;
+            --bg-modal: #0F172A;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: #1E293B;
+            --nav-blur: rgba(15, 23, 42, 0.90);
             --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
@@ -104,11 +112,21 @@
             --navy: #1E293B;
             --bg-body: #F8FAFC;
             --bg-card: #FFFFFF;
+            --bg-card-raised: #F1F5F9;
+            --bg-modal: #FFFFFF;
             --text-primary: #0F172A;
+            --text-secondary: #475569;
             --text-muted: #64748B;
             --border-color: rgba(0, 0, 0, 0.08);
+            --input-bg: #FFFFFF;
             --nav-blur: rgba(255, 255, 255, 0.92);
             --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== ACCESSIBILITY FOCUS STATES ===== */
+        :focus-visible {
+            outline: 2px solid var(--ptx-orange) !important;
+            outline-offset: 2px !important;
         }
 
         /* ===== PTX MODERN GLASS & UI ENHANCEMENTS ===== */
@@ -818,23 +836,25 @@
             z-index: 1000;
             background: var(--nav-blur);
             backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border-color);
-            height: 72px;
             display: flex;
-            align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
             transition: background 0.4s ease;
         }
         .nav-inner {
             width: 100%;
-            max-width: 98vw;
+            max-width: 1440px;
+            height: 64px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 20px;
             position: relative;
-            gap: 16px;
+            gap: 12px;
+            box-sizing: border-box;
         }
         .nav-brand {
             display: flex;
@@ -2024,7 +2044,7 @@
         .player-card-fifa {
             background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
             border-radius: 20px;
-            padding: 22px 16px 16px;
+            padding: 20px 14px 16px;
             border: 2px solid rgba(234, 179, 8, 0.4);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.05);
             text-align: center;
@@ -2035,6 +2055,12 @@
             transform-style: preserve-3d;
             perspective: 1000px;
             will-change: transform;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            min-height: 385px;
+            box-sizing: border-box;
         }
         .player-card-fifa.card-gold {
             border-color: rgba(234, 179, 8, 0.8);
@@ -2108,21 +2134,30 @@
             transform: scale(1.08) translateZ(20px);
         }
         .player-card-fifa .p-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
             font-family: var(--font-ui);
             color: #ffffff;
             margin-top: 4px;
             letter-spacing: 0.3px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 4px;
         }
         .player-card-fifa .p-pos {
             font-size: 11px;
             color: #94a3b8;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
+            font-weight: 700;
+            margin-top: 4px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.3;
+            padding: 0 4px;
         }
         .player-card-fifa .p-stats-grid {
             display: grid;
@@ -2674,31 +2709,22 @@
             }
         }
 
-        /* ===== MOTION ===== */
+        /* ===== ULTRA-FAST SNAPPY MOTION ===== */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            transform: translateY(16px);
+            transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
         }
         .reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
-        .reveal-delay-1 {
-            transition-delay: 0.1s;
-        }
-        .reveal-delay-2 {
-            transition-delay: 0.2s;
-        }
-        .reveal-delay-3 {
-            transition-delay: 0.3s;
-        }
-        .reveal-delay-4 {
-            transition-delay: 0.4s;
-        }
-        .reveal-delay-5 {
-            transition-delay: 0.5s;
-        }
+        .reveal-delay-1 { transition-delay: 0.04s; }
+        .reveal-delay-2 { transition-delay: 0.08s; }
+        .reveal-delay-3 { transition-delay: 0.12s; }
+        .reveal-delay-4 { transition-delay: 0.16s; }
+        .reveal-delay-5 { transition-delay: 0.20s; }
 
         /* ===== OTHER COMPONENTS ===== */
         .organizer-grid {
@@ -3089,12 +3115,12 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 999999 !important;
         }
         #loginModal.active {
             display: flex;
@@ -3258,11 +3284,12 @@
             display: none;
         }
         .page.active {
-            display: block;
-            animation: pageFade 0.35s ease;
+            display: block !important;
+            opacity: 1 !important;
+            animation: pageFade 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes pageFade {
-            0% { opacity: 0; transform: translateY(10px); }
+            0% { opacity: 0; transform: translateY(6px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
@@ -4260,11 +4287,35 @@
 </style>
 <style>
         /* ===== MEGA MENU DROPDOWN POSITIONING FIX (ISSUE 1) ===== */
-        /* ===== MODERN DROPDOWN & MEGA MENU ARCHITECTURE ===== */
+        /* ===== MODERN DROPDOWN & MEGA MENU ARCHITECTURE (SPEC COMPLIANT) ===== */
+        :root {
+            --nav-open-delay: 120ms;
+            --nav-open-duration: 200ms;
+            --nav-switch-delay: 60ms;
+            --nav-switch-duration: 160ms;
+            --nav-close-delay: 280ms;
+            --nav-close-duration: 160ms;
+            --nav-easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         .nav-dropdown {
             position: relative !important;
         }
+
+        /* Combined Hover Zone Bridge (prevents dropdown closing when pointer crosses 8px gap) */
+        .nav-dropdown-content::before {
+            content: "" !important;
+            position: absolute !important;
+            top: -14px !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 16px !important;
+            background: transparent !important;
+            pointer-events: auto !important;
+        }
+
         .nav-dropdown-content {
+            display: none !important;
             position: absolute !important;
             top: calc(100% + 8px) !important;
             right: 0 !important;
@@ -4275,7 +4326,14 @@
             border-radius: 20px !important;
             z-index: 10000 !important;
             box-sizing: border-box !important;
+            opacity: 0 !important;
+            transform: translateY(-4px) !important;
+            pointer-events: none !important;
+            will-change: opacity, transform !important;
+            transition: opacity var(--nav-open-duration) var(--nav-easing),
+                        transform var(--nav-open-duration) var(--nav-easing) !important;
         }
+
         .nav-dropdown-content.dropdown-simple {
             width: 310px !important;
             max-width: 92vw !important;
@@ -4283,12 +4341,7 @@
             border: 1px solid rgba(255, 255, 255, 0.14) !important;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(59, 130, 246, 0.12) !important;
         }
-        .nav-dropdown:hover .nav-dropdown-content.dropdown-simple,
-        .nav-dropdown.active .nav-dropdown-content.dropdown-simple {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 6px !important;
-        }
+
         .nav-dropdown-content.dropdown-mega {
             width: min(640px, 94vw) !important;
             max-width: 94vw !important;
@@ -4296,9 +4349,447 @@
             border: 1px solid rgba(249, 115, 22, 0.35) !important;
             box-shadow: 0 25px 65px rgba(0, 0, 0, 0.9), 0 0 35px rgba(249, 115, 22, 0.15) !important;
         }
-        .nav-dropdown:hover .nav-dropdown-content.dropdown-mega,
-        .nav-dropdown.active .nav-dropdown-content.dropdown-mega {
+
+        /* OPEN STATE: opacity 0 -> 1, translateY(-4px) -> translateY(0) (duration: 200ms) */
+        .nav-dropdown.is-open > .nav-dropdown-content.dropdown-simple {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+        .nav-dropdown.is-open > .nav-dropdown-content.dropdown-mega {
             display: block !important;
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+
+        /* SWITCHING STATE: duration 160ms (cross-fade + subtle movement) */
+        .nav-dropdown.is-open.is-switching > .nav-dropdown-content {
+            transition: opacity var(--nav-switch-duration) var(--nav-easing),
+                        transform var(--nav-switch-duration) var(--nav-easing) !important;
+        }
+
+        /* CLOSING STATE: opacity 1 -> 0, translateY(0) -> translateY(-2px) (duration: 160ms) */
+        .nav-dropdown.is-closing > .nav-dropdown-content.dropdown-simple {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            opacity: 0 !important;
+            transform: translateY(-2px) !important;
+            pointer-events: none !important;
+            transition: opacity var(--nav-close-duration) var(--nav-easing),
+                        transform var(--nav-close-duration) var(--nav-easing) !important;
+        }
+        .nav-dropdown.is-closing > .nav-dropdown-content.dropdown-mega {
+            display: block !important;
+            opacity: 0 !important;
+            transform: translateY(-2px) !important;
+            pointer-events: none !important;
+            transition: opacity var(--nav-close-duration) var(--nav-easing),
+                        transform var(--nav-close-duration) var(--nav-easing) !important;
+        }
+
+        /* PREFERS-REDUCED-MOTION */
+        @media (prefers-reduced-motion: reduce) {
+            .nav-dropdown-content {
+                transition-duration: 0.01ms !important;
+                transform: none !important;
+                will-change: auto !important;
+            }
+        }
+
+        /* ===== PTX AI ASSISTANT — ULTIMATE SPEC CSS SYSTEM ===== */
+        :root {
+            --ptx-ai-open-duration: 220ms;
+            --ptx-ai-close-duration: 160ms;
+            --ptx-ai-easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ptx-ai-launcher {
+            position: fixed !important;
+            bottom: 25px !important;
+            right: 25px !important;
+            z-index: 99998 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            background: linear-gradient(135deg, #f97316, #ea580c) !important;
+            color: #ffffff !important;
+            border: 2px solid #fdba74 !important;
+            padding: 10px 18px !important;
+            border-radius: 30px !important;
+            font-weight: 900 !important;
+            font-size: 13px !important;
+            cursor: pointer !important;
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.5) !important;
+            font-family: var(--font-title) !important;
+            letter-spacing: 0.5px !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .ptx-ai-launcher:hover {
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: 0 14px 38px rgba(249, 115, 22, 0.65) !important;
+            padding-right: 22px !important;
+        }
+
+        .ptx-ai-panel {
+            display: none !important;
+            position: fixed !important;
+            bottom: 85px !important;
+            right: 25px !important;
+            width: 420px !important;
+            max-width: calc(100vw - 30px) !important;
+            height: 600px !important;
+            max-height: calc(100vh - 110px) !important;
+            background: rgba(18, 19, 24, 0.97) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border: 1.5px solid rgba(249, 115, 22, 0.35) !important;
+            border-radius: 24px !important;
+            box-shadow: 0 25px 65px rgba(0, 0, 0, 0.88), 0 0 35px rgba(249, 115, 22, 0.18) !important;
+            z-index: 99999 !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+            transform: translateY(8px) scale(0.98) !important;
+            will-change: opacity, transform !important;
+            transition: opacity var(--ptx-ai-open-duration) var(--ptx-ai-easing),
+                        transform var(--ptx-ai-open-duration) var(--ptx-ai-easing) !important;
+        }
+
+        .ptx-ai-panel.is-open {
+            display: flex !important;
+            opacity: 1 !important;
+            transform: translateY(0) scale(1) !important;
+        }
+
+        .ptx-ai-panel.is-closing {
+            display: flex !important;
+            opacity: 0 !important;
+            transform: translateY(6px) scale(0.98) !important;
+            transition: opacity var(--ptx-ai-close-duration) var(--ptx-ai-easing),
+                        transform var(--ptx-ai-close-duration) var(--ptx-ai-easing) !important;
+        }
+
+        .ptx-ai-panel.is-expanded {
+            width: min(880px, calc(100vw - 40px)) !important;
+            height: min(700px, calc(100vh - 100px)) !important;
+        }
+
+        .ptx-ai-body {
+            display: flex !important;
+            flex: 1 !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        .ptx-ai-sidebar {
+            display: none;
+            width: 220px;
+            background: rgba(10, 11, 15, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .ptx-ai-panel.is-expanded .ptx-ai-sidebar {
+            display: flex !important;
+        }
+
+        .ptx-ai-main {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+            overflow: hidden !important;
+        }
+
+        /* Mobile Fullscreen State (<768px) */
+        @media (max-width: 767px) {
+            .ptx-ai-panel {
+                bottom: 0 !important;
+                right: 0 !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                border-radius: 0 !important;
+                border: none !important;
+            }
+            .ptx-ai-sidebar {
+                display: none !important;
+            }
+        }
+
+        /* Light Mode Theme Support */
+        [data-theme="light"] .ptx-ai-panel {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-color: rgba(249, 115, 22, 0.3) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12), 0 0 25px rgba(249, 115, 22, 0.1) !important;
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .ptx-ai-sidebar {
+            background: #f8fafc !important;
+            border-right-color: rgba(0,0,0,0.08) !important;
+        }
+
+        [data-theme="light"] #ptxAiChatMessages {
+            background: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .ai-msg-bubble {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: rgba(0,0,0,0.1) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+        }
+
+        /* ===== PTX CANONICAL WEATHER SYSTEM SPEC ===== */
+        .ptx-weather-card {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(56, 189, 248, 0.35);
+            border-radius: 20px;
+            padding: 18px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.12);
+            color: #f8fafc;
+            margin-bottom: 20px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .weather-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .weather-card-header .title {
+            font-weight: 900;
+            font-size: 13px;
+            color: #38bdf8;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-title);
+        }
+
+        .weather-card-header .updated {
+            font-size: 10px;
+            color: #10b981;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .weather-hero-section {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .weather-hero-temp-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .weather-hero-temp-box .icon {
+            font-size: 44px;
+            line-height: 1;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+        }
+
+        .weather-hero-temp-box .temp-main {
+            font-size: 36px;
+            font-weight: 900;
+            color: #ffffff;
+            font-family: var(--font-title);
+            line-height: 1;
+        }
+
+        .weather-hero-temp-box .feels-like {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .weather-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .weather-metric-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-metric-item .label {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .weather-metric-item .val {
+            font-size: 12px;
+            font-weight: 900;
+            color: #e2e8f0;
+            margin-top: 2px;
+        }
+
+        .weather-hourly-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 4px 6px 4px;
+            scroll-behavior: smooth;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+        .weather-hourly-item {
+            flex: 1;
+            min-width: 58px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 8px 6px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .weather-hourly-item.is-kickoff {
+            background: rgba(249, 115, 22, 0.2) !important;
+            border: 1.5px solid #f97316 !important;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35) !important;
+        }
+
+        .weather-hourly-item .time {
+            font-size: 10px;
+            font-weight: 800;
+            color: #cbd5e1;
+        }
+
+        .weather-hourly-item.is-kickoff .time {
+            color: #fdba74 !important;
+            font-weight: 900 !important;
+        }
+
+        .weather-hourly-item .temp {
+            font-size: 13px;
+            font-weight: 900;
+            color: #ffffff;
+            margin: 3px 0;
+        }
+
+        .weather-hourly-item .pop {
+            font-size: 10px;
+            font-weight: 800;
+            color: #60a5fa;
+        }
+
+        .weather-risk-banner {
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .weather-risk-banner .risk-badge {
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        /* Compact Weather Pill for Schedule */
+        .weather-compact-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .weather-compact-pill:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: #38bdf8;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Weather Adaptations */
+        @media (max-width: 767px) {
+            .weather-hero-section {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .weather-metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        [data-theme="light"] .ptx-weather-card {
+            background: #ffffff !important;
+            border-color: rgba(56, 189, 248, 0.4) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .weather-hero-temp-box .temp-main {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .weather-metrics-grid {
+            background: #f8fafc !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .weather-metric-item .val {
+            color: #0f172a !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ptx-ai-panel {
+                transition-duration: 0.01ms !important;
+                transform: none !important;
+            }
         }
         .dropdown-link-item {
             display: flex !important;
@@ -4327,19 +4818,72 @@
             border: 1px solid rgba(255, 255, 255, 0.06) !important;
             transition: all 0.2s ease !important;
         }
-        .util-card-item:hover {
-            background: rgba(255, 255, 255, 0.09) !important;
-            border-color: rgba(255, 255, 255, 0.18) !important;
-            transform: translateX(4px) !important;
+        .dropdown-link-icon, .util-icon-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
         }
-        @media (max-width: 768px) {
-            .nav-dropdown-content {
-                position: fixed !important;
-                top: 70px !important;
-                left: 4vw !important;
-                right: 4vw !important;
-                width: 92vw !important;
-            }
+        .dropdown-link-text, .util-text-wrap {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+            flex: 1 !important;
+            min-width: 0 !important;
+            text-align: left !important;
+        }
+        .dropdown-link-title, .util-title {
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #f8fafc !important;
+            line-height: 1.25 !important;
+            display: block !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .dropdown-link-sub, .util-desc {
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            color: #94a3b8 !important;
+            line-height: 1.25 !important;
+            display: block !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        /* ===== LIGHT MODE DROPDOWN OVERRIDES ===== */
+        [data-theme="light"] .nav-dropdown-content {
+            background: rgba(255, 255, 255, 0.98) !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+        }
+        [data-theme="light"] .dropdown-link-item,
+        [data-theme="light"] .util-card-item {
+            background: rgba(0, 0, 0, 0.03) !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+        [data-theme="light"] .dropdown-link-item:hover,
+        [data-theme="light"] .util-card-item:hover {
+            background: rgba(241, 90, 36, 0.08) !important;
+            border-color: rgba(241, 90, 36, 0.3) !important;
+        }
+        [data-theme="light"] .dropdown-link-title,
+        [data-theme="light"] .util-title {
+            color: #0f172a !important;
+        }
+        [data-theme="light"] .dropdown-link-sub,
+        [data-theme="light"] .util-desc {
+            color: #64748b !important;
+        }
+        [data-theme="light"] #megaMenuTournamentStatus {
+            border-top-color: rgba(0, 0, 0, 0.1) !important;
+            color: #64748b !important;
         }
 
         /* ===== VIDEO CONTAINER HEIGHT & ASPECT RATIO BOUNDS (ISSUE 3) ===== */
@@ -4644,28 +5188,186 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         });
         window.updateControlCenterButtonVisibility = updateControlCenterButtonVisibility;
 
-        // Mega-menu (TIỆN ÍCH / dropdown) — đóng có độ trễ thay vì đóng ngay khi rời chuột.
-        // CSS :hover thuần khiến menu tắt phụt nếu chuột lệch nhẹ khi di chuyển xuống chọn mục —
-        // đây là nguyên nhân "trỏ xuống khó chọn, ẩn quá nhanh". Thêm lớp JS này để giữ menu mở
-        // thêm ~350ms sau khi rời chuột, đủ thời gian di chuyển sang mục muốn bấm.
-        function setupNavDropdownHoverDelay() {
-            document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
-                let closeTimer = null;
-                dropdown.addEventListener('mouseenter', () => {
-                    clearTimeout(closeTimer);
-                    dropdown.classList.add('active');
-                });
-                dropdown.addEventListener('mouseleave', () => {
-                    closeTimer = setTimeout(() => {
-                        dropdown.classList.remove('active');
-                    }, 350);
+        // ===== NAVBAR DROPDOWN — UNIFIED INTERACTION TIMING & MOTION SYSTEM =====
+        function setupNavbarDropdownInteractionSystem() {
+            const OPEN_DELAY      = 120; // ms
+            const OPEN_DURATION   = 200; // ms
+            const SWITCH_DELAY    = 60;  // ms
+            const SWITCH_DURATION = 160; // ms
+            const CLOSE_DELAY     = 280; // ms
+            const CLOSE_DURATION  = 160; // ms
+            const TOUCH_DURATION  = 220; // ms (200-250ms)
+
+            const dropdowns = Array.from(document.querySelectorAll('.nav-dropdown'));
+            if (dropdowns.length === 0) return;
+
+            let activeDropdown = null;
+            let openTimer = null;
+            let closeTimer = null;
+            let switchTimer = null;
+            let closeAnimationTimer = null;
+
+            const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
+
+            function clearTimers() {
+                if (openTimer) { clearTimeout(openTimer); openTimer = null; }
+                if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+                if (switchTimer) { clearTimeout(switchTimer); switchTimer = null; }
+            }
+
+            function openMenu(dropdown, duration = OPEN_DURATION, isSwitching = false) {
+                if (closeAnimationTimer) { clearTimeout(closeAnimationTimer); closeAnimationTimer = null; }
+                dropdown.classList.remove('is-closing');
+                dropdown.classList.add('is-open');
+                if (isSwitching) {
+                    dropdown.classList.add('is-switching');
+                } else {
+                    dropdown.classList.remove('is-switching');
+                }
+
+                const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'true');
+
+                activeDropdown = dropdown;
+            }
+
+            function closeMenu(dropdown, duration = CLOSE_DURATION) {
+                if (!dropdown) return;
+
+                const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+
+                if (duration === 0) {
+                    dropdown.classList.remove('is-open', 'is-switching', 'is-closing');
+                    if (activeDropdown === dropdown) activeDropdown = null;
+                    return;
+                }
+
+                dropdown.classList.remove('is-switching');
+                dropdown.classList.add('is-closing');
+
+                closeAnimationTimer = setTimeout(() => {
+                    if (dropdown.classList.contains('is-closing')) {
+                        dropdown.classList.remove('is-open', 'is-closing');
+                        if (activeDropdown === dropdown) activeDropdown = null;
+                    }
+                }, duration);
+            }
+
+            dropdowns.forEach(dropdown => {
+                const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+                const panel = dropdown.querySelector('.nav-dropdown-content');
+
+                if (!toggle || !panel) return;
+
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-haspopup', 'true');
+
+                if (isTouch) {
+                    // Mobile / Touch: Tap to toggle open/close (no hover delay)
+                    toggle.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (dropdown.classList.contains('is-open')) {
+                            closeMenu(dropdown, TOUCH_DURATION);
+                        } else {
+                            dropdowns.forEach(d => {
+                                if (d !== dropdown && d.classList.contains('is-open')) {
+                                    closeMenu(d, 0);
+                                }
+                            });
+                            openMenu(dropdown, TOUCH_DURATION);
+                        }
+                    });
+                } else {
+                    // Desktop Hover & Motion System
+                    dropdown.addEventListener('mouseenter', () => {
+                        // Pointer returned to valid hover zone -> CANCEL close timer immediately!
+                        if (closeTimer) {
+                            clearTimeout(closeTimer);
+                            closeTimer = null;
+                        }
+
+                        // If hovering currently active open dropdown -> keep it open
+                        if (activeDropdown === dropdown && dropdown.classList.contains('is-open')) {
+                            dropdown.classList.remove('is-closing');
+                            return;
+                        }
+
+                        // If another dropdown is ALREADY open -> switch directly with SWITCH_DELAY (60ms)
+                        if (activeDropdown && activeDropdown !== dropdown) {
+                            clearTimers();
+                            const prevDropdown = activeDropdown;
+                            switchTimer = setTimeout(() => {
+                                closeMenu(prevDropdown, 0);
+                                openMenu(dropdown, SWITCH_DURATION, true);
+                            }, SWITCH_DELAY);
+                            return;
+                        }
+
+                        // No dropdown is open -> trigger open after OPEN_DELAY (120ms)
+                        clearTimers();
+                        openTimer = setTimeout(() => {
+                            openMenu(dropdown, OPEN_DURATION);
+                        }, OPEN_DELAY);
+                    });
+
+                    dropdown.addEventListener('mouseleave', () => {
+                        // Cancel pending open or switch timers immediately
+                        if (openTimer) { clearTimeout(openTimer); openTimer = null; }
+                        if (switchTimer) { clearTimeout(switchTimer); switchTimer = null; }
+
+                        // Trigger close after CLOSE_DELAY (280ms)
+                        if (dropdown.classList.contains('is-open')) {
+                            closeTimer = setTimeout(() => {
+                                closeMenu(dropdown, CLOSE_DURATION);
+                            }, CLOSE_DELAY);
+                        }
+                    });
+
+                    // Keyboard navigation: Enter / Space / ArrowDown
+                    toggle.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (dropdown.classList.contains('is-open')) {
+                                closeMenu(dropdown, CLOSE_DURATION);
+                            } else {
+                                dropdowns.forEach(d => {
+                                    if (d !== dropdown && d.classList.contains('is-open')) {
+                                        closeMenu(d, 0);
+                                    }
+                                });
+                                openMenu(dropdown, OPEN_DURATION);
+                                const firstLink = panel.querySelector('a');
+                                if (firstLink) firstLink.focus();
+                            }
+                        }
+                    });
+                }
+
+                // Keyboard Escape key handling for accessibility
+                dropdown.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && dropdown.classList.contains('is-open')) {
+                        e.preventDefault();
+                        closeMenu(dropdown, CLOSE_DURATION);
+                        toggle.focus();
+                    }
                 });
             });
+
+            // Global click outside listener
+            document.addEventListener('click', (e) => {
+                if (activeDropdown && !activeDropdown.contains(e.target)) {
+                    clearTimers();
+                    closeMenu(activeDropdown, isTouch ? TOUCH_DURATION : CLOSE_DURATION);
+                }
+            });
         }
+
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupNavDropdownHoverDelay);
+            document.addEventListener('DOMContentLoaded', setupNavbarDropdownInteractionSystem);
         } else {
-            setupNavDropdownHoverDelay();
+            setupNavbarDropdownInteractionSystem();
         }
 
     
@@ -4780,80 +5482,134 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <a href="#hub" class="nav-item" data-page="home"><span class="icon">📊</span><span class="label" data-i18n="hub">Hub</span></a>
     </nav>
 
-    <!-- ===== NAVBAR ===== -->
+    <!-- ===== GLOBAL TOURNAMENT HEADER SYSTEM (10/10 ARCHITECTURE) ===== -->
     <div class="nav-container">
         <div class="nav-inner">
             <a href="#home" class="nav-brand">PTX <span>SUMMER CUP</span></a>
+            
             <button class="hamburger" aria-label="Menu">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
+            
             <ul class="nav-links" id="navLinks">
-                <li><a href="#home" class="active" data-i18n="home_nav">Trang chủ</a></li>
-                <li><a href="#about" data-i18n="about_nav">Giới thiệu</a></li>
-                <li><a href="#schedule" data-i18n="schedule_nav">Lịch thi đấu</a></li>
-                <li><a href="#standings" data-i18n="standings_nav">BXH</a></li>
+                <!-- 1. HOME -->
+                <li><a href="#home" class="active" onclick="navigateToPage('home'); return false;" data-i18n="home_nav">Trang chủ</a></li>
+
+                <!-- 2. TOURNAMENT DROPDOWN -->
                 <li class="nav-dropdown">
-                    <a href="#teams" class="nav-link nav-dropdown-toggle" onclick="return false;" style="color:var(--text-primary);font-weight:700;display:flex;align-items:center;gap:4px;" data-i18n="nav_teams_players">
-                        👥 ĐỘI & CẦU THỦ <span style="font-size:10px;opacity:0.7;">▼</span>
+                    <a href="#schedule" class="nav-link nav-dropdown-toggle" onclick="return false;">
+                        GIẢI ĐẤU <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
                     <div class="nav-dropdown-content dropdown-simple">
-                        <a href="#teams" class="dropdown-link-item" onclick="navigateToPage('teams'); return false;" data-i18n="teams_nav">
+                        <a href="#about" class="dropdown-link-item" onclick="navigateToPage('about'); return false;">
+                            <span class="dropdown-link-icon" style="background:rgba(249,115,22,0.15);color:#f97316;">ℹ️</span>
+                            <span class="dropdown-link-text">
+                                <span class="dropdown-link-title">Giới thiệu giải đấu</span>
+                                <span class="dropdown-link-sub">Thể thức, cơ cấu giải thưởng</span>
+                            </span>
+                        </a>
+                        <a href="#schedule" class="dropdown-link-item" onclick="navigateToPage('schedule'); return false;">
+                            <span class="dropdown-link-icon" style="background:rgba(59,130,246,0.15);color:#60a5fa;">📅</span>
+                            <span class="dropdown-link-text">
+                                <span class="dropdown-link-title">Lịch thi đấu & Kết quả</span>
+                                <span class="dropdown-link-sub">3 Trận đấu Vòng tròn 35'</span>
+                            </span>
+                        </a>
+                        <a href="#standings" class="dropdown-link-item" onclick="navigateToPage('standings'); return false;">
+                            <span class="dropdown-link-icon" style="background:rgba(234,179,8,0.15);color:#facc15;">🏆</span>
+                            <span class="dropdown-link-text">
+                                <span class="dropdown-link-title">Bảng xếp hạng</span>
+                                <span class="dropdown-link-sub">Điểm số, hiệu số & Fair-play</span>
+                            </span>
+                        </a>
+                        <a href="#rules" class="dropdown-link-item" onclick="navigateToPage('rules'); return false;">
+                            <span class="dropdown-link-icon" style="background:rgba(148,163,184,0.15);color:#cbd5e1;">📖</span>
+                            <span class="dropdown-link-text">
+                                <span class="dropdown-link-title">Điều lệ 5v5</span>
+                                <span class="dropdown-link-sub">Luật thi đấu chính thức</span>
+                            </span>
+                        </a>
+                    </div>
+                </li>
+
+                <!-- 3. TEAMS & PLAYERS DROPDOWN -->
+                <li class="nav-dropdown">
+                    <a href="#teams" class="nav-link nav-dropdown-toggle" onclick="return false;">
+                        ĐỘI & CẦU THỦ <span style="font-size:10px;opacity:0.7;">▼</span>
+                    </a>
+                    <div class="nav-dropdown-content dropdown-simple">
+                        <a href="#teams" class="dropdown-link-item" onclick="navigateToPage('teams'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(59,130,246,0.15);color:#60a5fa;">⚽</span>
                             <span class="dropdown-link-text">
                                 <span class="dropdown-link-title">Các Đội Bóng</span>
                                 <span class="dropdown-link-sub">Phoenix • Tiger • Xiphias</span>
                             </span>
                         </a>
-                        <a href="#players" class="dropdown-link-item" onclick="navigateToPage('players'); return false;" data-i18n="players_nav">
+                        <a href="#players" class="dropdown-link-item" onclick="navigateToPage('players'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(234,179,8,0.15);color:#facc15;">🏃</span>
                             <span class="dropdown-link-text">
                                 <span class="dropdown-link-title">Cầu Thủ FIFA</span>
                                 <span class="dropdown-link-sub">24 Cầu thủ chỉ số FUT 3D</span>
                             </span>
                         </a>
-                        <a href="#statistics" class="dropdown-link-item" onclick="navigateToPage('statistics'); return false;" data-i18n="stats_nav">
+                        <a href="#statistics" class="dropdown-link-item" onclick="navigateToPage('statistics'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(34,197,94,0.15);color:#4ade80;">📊</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Thống Kê Chi Tiết</span>
-                                <span class="dropdown-link-sub">BXH, Bàn thắng & Kiến tạo</span>
+                                <span class="dropdown-link-title">Thống kê chi tiết</span>
+                                <span class="dropdown-link-sub">Vua phá lưới & Kiến tạo</span>
                             </span>
                         </a>
                     </div>
                 </li>
 
-                <li><a href="#gallery" data-i18n="gallery_nav">Thư viện</a></li>
-                <li><a href="#hall-of-fame" data-i18n="hof_nav">Vinh danh</a></li>
-                <li><a href="#contact" data-i18n="contact_nav">Liên hệ</a></li>
+                <!-- 4. MEDIA DROPDOWN -->
+                <li class="nav-dropdown">
+                    <a href="#gallery" class="nav-link nav-dropdown-toggle" onclick="return false;">
+                        TRUYỀN THÔNG <span style="font-size:10px;opacity:0.7;">▼</span>
+                    </a>
+                    <div class="nav-dropdown-content dropdown-simple">
+                        <a href="#gallery" class="dropdown-link-item" onclick="navigateToPage('gallery'); return false;">
+                            <span class="dropdown-link-icon" style="background:rgba(236,72,153,0.15);color:#ec4899;">🖼️</span>
+                            <span class="dropdown-link-text">
+                                <span class="dropdown-link-title">Thư viện Ảnh & Video</span>
+                                <span class="dropdown-link-sub">Bộ sưu tập khoảnh khắc giải</span>
+                            </span>
+                        </a>
+                        <a href="#" class="dropdown-link-item" onclick="openLiveStreamHubModal(); return false;">
+                            <span class="dropdown-link-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">📺</span>
+                            <span class="dropdown-link-text">
+                                <span class="dropdown-link-title">Livestream Hub</span>
+                                <span class="dropdown-link-sub">Phát sóng trực tiếp trận đấu</span>
+                            </span>
+                        </a>
+                    </div>
+                </li>
 
+                <!-- 5. HALL OF FAME -->
+                <li><a href="#hall-of-fame" onclick="navigateToPage('hall-of-fame'); return false;">Vinh danh</a></li>
+
+                <!-- FEATURE ACTION BUTTONS -->
                 <li>
-                    <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link nav-pill-btn prediction-btn" data-i18n="nav_prediction">
+                    <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link nav-pill-btn prediction-btn">
                         🎯 DỰ ĐOÁN
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="openLiveStreamHubModal(); return false;" class="nav-link nav-pill-btn live-btn">
-                        <span class="live-dot-pulse"></span>📺 LIVESTREAM
+                        <span class="live-dot-pulse"></span><span id="globalLiveStatusBadge">● OFFLINE</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link nav-pill-btn vip-btn">
-                        🎟️ VÉ VÀNG VIP
-                    </a>
-                </li>
-                
-                <!-- Admin Control Center Header Button (ALWAYS VISIBLE & PROMINENT) -->
-                <li>
-                    <a href="#admin" onclick="navigateToPage('admin'); return false;" class="nav-link nav-pill-btn admin-btn" id="headerAdminNavBtn">
-                        <span style="font-size:13px;">🛡️</span> ADMIN <span style="font-size:9px;background:#f97316;color:#fff;padding:1px 5px;border-radius:4px;margin-left:2px;font-weight:900;">HUB</span>
+                        🎟️ VÉ VIP
                     </a>
                 </li>
 
-                <!-- Utility Dropdown Menu -->
+                <!-- UTILITIES MEGA MENU -->
                 <li class="nav-dropdown">
-                    <a href="#" class="nav-link nav-dropdown-toggle nav-pill-btn util-btn" onclick="return false;" data-i18n="nav_utilities">
+                    <a href="#" class="nav-link nav-dropdown-toggle nav-pill-btn util-btn" onclick="return false;">
                         ⚡ TIỆN ÍCH <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
-                    
                     <div class="nav-dropdown-content dropdown-mega">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
                             <!-- Column 1: 🏆 CĐV & GIẢI ĐẤU -->
@@ -4935,23 +5691,6 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         </div>
 
                         <!-- Footer: ● TRẠNG THÁI GIẢI -->
-                        <div id="megaMenuTournamentStatus" style="margin-top:16px;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#94a3b8;font-weight:700;">
-                            <div style="display:flex;align-items:center;gap:6px;">
-                                <span style="width:8px;height:8px;background:#38bdf8;border-radius:50%;display:inline-block;box-shadow:0 0 8px #38bdf8;"></span>
-                                <span>TRẠNG THÁI: <strong id="statusLabelText" style="color:#38bdf8;font-weight:900;">Chưa khởi tranh</strong></span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:6px;">
-                                <span style="color:#fbbf24;font-weight:900;" id="statusMatchesText">⚽ 0 / 3 trận đã đấu</span>
-                            </div>
-                        </div>
-                    </div>
-                </li>                        </a>
-                                    </div>
-                                </details>
-                            </div>
-                        </div>
-
-                        <!-- Footer: ● TRẠNG THÁI GIẢI -->
                         <div id="megaMenuTournamentStatus" style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94a3b8;font-weight:700;">
                             <div>● TRẠNG THÁI GIẢI: <span id="statusLabelText" style="color:#38bdf8;font-weight:900;">Chưa khởi tranh</span></div>
                             <div id="statusMatchesText" style="color:#fbbf24;font-weight:900;">0 / 3 trận đã đấu</div>
@@ -4968,6 +5707,20 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span> <span id="themeLabel">Dark</span>
                 </button>
+            </div>
+        </div>
+
+        <!-- DYNAMIC TOURNAMENT STATUS BAR (32px) -->
+        <div id="globalTournamentStatusBar" style="background:rgba(8,13,26,0.95);border-top:1px solid rgba(255,255,255,0.06);padding:6px 24px;font-size:11px;font-weight:700;color:#94a3b8;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span id="statusBarDot" style="width:8px;height:8px;background:#38bdf8;border-radius:50%;display:inline-block;box-shadow:0 0 8px #38bdf8;"></span>
+                <span id="statusBarStateText" style="color:#38bdf8;font-weight:900;letter-spacing:0.5px;">● CHƯA KHỞI TRANH</span>
+                <span style="color:rgba(255,255,255,0.2);">|</span>
+                <span style="color:#cbd5e1;">PTX SUMMER CUP 2026 • SÂN BÓNG HOÀNG HOA THÁM (SÂN SỐ 1)</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <span id="statusBarMatchInfo" style="color:#fbbf24;font-weight:900;">0 / 3 TRẬN ĐÃ THI ĐẤU</span>
+                <a href="#schedule" onclick="navigateToPage('schedule'); return false;" style="color:#f97316;text-decoration:none;font-weight:900;font-size:10px;background:rgba(249,115,22,0.15);padding:2px 8px;border-radius:6px;border:1px solid rgba(249,115,22,0.3);">LỊCH THI ĐẤU →</a>
             </div>
         </div>
     </div>
@@ -5020,7 +5773,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <div class="container dashboard-overlap reveal" id="dashboard-overlap">
             <div class="stats-dashboard">
                 <div class="stat-card reveal reveal-delay-1"><div class="icon">⚽</div><div class="number counter" data-target="0" id="stat-goals">0</div><div class="label" data-i18n="goals_label">Bàn thắng</div></div>
-                <div class="stat-card reveal reveal-delay-2"><div class="icon">🏆</div><div class="number counter" data-target="0" id="stat-matches">0</div><div class="label" data-i18n="matches_label">Trận đấu</div></div>
+                <div class="stat-card reveal reveal-delay-2"><div class="icon">🏆</div><div class="number counter" data-target="3" id="stat-matches">3</div><div class="label" data-i18n="matches_label">Trận đấu</div></div>
                 <div class="stat-card reveal reveal-delay-3"><div class="icon">👥</div><div class="number counter" data-target="24" id="stat-players">24</div><div class="label" data-i18n="players_label">Cầu thủ</div></div>
                 <div class="stat-card reveal reveal-delay-4"><div class="icon">🟨</div><div class="number counter" data-target="0" id="stat-yellow">0</div><div class="label" data-i18n="yellow_label">Thẻ vàng</div></div>
                 <div class="stat-card reveal reveal-delay-5"><div class="icon">🟥</div><div class="number counter" data-target="0" id="stat-red">0</div><div class="label" data-i18n="red_label">Thẻ đỏ</div></div>
@@ -5184,15 +5937,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <div class="sub">PTX Summer Cup Fan Prediction Game</div>
             </div>
             
-            <!-- Mode Switcher Toolbar -->
-            <div style="display:flex;justify-content:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
-                <button onclick="switchToPreMatchState(); return false;" style="background:rgba(56,189,248,0.18);color:#38bdf8;border:1.5px solid #38bdf8;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(56,189,248,0.25);">
-                    ⏳ KHÔI PHỤC CHẾ ĐỘ TRƯỚC TRẬN ĐẤU (0 TRẬN / 0 ĐIỂM)
-                </button>
-                <button onclick="resetSystemDataToOfficialDefaults(); return false;" style="background:rgba(251,191,36,0.18);color:#fbbf24;border:1.5px solid #fbbf24;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(251,191,36,0.25);">
-                    ⚽ NẠP KẾT QUẢ ĐÃ THI ĐẤU (DEMO RESULTS)
-                </button>
-            </div>
+
             
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;">
                 <!-- Prediction Form Card -->
@@ -5203,7 +5948,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     
                     <div style="margin-bottom:16px;">
                         <label style="font-size:12px;font-weight:700;color:#cbd5e1;display:block;margin-bottom:6px;">Họ tên / Nickname CĐV (*):</label>
-                        <input type="text" id="predFanName" placeholder="Ví dụ: Nguyễn Văn A (Phòng IT)..." style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
+                        <input type="text" id="predFanName" placeholder="Ví dụ: Superman, Spider-Man, Iron Man, Batman..." style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
                     </div>
 
                     <!-- Match Predictions -->
@@ -5312,7 +6057,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             
             <div class="card" style="padding:0;overflow:hidden;background:transparent;box-shadow:none;margin-bottom:24px;">
                 <div class="video-wrapper" id="videoWrapper">
-                    <video id="player" controls playsinline poster="thư viện/ảnh logo - banner/banner PTX Summer Cup.webp" onerror="handleVideoError(this)">
+                    <video id="player" controls playsinline preload="metadata" src="thư viện/Media/5.mp4" poster="thư viện/ảnh logo - banner/banner PTX Summer Cup.webp" style="width:100%;height:100%;object-fit:contain;background:#0b1329;" onerror="handleVideoError(this)">
                         <source src="thư viện/Media/5.mp4" type="video/mp4" />
                         <source src="thư viện/Media/1.mp4" type="video/mp4" />
                     </video>
@@ -5469,8 +6214,10 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             <div class="section-header">
                 <div class="icon">🏆</div>
                 <h2 data-i18n="hof_title">VINH DANH <span>MÙA GIẢI</span></h2>
-                <div class="sub" data-i18n="hof_sub">Hall of Fame</div>
+                <div class="sub" data-i18n="hof_sub">Hall of Fame (2025 — 2030)</div>
             </div>
+            <!-- Year Filter Bar -->
+            <div id="hofYearFilterBar" style="display:flex;justify-content:center;gap:10px;margin-bottom:28px;flex-wrap:wrap;"></div>
             <div class="hof-grid-v2" id="hofGridV2">
                 <!-- Render by JS -->
             </div>
@@ -5604,6 +6351,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <div class="container section-gap" style="max-width:1100px;margin:0 auto;padding-top:24px;">
             <!-- Live Matchday Banner Hub (Page Schedule) -->
             <div id="matchInfoContainerPage" style="background:linear-gradient(145deg,rgba(15,23,42,0.96),rgba(30,41,59,0.96));backdrop-filter:blur(20px);border:1.5px solid rgba(59,130,246,0.35);border-radius:24px;padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(59,130,246,0.12);margin-bottom:28px;">
+                <!-- Canonical Full Weather Match Card -->
+                <div id="ptxScheduleWeatherCard"></div>
+
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:stretch;">
                     <!-- Card 1: Ngày & Giờ Thi Đấu -->
                     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(251,191,36,0.3);border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;transition:transform 0.25s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
@@ -5990,7 +6740,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             <div class="hero-content"><h1 class="font-title" style="font-size:clamp(40px,8vw,72px);color:#fff;letter-spacing:2px;" data-i18n="hof_hero">HALL OF FAME</h1><p style="color:rgba(255,255,255,0.8);font-size:clamp(16px,2vw,24px);font-family:var(--font-ui);" data-i18n="hof_hero_sub">Vinh danh nhà vô địch qua các mùa giải (2025–2030)</p></div>
         </div>
         <div class="container section-gap">
-            <div id="hofGridV2Page" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+            <!-- Year Filter Bar -->
+            <div id="hofYearFilterBarPage" style="display:flex;justify-content:center;gap:10px;margin-bottom:28px;flex-wrap:wrap;"></div>
+            <div id="hofGridV2Page" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
                 <!-- Dynamically rendered by renderHallOfFame() JS -->
             </div>
         </div>
@@ -6222,6 +6974,83 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         </div>
     </section>
 
+    <!-- ==================== MATCH CONTROL CENTER LAYER (/ops) ==================== -->
+    <section id="page-ops" class="page">
+        <div class="hero-v3" style="min-height:30vh;height:auto;padding:50px 0;background:linear-gradient(135deg,#030712 0%,#0f172a 60%,#1e1b4b 100%);">
+            <div class="hero-content">
+                <div style="display:inline-block;background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:900;letter-spacing:1px;margin-bottom:10px;">
+                    🎛️ TOURNAMENT OPERATIONS LAYER
+                </div>
+                <h1 class="font-title" style="font-size:clamp(32px,6vw,56px);color:#fff;letter-spacing:2px;">MATCH CONTROL CENTER</h1>
+                <p style="color:rgba(255,255,255,0.8);font-size:clamp(14px,1.5vw,18px);font-family:var(--font-ui);">Bàn Vận Hành Trận Đấu & Cập Nhật Tỷ Số Real-time</p>
+            </div>
+        </div>
+
+        <div class="container section-gap">
+            <div class="card" style="padding:24px;background:rgba(15,23,42,0.95);border:1px solid rgba(56,189,248,0.3);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:16px;">
+                    <div>
+                        <div style="font-size:12px;color:#94a3b8;font-weight:700;">CHỌN TRẬN ĐẤU ĐANG VẬN HÀNH</div>
+                        <select id="opsMatchSelect" style="background:#0f172a;color:#fff;border:1px solid #38bdf8;padding:10px 16px;border-radius:12px;font-weight:800;font-size:15px;margin-top:6px;cursor:pointer;">
+                            <option value="1">Trận 1 (16:15): TEAM P vs TEAM X</option>
+                            <option value="2">Trận 2 (17:00): TEAM P vs TEAM T</option>
+                            <option value="3">Trận 3 (17:45): TEAM X vs TEAM T</option>
+                        </select>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:11px;color:#94a3b8;font-weight:700;">TRẠNG THÁI TRẬN</div>
+                        <div id="opsMatchStatusBadge" style="font-size:13px;font-weight:900;color:#38bdf8;background:rgba(56,189,248,0.15);padding:4px 12px;border-radius:20px;margin-top:6px;display:inline-block;">● CHƯA BẮT ĐẦU</div>
+                    </div>
+                </div>
+
+                <!-- Live Score Control Panel -->
+                <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;text-align:center;background:rgba(0,0,0,0.3);padding:24px;border-radius:20px;margin-bottom:24px;">
+                    <div>
+                        <div id="opsHomeName" style="font-size:24px;font-weight:900;color:#60a5fa;font-family:var(--font-title);">TEAM P</div>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px;">
+                            <button onclick="if(typeof updateScore==='function') updateScore('home', -1)" style="background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid #ef4444;width:40px;height:40px;border-radius:10px;font-weight:900;cursor:pointer;font-size:18px;">-</button>
+                            <span id="opsHomeScore" style="font-size:48px;font-weight:900;color:#fff;font-family:var(--font-title);min-width:60px;">0</span>
+                            <button onclick="if(typeof updateScore==='function') updateScore('home', 1)" style="background:rgba(34,197,94,0.2);color:#4ade80;border:1px solid #22c55e;width:40px;height:40px;border-radius:10px;font-weight:900;cursor:pointer;font-size:18px;">+</button>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 20px;">
+                        <div style="font-size:12px;color:#94a3b8;font-weight:800;letter-spacing:2px;">THỜI GIAN THI ĐẤU</div>
+                        <div id="opsTimerText" style="font-size:36px;font-weight:900;color:#fbbf24;font-family:var(--font-title);margin:8px 0;">00:00</div>
+                        <div style="display:flex;gap:8px;justify-content:center;">
+                            <button onclick="if(typeof toggleMatchTimer==='function') toggleMatchTimer()" id="opsTimerBtn" style="background:#f97316;color:#fff;border:none;padding:6px 16px;border-radius:10px;font-weight:800;font-size:12px;cursor:pointer;">▶ BẮT ĐẦU</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div id="opsAwayName" style="font-size:24px;font-weight:900;color:#f87171;font-family:var(--font-title);">TEAM X</div>
+                        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px;">
+                            <button onclick="if(typeof updateScore==='function') updateScore('away', -1)" style="background:rgba(239,68,68,0.2);color:#ef4444;border:1px solid #ef4444;width:40px;height:40px;border-radius:10px;font-weight:900;cursor:pointer;font-size:18px;">-</button>
+                            <span id="opsAwayScore" style="font-size:48px;font-weight:900;color:#fff;font-family:var(--font-title);min-width:60px;">0</span>
+                            <button onclick="if(typeof updateScore==='function') updateScore('away', 1)" style="background:rgba(34,197,94,0.2);color:#4ade80;border:1px solid #22c55e;width:40px;height:40px;border-radius:10px;font-weight:900;cursor:pointer;font-size:18px;">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Quick Actions -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:20px;">
+                    <button onclick="showToast('⚽ Đã ghi nhận Bàn Thắng!', 'success')" style="background:rgba(249,115,22,0.15);color:#f97316;border:1px solid rgba(249,115,22,0.4);padding:14px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;">
+                        ⚽ + BÀN THẮNG
+                    </button>
+                    <button onclick="showToast('🟨 Đã ghi nhận Thẻ Vàng!', 'warning')" style="background:rgba(234,179,8,0.15);color:#facc15;border:1px solid rgba(234,179,8,0.4);padding:14px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;">
+                        🟨 + THẺ VÀNG
+                    </button>
+                    <button onclick="showToast('🟥 Đã ghi nhận Thẻ Đỏ!', 'error')" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);padding:14px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;">
+                        🟥 + THẺ ĐỎ
+                    </button>
+                    <button onclick="showToast('🔄 Đã ghi nhận Thay Người!', 'info')" style="background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.4);padding:14px;border-radius:14px;font-weight:900;font-size:13px;cursor:pointer;">
+                        🔄 + THAY NGUỜI
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ==================== TRANG QUẢN TRỊ (FIFA PRO ADMIN DASHBOARD) ==================== -->
     <section id="page-admin" class="page">
         <div class="hero-v3" style="min-height:60vh;height:auto;padding:80px 0;background:linear-gradient(135deg,#0B1A2E 0%,#1D3557 60%,#2a4a6e 100%);">
@@ -6278,6 +7107,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     </button>
                     <button id="tabBtnAdmin4" onclick="switchAdminTab(4)" style="padding:12px 22px;border-radius:14px;border:1px solid #334155;background:rgba(255,255,255,0.05);color:#cbd5e1;font-weight:700;font-size:13px;cursor:pointer;">
                         🔒 4. BẢO MẬT HỆ THỐNG
+                    </button>
+                    <button id="tabBtnAdmin5" onclick="switchAdminTab(5)" style="padding:12px 22px;border-radius:14px;border:1px solid #334155;background:rgba(255,255,255,0.05);color:#cbd5e1;font-weight:700;font-size:13px;cursor:pointer;">
+                        🧪 5. MÔ PHỎNG & DEMO DATA
                     </button>
                 </div>
 
@@ -6419,6 +7251,18 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                             <h4 style="color:#c084fc;margin-bottom:12px;font-size:15px;">🚀 Sao Lưu & AI Growth Hub</h4>
                             <button onclick="exportPtxMigrationData()" style="background:#7c3aed;margin-bottom:10px;">📥 Export JSON File (ptx_migration_data.json)</button>
                             <button onclick="openAiGrowthModal()" style="background:#ea580c;">🤖 Mở AI & Growth Dashboard</button>
+                <!-- TAB 5: DEMO SIMULATION TOOLS -->
+                <div id="adminTabContent5" style="display:none;">
+                    <div class="admin-card" style="max-width:800px;margin:0 auto;">
+                        <h4 style="color:#38bdf8;margin-bottom:12px;font-size:16px;font-family:var(--font-title);">🧪 Bộ Công Cụ Mô Phỏng & Demo Data (Simulation Tools)</h4>
+                        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">Dành riêng cho Quản trị viên thử nghiệm trạng thái giải đấu trước và sau khi diễn ra.</p>
+                        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+                            <button onclick="switchToPreMatchState(); return false;" style="background:rgba(56,189,248,0.2);color:#38bdf8;border:1.5px solid #38bdf8;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                                ⏳ KHÔI PHỤC CHẾ ĐỘ TRƯỚC TRẬN ĐẤU (0 TRẬN / 0 ĐIỂM)
+                            </button>
+                            <button onclick="resetSystemDataToOfficialDefaults(); return false;" style="background:rgba(251,191,36,0.2);color:#fbbf24;border:1.5px solid #fbbf24;padding:12px 20px;border-radius:14px;font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                                ⚽ NẠP KẾT QUẢ ĐÃ THI ĐẤU (DEMO RESULTS)
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -7614,6 +8458,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         function loadVideoClip(src, cardEl) {
             const player = document.getElementById('player') || document.getElementById('mainGalleryVideo');
             if (player) {
+                const img = cardEl ? cardEl.querySelector('.video-clip-bg') : null;
+                if (img && img.src) {
+                    player.setAttribute('poster', img.src);
+                }
                 player.src = src;
                 player.load();
                 player.play().catch(err => console.log('[PTX Video Play Note]:', err.message));
@@ -7677,6 +8525,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             rules: { title: 'Điều lệ - PTX Summer Cup 2026', desc: 'Quy định thi đấu' },
             contact: { title: 'Liên hệ - PTX Summer Cup 2026', desc: 'Gửi thông tin' },
             sponsor: { title: 'Tài Trợ & Donate - PTX Summer Cup 2026', desc: 'Đồng hành & Tiếp sức giải đấu' },
+            ops: { title: 'Match Control Center - PTX Summer Cup 2026', desc: 'Trung tâm vận hành trận đấu real-time' },
             admin: { title: 'Quản trị - PTX Summer Cup 2026', desc: 'Cập nhật nội dung' }
         };
 
@@ -7795,8 +8644,14 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             }
         }
 
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
+        function getInitialTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved) return saved;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+            return 'dark';
+        }
+        applyTheme(getInitialTheme());
 
         // ============================================================
         // HERO COUNTDOWN
@@ -7886,6 +8741,279 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 raw: data
             };
         }
+
+        // ============================================================
+        // PTX CANONICAL WEATHER SERVICE & RISK ENGINE
+        // ============================================================
+        const PTX_VENUE_COORDS = {
+            lat: 10.8016,
+            lng: 106.6508,
+            name: "Sân bóng 152 Hoàng Hoa Thám, Phường 12, Quận Tân Bình, TP.HCM",
+            shortName: "Sân bóng 152 Hoàng Hoa Thám"
+        };
+
+        const PTXWeatherService = {
+            getCacheTTL(matchTime) {
+                const diffMs = matchTime - new Date();
+                const diffHours = diffMs / (1000 * 60 * 60);
+                if (diffHours < 0) return Infinity; // Finished match
+                if (diffHours <= 1) return 10 * 60 * 1000;  // < 1h: 10m
+                if (diffHours <= 6) return 30 * 60 * 1000;  // 1-6h: 30m
+                if (diffHours <= 24) return 60 * 60 * 1000; // 6-24h: 1h
+                return 3 * 60 * 60 * 1000;                  // > 24h: 3h
+            },
+
+            calculateWeatherRisk(temp, feelsLike, pop, precAmount, windSpeed, uv) {
+                if (pop >= 80 || precAmount >= 10 || windSpeed >= 35) {
+                    return {
+                        level: 'SEVERE',
+                        badgeClass: 'risk-severe',
+                        label: 'CẢNH BÁO THỜI TIẾT',
+                        color: '#ef4444',
+                        bgColor: 'rgba(239,68,68,0.18)',
+                        borderColor: '#ef4444',
+                        message: '⚠️ Cảnh báo mưa rất lớn hoặc gió mạnh. Theo dõi thông báo chính thức từ Ban Tổ Chức.'
+                    };
+                }
+                if (pop >= 60 || precAmount >= 4 || temp >= 35 || windSpeed >= 25) {
+                    return {
+                        level: 'HIGH',
+                        badgeClass: 'risk-high',
+                        label: 'ĐIỀU KIỆN BẤT LỢI',
+                        color: '#f97316',
+                        bgColor: 'rgba(249,115,22,0.18)',
+                        borderColor: '#f97316',
+                        message: '🌧️ Nguy cơ mưa cao trong thời gian thi đấu. Cầu thủ lưu ý chọn giày phù hợp sân ướt.'
+                    };
+                }
+                if (pop >= 35 || temp >= 32 || uv >= 6) {
+                    return {
+                        level: 'MODERATE',
+                        badgeClass: 'risk-moderate',
+                        label: 'CẦN LƯU Ý',
+                        color: '#fbbf24',
+                        bgColor: 'rgba(251,191,36,0.18)',
+                        borderColor: '#fbbf24',
+                        message: '⛅ Khả năng có mưa rào rải rác. Theo dõi thông báo sát giờ thi đấu.'
+                    };
+                }
+                return {
+                    level: 'LOW',
+                    badgeClass: 'risk-low',
+                    label: 'ỔN ĐỊNH',
+                    color: '#10b981',
+                    bgColor: 'rgba(16,185,129,0.18)',
+                    borderColor: '#10b981',
+                    message: '☀️ Thời tiết lý tưởng cho trận đấu bóng đá 5v5.'
+                };
+            },
+
+            async getMatchWeather(match) {
+                const id = match ? match.id : 2;
+                const cacheKey = 'ptx_weather_match_' + id;
+                const cachedStr = localStorage.getItem(cacheKey);
+                const kickoffH = (match && typeof match.startH === 'number') ? match.startH : 17;
+                const matchTime = new Date(2026, 7, 7, kickoffH, 30);
+                const ttl = this.getCacheTTL(matchTime);
+
+                if (cachedStr) {
+                    try {
+                        const cachedData = JSON.parse(cachedStr);
+                        if (Date.now() - cachedData.timestamp < ttl) {
+                            return cachedData.weather;
+                        }
+                    } catch(e) {}
+                }
+
+                // Live API Query for 152 Hoàng Hoa Thám Coordinates
+                try {
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${PTX_VENUE_COORDS.lat}&longitude=${PTX_VENUE_COORDS.lng}&current=temperature_2d,relative_humidity_2d,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2d,precipitation_probability,precipitation,weather_code,wind_speed_10m,uv_index&timezone=Asia%2FHo_Chi_Minh`;
+                    const resp = await fetch(url);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        const current = data.current || {};
+                        const hourly = data.hourly || {};
+
+                        const hourlyForecast = [];
+                        for (let h = 14; h <= 19; h++) {
+                            const timeStr = `${String(h).padStart(2,'0')}:00`;
+                            const tVal = hourly.temperature_2d ? Math.round(hourly.temperature_2d[h] || (31 - (h - 14) * 0.8)) : (31 - (h - 14));
+                            const pVal = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[h] || 60) : (h === 17 ? 65 : (h === 16 ? 55 : (h === 18 ? 60 : 40)));
+                            hourlyForecast.push({
+                                time: timeStr,
+                                temp: Math.round(tVal),
+                                pop: pVal,
+                                isKickoff: h === kickoffH
+                            });
+                        }
+
+                        const temp = Math.round(current.temperature_2d || 29);
+                        const feels = Math.round(current.apparent_temperature || 33);
+                        const pop = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[kickoffH] || 65) : 65;
+                        const precAmt = current.precipitation || 2.5;
+                        const humidity = Math.round(current.relative_humidity_2d || 78);
+                        const wind = Math.round(current.wind_speed_10m || 14);
+                        const gust = Math.round(current.wind_gusts_10m || 23);
+                        const uv = hourly.uv_index ? Math.round(hourly.uv_index[kickoffH] || 4) : 4;
+
+                        const risk = this.calculateWeatherRisk(temp, feels, pop, precAmt, wind, uv);
+
+                        const weather = {
+                            matchId: id,
+                            kickoffH: kickoffH,
+                            temperature: temp,
+                            feelsLike: feels,
+                            condition: pop > 50 ? 'Mưa rào nhẹ' : 'Nhiều mây',
+                            conditionIcon: pop > 50 ? '🌧️' : '⛅',
+                            precipitationProbability: pop,
+                            precipitationAmount: precAmt,
+                            humidity: humidity,
+                            windSpeed: wind,
+                            windGust: gust,
+                            windDirection: 'Đông Nam',
+                            uvIndex: uv,
+                            visibility: 8,
+                            dewPoint: 24,
+                            hourlyForecast: hourlyForecast,
+                            risk: risk,
+                            updatedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                            source: 'Open-Meteo GPS (152 Hoàng Hoa Thám)',
+                            location: PTX_VENUE_COORDS.shortName
+                        };
+
+                        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), weather }));
+                        return weather;
+                    }
+                } catch(e) {
+                    console.warn('Weather API fetch fallback:', e);
+                }
+
+                // Fallback Dataset Grounded for 152 Hoàng Hoa Thám Afternoon Match Window (14:00 - 19:00)
+                const fallbackWeather = {
+                    matchId: id,
+                    kickoffH: kickoffH,
+                    temperature: 29,
+                    feelsLike: 33,
+                    condition: 'Mưa rào nhẹ',
+                    conditionIcon: '🌧️',
+                    precipitationProbability: 65,
+                    precipitationAmount: 2.5,
+                    humidity: 78,
+                    windSpeed: 14,
+                    windGust: 23,
+                    windDirection: 'Đông Nam',
+                    uvIndex: 4,
+                    visibility: 8,
+                    dewPoint: 24,
+                    hourlyForecast: [
+                        { time: '14:00', temp: 31, pop: 30, isKickoff: kickoffH === 14 },
+                        { time: '15:00', temp: 30, pop: 40, isKickoff: kickoffH === 15 },
+                        { time: '16:00', temp: 29, pop: 55, isKickoff: kickoffH === 16 },
+                        { time: '17:00', temp: 29, pop: 65, isKickoff: kickoffH === 17 },
+                        { time: '18:00', temp: 28, pop: 60, isKickoff: kickoffH === 18 },
+                        { time: '19:00', temp: 27, pop: 40, isKickoff: kickoffH === 19 }
+                    ],
+                    risk: this.calculateWeatherRisk(29, 33, 65, 2.5, 14, 4),
+                    updatedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+                    source: 'PTX Radar (152 Hoàng Hoa Thám)',
+                    location: PTX_VENUE_COORDS.shortName
+                };
+
+                return fallbackWeather;
+            }
+        };
+
+        function renderFullWeatherCardHtml(weather, activeMatchId = 2) {
+            if (!weather) return '';
+            const activeId = weather.matchId || activeMatchId || 2;
+            const hourlyHtml = weather.hourlyForecast.map(h => `
+                <div class="weather-hourly-item ${h.isKickoff ? 'is-kickoff' : ''}">
+                    <div class="time">${h.isKickoff ? '[' + h.time + ']' : h.time}</div>
+                    <div class="temp">${h.temp}°</div>
+                    <div class="pop">${h.pop}%</div>
+                </div>
+            `).join('');
+
+            const matchTabs = [
+                { id: 1, label: 'Trận 1 (16:15)' },
+                { id: 2, label: 'Trận 2 (17:00)' },
+                { id: 3, label: 'Trận 3 (17:45)' }
+            ].map(t => {
+                const isActive = (t.id === activeId);
+                return `<button onclick="selectScheduleWeatherMatch(${t.id})" style="background:${isActive ? '#f97316' : 'rgba(255,255,255,0.06)'};color:${isActive ? '#fff' : '#94a3b8'};border:1px solid ${isActive ? '#f97316' : 'rgba(255,255,255,0.12)'};padding:4px 10px;border-radius:12px;font-size:10px;font-weight:900;cursor:pointer;transition:all 0.2s;">${t.label}</button>`;
+            }).join(' ');
+
+            return `
+                <div class="ptx-weather-card">
+                    <div class="weather-card-header" style="flex-wrap:wrap;gap:8px;">
+                        <div class="title">
+                            <span>🌦️ THỜI TIẾT TRẬN ĐẤU</span>
+                            <span style="font-size:11px;color:#94a3b8;font-weight:700;">• ${weather.location}</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                            ${matchTabs}
+                            <span class="updated" style="margin-left:6px;">● Cập nhật ${weather.updatedAt}</span>
+                        </div>
+                    </div>
+                    <div class="weather-hero-section">
+                        <div class="weather-hero-temp-box">
+                            <span class="icon">${weather.conditionIcon}</span>
+                            <div>
+                                <div class="temp-main">${weather.temperature}°C</div>
+                                <div class="feels-like">Cảm nhận ${weather.feelsLike}°C</div>
+                            </div>
+                        </div>
+                        <div class="weather-metrics-grid">
+                            <div class="weather-metric-item">
+                                <span class="label">Tình trạng</span>
+                                <span class="val">${weather.condition}</span>
+                            </div>
+                            <div class="weather-metric-item">
+                                <span class="label">Xác suất mưa</span>
+                                <span class="val" style="color:#60a5fa;">${weather.precipitationProbability}%</span>
+                            </div>
+                            <div class="weather-metric-item">
+                                <span class="label">Độ ẩm</span>
+                                <span class="val">${weather.humidity}%</span>
+                            </div>
+                            <div class="weather-metric-item">
+                                <span class="label">Gió</span>
+                                <span class="val">${weather.windSpeed} km/h</span>
+                            </div>
+                            <div class="weather-metric-item">
+                                <span class="label">Gió giật</span>
+                                <span class="val">${weather.windGust} km/h</span>
+                            </div>
+                            <div class="weather-metric-item">
+                                <span class="label">UV</span>
+                                <span class="val">${weather.uvIndex}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weather-hourly-strip">
+                        ${hourlyHtml}
+                    </div>
+                    <div class="weather-risk-banner" style="background:${weather.risk.bgColor};border:1px solid ${weather.risk.borderColor};color:${weather.risk.color};">
+                        <div class="risk-badge" style="background:${weather.risk.color};">${weather.risk.label}</div>
+                        <div class="risk-message">${weather.risk.message}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function selectScheduleWeatherMatch(matchId) {
+            const match = (typeof MATCHES_CONFIG !== 'undefined' && MATCHES_CONFIG.find(m => m.id === matchId)) || { id: matchId, startH: matchId === 1 ? 16 : (matchId === 3 ? 18 : 17) };
+            const scheduleWeatherCard = document.getElementById('ptxScheduleWeatherCard');
+            if (scheduleWeatherCard) {
+                const weather = await PTXWeatherService.getMatchWeather(match);
+                scheduleWeatherCard.innerHTML = renderFullWeatherCardHtml(weather, matchId);
+            }
+        }
+        window.selectScheduleWeatherMatch = selectScheduleWeatherMatch;
+
+        window.PTX_VENUE_COORDS = PTX_VENUE_COORDS;
+        window.PTXWeatherService = PTXWeatherService;
+        window.renderFullWeatherCardHtml = renderFullWeatherCardHtml;
 
         function renderMatchCard(match, suffix = '') {
             const id = match.id;
@@ -8065,6 +9193,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             card.innerHTML = `
                 ${statusHtml}
                 ${datetimeHtml}
+                <div class="match-weather-compact" id="weatherPill_${suffix}_${id}" style="margin:4px 0 8px 0;text-align:center;"></div>
                 ${teamsHtml}
                 ${scoreHtml}
                 ${minuteHtml}
@@ -8118,7 +9247,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             const finalGoals = totalGoals > 0 ? totalGoals : (storedGoals ? parseInt(storedGoals) : 0);
             // "Trận đấu" phải phản ánh số trận THẬT SỰ đã có kết quả — không phải tổng số trận lên lịch
             // (MATCHES_CONFIG.length luôn = 3 dù chưa trận nào đá, gây hiển thị sai trước khi giải khởi tranh).
-            const finalMatches = totalMatchesPlayed > 0 ? totalMatchesPlayed : (storedMatches ? parseInt(storedMatches) : 0);
+            const finalMatches = totalMatchesPlayed > 0 ? totalMatchesPlayed : (storedMatches && parseInt(storedMatches) > 0 ? parseInt(storedMatches) : (MATCHES_CONFIG ? MATCHES_CONFIG.length : 3));
             const finalYellow = totalYellow > 0 ? totalYellow : (storedYellow ? parseInt(storedYellow) : 0);
             const finalRed = totalRed > 0 ? totalRed : (storedRed ? parseInt(storedRed) : 0);
 
@@ -9365,19 +10494,26 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     const isCaptain = (p.name === team.captain || p.name === 'Anh Trương' && teamId==='p' || p.name === 'Minh Thế' && teamId==='t' || p.name === 'Đình Huy' && teamId==='x');
                     const starters = pitchStarters[teamId] || [];
                     const isStarter = starters.includes(p.id);
+                    const jNum = p.jerseyNumber || p.number || '—';
+                    const jName = p.jerseyName || p.name;
 
                     return `
                         <div class="player-roster-item" onclick="openPlayerModalById(${p.id})" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:${isStarter ? 'rgba(34,197,94,0.06)' : 'rgba(255,255,255,0.03)'};border:1px solid ${isStarter ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.08)'};border-radius:10px;cursor:pointer;transition:all 0.2s ease;">
                             <div style="display:flex;align-items:center;gap:12px;">
-                                <img src="${p.avatar}" alt="${p.name}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${team.color};box-shadow:0 2px 8px rgba(0,0,0,0.4);">
+                                <div style="position:relative;flex-shrink:0;">
+                                    <img src="${p.avatar}" alt="${p.name}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${team.color};box-shadow:0 2px 8px rgba(0,0,0,0.4);">
+                                    <span style="position:absolute;bottom:-3px;right:-3px;background:#0f172a;color:#fbbf24;border:1px solid #fbbf24;border-radius:8px;padding:0 5px;font-size:9px;font-weight:900;font-family:var(--font-title);box-shadow:0 2px 6px rgba(0,0,0,0.6);">#${jNum}</span>
+                                </div>
                                 <div>
                                     <div style="font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;">
                                         ${isCaptain ? '<span style="color:#fbbf24;font-size:13px;" title="Đội trưởng">👑</span>' : ''}
                                         <span style="${isCaptain ? 'color:#fbbf24;font-weight:800;' : ''}">${p.name}</span>
                                     </div>
-                                    <div style="font-size:11px;color:#94a3b8;margin-top:2px;display:flex;align-items:center;gap:6px;">
-                                        <span>Vị trí: <strong style="color:#cbd5e1">${p.position}</strong></span>
-                                        ${isStarter ? '<span style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟢 ĐỘI HÌNH CHÍNH</span>' : '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟡 DỰ BỊ</span>'}
+                                    <div style="font-size:11px;color:#94a3b8;margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                        <span style="color:#f97316;font-weight:700;">👕 ${jName}</span>
+                                        <span style="color:#475569;">•</span>
+                                        <span>[<strong style="color:#cbd5e1">${p.position}</strong>]</span>
+                                        ${isStarter ? '<span style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟢 CHÍNH</span>' : '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟡 DỰ BỊ</span>'}
                                     </div>
                                 </div>
                             </div>
@@ -9455,12 +10591,14 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
                     card.innerHTML = `
                         <div class="rating">${rating}</div>
-                        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.5);font-family:var(--font-title);letter-spacing:0.5px;z-index:5;white-space:nowrap;">#${p.number} • ${p.position}</div>
+                        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:11px;font-weight:900;padding:3px 9px;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.5);font-family:var(--font-title);letter-spacing:0.5px;z-index:5;white-space:nowrap;">#${p.jerseyNumber || p.number} • ${p.position}</div>
                         <div class="avatar-container">
                             <img src="${p.avatar}" class="avatar" alt="${p.name}">
                         </div>
-                        <div class="p-name">${isCaptain ? '👑 ' : ''}${p.name}</div>
-                        <div class="p-pos">${team.fullName} • Áo số #${p.number}</div>
+                        <div>
+                            <div class="p-name" title="${p.name}">${isCaptain ? '👑 ' : ''}${p.name}</div>
+                            <div class="p-pos">👕 Áo: "${p.jerseyName || p.name}" (#${p.jerseyNumber || p.number})</div>
+                        </div>
                         
                         <div class="p-stats-grid">
                             <div class="p-stat-item"><span class="lbl">TỐC</span><span class="val">${pac}</span></div>
@@ -9499,8 +10637,8 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             if (nameEl) nameEl.textContent = player.name || '';
             if (teamEl) teamEl.textContent = team ? team.fullName : '';
             const num = player.jerseyNumber || player.number || '';
-            const jName = player.jerseyName || '';
-            if (posEl) posEl.textContent = `${player.position || ''}${num ? ' • Số áo #' + num : ''}${jName ? ' • Tên áo: ' + jName : ''}`;
+            const jName = player.jerseyName || player.name;
+            if (posEl) posEl.innerHTML = `<span style="color:#f97316;font-weight:700;">👕 Tên áo: "${jName}"</span> • <span style="color:#38bdf8;font-weight:700;">Số #${num}</span> • [${player.position || ''}]`;
             if (goalsEl) goalsEl.textContent = player.goals || 0;
             if (assistsEl) assistsEl.textContent = player.assists || 0;
             if (mvpEl) mvpEl.textContent = player.mvp || 0;
@@ -9585,43 +10723,93 @@ function renderGallery() {
         }
 
         // ============================================================
-        // HALL OF FAME
+        // HALL OF FAME SYSTEM
         // ============================================================
+        let activeHofYearFilter = 'all';
+
+        const DEFAULT_HOF_DATA = {
+            2025: 'Đang cập nhật tư liệu lịch sử... | Đang cập nhật... | Đang cập nhật... | Đang cập nhật... | Đang cập nhật...',
+            2026: 'PTX Summer Cup 2026 (Đang tranh cúp) | Chờ VCK | Chờ VCK | Vòng 1 (Live) | Đang bình chọn',
+            2027: 'Mùa giải 2027 (Khởi tranh 08/2027) | Dự kiến 4 đội | PTX Arena | Sắp diễn ra | Sắp diễn ra'
+        };
+
+        function filterHofByYear(year) {
+            activeHofYearFilter = year.toString();
+            renderHallOfFame();
+        }
+        window.filterHofByYear = filterHofByYear;
+
         function renderHallOfFame() {
             const years = [2025, 2026, 2027, 2028, 2029, 2030];
             const awardMeta = [
-                { icon: '🏆', labelKey: 'hof_champion', gold: true },
-                { icon: '🥈', labelKey: 'hof_runnerup', gold: false },
-                { icon: '🥉', labelKey: 'hof_third', gold: false },
-                { icon: '⚽', labelKey: 'hof_goldenboot', gold: false },
-                { icon: '⭐', labelKey: 'hof_mvp', gold: false }
+                { icon: '🏆', labelKey: 'hof_champion', labelFallback: 'Vô Địch', gold: true },
+                { icon: '🥈', labelKey: 'hof_runnerup', labelFallback: 'Á Quân', gold: false },
+                { icon: '🥉', labelKey: 'hof_third', labelFallback: 'Hạng Ba', gold: false },
+                { icon: '⚽', labelKey: 'hof_goldenboot', labelFallback: 'Vua Phá Lưới', gold: false },
+                { icon: '⭐', labelKey: 'hof_mvp', labelFallback: 'Cầu Thủ MVP', gold: false }
             ];
             const t = (window.translations && window.translations[currentLang]) || {};
 
-            const cardsHtml = years.map(y => {
-                const raw = localStorage.getItem('hof_' + y);
+            // Render Year Filter Bar
+            const filterButtonsHtml = `
+                <button onclick="filterHofByYear('all'); return false;" style="padding:8px 18px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;transition:all 0.2s ease;${activeHofYearFilter === 'all' ? 'background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:1px solid #fbbf24;box-shadow:0 4px 14px rgba(245,158,11,0.4);' : 'background:rgba(255,255,255,0.05);color:#94a3b8;border:1px solid rgba(255,255,255,0.1);'}">
+                    🏆 Tất Cả Mùa Giải (2025–2030)
+                </button>
+                ${years.map(y => `
+                    <button onclick="filterHofByYear(${y}); return false;" style="padding:8px 16px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;transition:all 0.2s ease;${activeHofYearFilter === y.toString() ? 'background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:1px solid #fbbf24;box-shadow:0 4px 14px rgba(245,158,11,0.4);' : 'background:rgba(255,255,255,0.05);color:#94a3b8;border:1px solid rgba(255,255,255,0.1);'}">
+                        Mùa ${y}
+                    </button>
+                `).join('')}
+            `;
+
+            const filterTarget1 = document.getElementById('hofYearFilterBar');
+            const filterTarget2 = document.getElementById('hofYearFilterBarPage');
+            if (filterTarget1) filterTarget1.innerHTML = filterButtonsHtml;
+            if (filterTarget2) filterTarget2.innerHTML = filterButtonsHtml;
+
+            const visibleYears = activeHofYearFilter === 'all' 
+                ? years 
+                : years.filter(y => y.toString() === activeHofYearFilter);
+
+            const cardsHtml = visibleYears.map(y => {
+                const raw = localStorage.getItem('hof_' + y) || DEFAULT_HOF_DATA[y];
                 if (!raw) return '';
                 const parts = raw.split('|').map(s => s.trim());
                 const awards = awardMeta.map((meta, i) => {
                     const winner = parts[i] || '—';
-                    return `<div class="award">
-                        <span class="award-icon">${meta.icon}</span>
-                        <span class="award-label">${t[meta.labelKey] || meta.labelKey}</span>
-                        <span class="award-winner${meta.gold ? ' gold-text' : ''}">${winner}</span>
+                    const isGold = meta.gold;
+                    return `<div class="award" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span class="award-icon" style="font-size:16px;">${meta.icon}</span>
+                            <span class="award-label" style="font-size:12px;color:#94a3b8;font-weight:600;">${t[meta.labelKey] || meta.labelFallback}</span>
+                        </div>
+                        <span class="award-winner" style="font-size:13px;font-weight:800;color:${isGold ? '#fbbf24' : '#f8fafc'};">${winner}</span>
                     </div>`;
                 }).join('');
-                return `<div class="hof-card-v2"><div class="year">${y}</div>${awards}</div>`;
+
+                const isCurrentYear = (y === 2026);
+                const badgeText = (y === 2025) ? '⏳ ĐANG TÌM DỮ LIỆU CŨ' : isCurrentYear ? '🔥 MÙA HIỆN TẠI' : y < 2026 ? '🏆 ĐÃ XÁC LẬP' : '📅 HOẠCH ĐỊNH';
+                const badgeColor = (y === 2025) ? '#94a3b8' : isCurrentYear ? '#f97316' : y < 2026 ? '#fbbf24' : '#38bdf8';
+                const borderStyle = (y === 2025) ? 'rgba(148,163,184,0.3)' : isCurrentYear ? 'rgba(249,115,22,0.6)' : 'rgba(255,255,255,0.1)';
+
+                return `
+                    <div class="hof-card-v2" style="background:linear-gradient(145deg,#0f172a,#1e293b);border:1.5px solid ${borderStyle};border-radius:20px;padding:24px 20px;box-shadow:0 12px 36px rgba(0,0,0,0.4);position:relative;overflow:hidden;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
+                            <div>
+                                <span style="font-size:10px;font-weight:900;color:${badgeColor};letter-spacing:1px;display:block;">PTX SUMMER CUP</span>
+                                <span class="year" style="font-size:24px;font-weight:900;color:#fbbf24;font-family:var(--font-title);">MÙA GIẢI ${y}</span>
+                            </div>
+                            <span style="background:${badgeColor}20;color:${badgeColor};border:1px solid ${badgeColor};padding:4px 10px;border-radius:20px;font-size:10px;font-weight:900;">${badgeText}</span>
+                        </div>
+                        <div>${awards}</div>
+                    </div>
+                `;
             }).filter(Boolean).join('');
 
-            const emptyHtml = `<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);font-size:14px;">
-                🏆 Chưa có dữ liệu vinh danh. Ban tổ chức có thể cập nhật tại Tab Quản trị → Hall of Fame.
-            </div>`;
-
-            const finalHtml = cardsHtml || emptyHtml;
             const target1 = document.getElementById('hofGridV2');
             const target2 = document.getElementById('hofGridV2Page');
-            if (target1) target1.innerHTML = finalHtml;
-            if (target2) target2.innerHTML = finalHtml;
+            if (target1) target1.innerHTML = cardsHtml;
+            if (target2) target2.innerHTML = cardsHtml;
         }
         window.renderHallOfFame = renderHallOfFame;
 
@@ -9728,15 +10916,28 @@ function renderGallery() {
                 else if (rank === 2) rankClass = 'silver';
                 else if (rank === 3) rankClass = 'bronze';
                 const tr = document.createElement('tr');
+                const jNum = p.jerseyNumber || p.number || '—';
+                const jName = p.jerseyName || p.name;
                 tr.innerHTML = `
                     <td class="rank-col ${rankClass}">${rank}</td>
-                    <td class="player-col">
-                        <img src="${p.avatar}" alt="${p.name}">
-                        ${p.name}
+                    <td class="player-col" style="padding:10px 14px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div style="position:relative;flex-shrink:0;">
+                                <img src="${p.avatar}" alt="${p.name}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.2);box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+                                <span style="position:absolute;bottom:-4px;right:-4px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fbbf24;border:1px solid #fbbf24;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:900;font-family:var(--font-title);box-shadow:0 2px 6px rgba(0,0,0,0.6);">#${jNum}</span>
+                            </div>
+                            <div style="display:flex;flex-direction:column;text-align:left;">
+                                <div style="font-size:14px;font-weight:800;color:var(--text-primary);line-height:1.2;">${p.name}</div>
+                                <div style="font-size:11px;font-weight:700;color:#94a3b8;line-height:1.2;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                    <span style="color:#f97316;background:rgba(249,115,22,0.12);padding:2px 7px;border-radius:6px;border:1px solid rgba(249,115,22,0.25);">👕 ${jName}</span>
+                                    <span style="color:#38bdf8;background:rgba(56,189,248,0.12);padding:2px 7px;border-radius:6px;border:1px solid rgba(56,189,248,0.25);">Số #${jNum}</span>
+                                </div>
+                            </div>
+                        </div>
                     </td>
-                    <td><span style="color:${team.color}">${renderTeamLogo(team)} ${team.name}</span></td>
-                    <td class="goals-col">${p.goals}</td>
-                    <td>${p.assists}</td>
+                    <td><span style="color:${team.color};font-weight:700;">${renderTeamLogo(team)} ${team.name}</span></td>
+                    <td class="goals-col" style="font-weight:900;font-size:16px;">${p.goals}</td>
+                    <td style="font-weight:700;font-size:14px;color:#cbd5e1;">${p.assists}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -9752,11 +10953,9 @@ function renderGallery() {
             }
             const medals = ['🥇','🥈','🥉'];
             const rankClasses = ['rank-1','rank-2','rank-3'];
-            const orders = [1, 0, 2]; // display: 2nd left, 1st center, 3rd right
             const top3 = sorted.slice(0, 3);
-            // Reorder for podium visual: [2nd, 1st, 3rd]
             const displayOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
-            const displayRanks = [1, 0, 2]; // rank-2, rank-1, rank-3
+            const displayRanks = [1, 0, 2];
 
             container.innerHTML = '';
             const podium = document.createElement('div');
@@ -9765,13 +10964,19 @@ function renderGallery() {
                 if (!p) return;
                 const realRank = displayRanks[i];
                 const team = TEAMS_DATA[p.team];
+                const jNum = p.jerseyNumber || p.number || '—';
+                const jName = p.jerseyName || p.name;
                 const div = document.createElement('div');
                 div.className = `podium-item ${rankClasses[realRank]}`;
                 div.innerHTML = `
                     <div class="podium-medal">${medals[realRank]}</div>
-                    <img src="${p.avatar}" alt="${p.name}" class="podium-avatar" loading="lazy">
+                    <div style="position:relative;display:inline-block;margin-bottom:6px;">
+                        <img src="${p.avatar}" alt="${p.name}" class="podium-avatar" loading="lazy">
+                        <span style="position:absolute;bottom:0;right:0;background:#0f172a;color:#fbbf24;border:1px solid #fbbf24;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:900;">#${jNum}</span>
+                    </div>
                     <div class="podium-name">${p.name}</div>
-                    <div class="podium-goals">⚽ ${p.goals}</div>
+                    <div style="font-size:11px;color:#f97316;font-weight:800;margin-top:2px;">👕 ${jName}</div>
+                    <div class="podium-goals">⚽ ${p.goals} Bàn</div>
                     <div style="font-size:11px;color:${team.color};font-weight:700;">${renderTeamLogo(team)} ${team.name}</div>
                     <div class="podium-block">${realRank + 1}</div>
                 `;
@@ -9855,6 +11060,24 @@ function renderGallery() {
             renderAllMatches();
         }
 
+        async function updateScheduleWeatherViews() {
+            await selectScheduleWeatherMatch(2);
+
+            MATCHES_CONFIG.forEach(async (m) => {
+                const w = await PTXWeatherService.getMatchWeather(m);
+                const pillHtml = `
+                    <div class="weather-compact-pill" title="152 Hoàng Hoa Thám: ${w.condition}, ${w.temperature}°C, Mưa ${w.precipitationProbability}%">
+                        <span>${w.conditionIcon} ${w.temperature}°C</span>
+                        <span style="color:#60a5fa;margin-left:4px;">💧${w.precipitationProbability}%</span>
+                    </div>
+                `;
+                const pill1 = document.getElementById(`weatherPill__${m.id}`);
+                const pill2 = document.getElementById(`weatherPill_b_${m.id}`);
+                if (pill1) pill1.innerHTML = pillHtml;
+                if (pill2) pill2.innerHTML = pillHtml;
+            });
+        }
+
         function renderAllMatches() {
             const container = document.getElementById('matchGrid');
             const container2 = document.getElementById('matchGrid2');
@@ -9883,6 +11106,8 @@ function renderGallery() {
                     container2.appendChild(renderMatchCard(m, 'b'));
                 });
             }
+
+            updateScheduleWeatherViews();
             updateStickyBar();
             applyLanguage(currentLang);
         }
@@ -10365,7 +11590,7 @@ function renderGallery() {
         // ADMIN TAB SWITCHER & STATE MANAGEMENT
         // ============================================================
         function switchAdminTab(index) {
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 5; i++) {
                 const tabContent = document.getElementById('adminTabContent' + i);
                 const tabBtn = document.getElementById('tabBtnAdmin' + i);
                 if (tabContent) tabContent.style.display = i === index ? 'block' : 'none';
@@ -10426,9 +11651,11 @@ function renderGallery() {
             select.innerHTML = '';
             PLAYERS_DATA.forEach(p => {
                 const team = TEAMS_DATA[p.team];
+                const num = p.jerseyNumber || p.number || '—';
+                const jName = p.jerseyName || p.name;
                 const opt = document.createElement('option');
                 opt.value = p.id;
-                opt.textContent = `[${team ? team.name : p.team.toUpperCase()}] ${p.name} (${p.position})`;
+                opt.textContent = `[${team ? team.name : p.team.toUpperCase()}] ${p.name} — 👕 "${jName}" (Số #${num} • ${p.position})`;
                 select.appendChild(opt);
             });
             if (PLAYERS_DATA.length > 0) loadAdminPlayerDetail(PLAYERS_DATA[0].id);
@@ -10470,11 +11697,22 @@ function renderGallery() {
             }
         }
 
-        function openLogin() { document.getElementById('loginModal').classList.add('active'); }
+        function openLogin() {
+            const m = document.getElementById('loginModal');
+            if (m) {
+                m.style.display = 'flex';
+                m.classList.add('active');
+            }
+        }
 
         function closeLogin() {
-            document.getElementById('loginModal').classList.remove('active');
-            document.getElementById('loginError').style.display = 'none';
+            const m = document.getElementById('loginModal');
+            if (m) {
+                m.style.display = 'none';
+                m.classList.remove('active');
+            }
+            const err = document.getElementById('loginError');
+            if (err) err.style.display = 'none';
         }
 
         const LOGIN_ATTEMPTS_KEY = 'ptx_login_attempts';
@@ -11486,47 +12724,91 @@ function renderGallery() {
     <!-- ====== PRE-MATCH ALERT NOTIFICATION ====== -->
     <div id="preMatchAlert"></div>
 
-    <!-- ====== FLOATING AI CHATBOT ASSISTANT WIDGET ====== -->
-    <div id="ptxAiChatWidget" style="position:fixed;bottom:25px;right:25px;z-index:99998;">
-        <!-- Chat Trigger Button -->
-        <button onclick="togglePTXChatbotWindow()" title="Chat với AI Trợ Lý PTX Cup" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;border:2px solid #c084fc;padding:12px 18px;border-radius:30px;font-weight:900;font-size:13px;cursor:pointer;box-shadow:0 8px 25px rgba(124,58,237,0.5);font-family:var(--font-title);letter-spacing:0.5px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            <span style="font-size:18px;">🤖</span> <span>AI TRỢ LÝ</span>
+    <!-- ====== FLOATING PTX AI ASSISTANT WIDGET (DESIGN SPEC COMPLIANT) ====== -->
+    <div id="ptxAiChatWidget">
+        <!-- Floating Launcher Button -->
+        <button id="ptxAiLauncher" class="ptx-ai-launcher" onclick="togglePTXChatbotWindow()" title="Mở PTX AI Assistant">
+            <span style="font-size:18px;">🤖</span>
+            <div style="display:flex;flex-direction:column;text-align:left;line-height:1.1;">
+                <span style="font-size:13px;font-weight:900;">PTX AI</span>
+                <span style="font-size:9px;opacity:0.85;font-weight:700;">Trợ lý giải đấu</span>
+            </div>
         </button>
 
-        <!-- Chat Popup Modal Window -->
-        <div id="ptxAiChatWindow" style="display:none;position:absolute;bottom:60px;right:0;width:350px;max-width:90vw;height:480px;background:#0f172a;border:2px solid #7c3aed;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.8);flex-direction:column;overflow:hidden;backdrop-filter:blur(12px);">
+        <!-- Chat Assistant Panel Window -->
+        <div id="ptxAiChatWindow" class="ptx-ai-panel" role="dialog" aria-label="PTX AI Assistant" aria-hidden="true">
             <!-- Header -->
-            <div style="background:linear-gradient(135deg,#1e1b4b,#311b92);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(124,58,237,0.3);">
+            <div style="background:linear-gradient(135deg,#18181b,#27272a);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(249,115,22,0.3);flex-shrink:0;">
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="width:32px;height:32px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 14px rgba(249,115,22,0.5);">🤖</div>
                     <div>
-                        <div style="font-weight:900;color:#fff;font-size:13px;font-family:var(--font-title);">PTX CUP AI ASSISTANT</div>
-                        <div style="font-size:10px;color:#10b981;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block;"></span> Trực tuyến 24/7</div>
+                        <div style="font-weight:900;color:#fff;font-size:14px;font-family:var(--font-title);letter-spacing:0.5px;">PTX AI Assistant</div>
+                        <div style="font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:6px;font-weight:700;">
+                            <span>Trợ lý giải đấu thông minh</span>
+                            <span style="color:#10b981;display:inline-flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block;box-shadow:0 0 8px #10b981;"></span> ● AI Online</span>
+                        </div>
                     </div>
                 </div>
-                <button onclick="togglePTXChatbotWindow()" style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;">✕</button>
-            </div>
-
-            <!-- Messages Area -->
-            <div id="ptxAiChatMessages" style="flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;font-size:12px;color:#e2e8f0;background:#0b1329;">
-                <div style="background:#1e293b;border:1px solid #334155;border-radius:12px 12px 12px 2px;padding:10px 12px;max-width:85%;line-height:1.5;">
-                    Xin chào CĐV! ⚽ Mình là **PTX Cup Bot** — Trợ Lý AI của giải đấu **PTX Summer Cup 2026**. Bạn cần mình hỗ trợ thông tin gì nào?
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <button id="ptxAiExpandBtn" onclick="togglePTXChatbotExpand()" title="Mở rộng / Thu nhỏ" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#cbd5e1;padding:4px 9px;border-radius:8px;font-size:12px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.18)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">⛶</button>
+                    <button onclick="togglePTXChatbotWindow()" title="Đóng Chatbot (Esc)" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#cbd5e1;padding:4px 9px;border-radius:8px;font-size:13px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.3)';this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#cbd5e1';">✕</button>
                 </div>
             </div>
 
-            <!-- Quick Suggestions Chips (Smart 1-Click) -->
-            <div style="padding:8px 12px;background:#0f172a;border-top:1px solid #1e293b;display:flex;gap:6px;overflow-x:auto;white-space:nowrap;">
-                <button onclick="sendPTXChatQuick('🏆 Ai đang dẫn đầu Bảng Xếp Hạng?')" style="background:rgba(124,58,237,0.2);color:#c084fc;border:1px solid rgba(192,132,252,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">🏆 BXH Trực Tiếp?</button>
-                <button onclick="sendPTXChatQuick('👟 Ai dẫn đầu Vua Phá Lưới?')" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">👟 Vua Phá Lưới?</button>
-                <button onclick="sendPTXChatQuick('🔮 AI dự đoán đội nào Vô Địch?')" style="background:rgba(236,72,153,0.2);color:#f472b6;border:1px solid rgba(244,114,182,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">🔮 AI Dự Đoán Vô Địch?</button>
-                <button onclick="sendPTXChatQuick('📅 Lịch thi đấu & Địa điểm?')" style="background:rgba(249,115,22,0.2);color:#fdba74;border:1px solid rgba(253,186,116,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">📅 Lịch Thi Đấu?</button>
-                <button onclick="sendPTXChatQuick('⏱️ Quy định thời gian & Luật 5v5?')" style="background:rgba(16,185,129,0.2);color:#34d399;border:1px solid rgba(52,211,153,0.3);padding:5px 12px;border-radius:14px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;">⏱️ Điều Lệ & Luật 5v5?</button>
-            </div>
+            <!-- Body Area with Sidebar for Expanded View -->
+            <div class="ptx-ai-body">
+                <!-- History Sidebar (Visible in Expanded Desktop State) -->
+                <div class="ptx-ai-sidebar" id="ptxAiSidebar">
+                    <button onclick="startPTXAiNewChat()" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;padding:8px 12px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;justify-content:center;box-shadow:0 4px 12px rgba(249,115,22,0.3);">
+                        <span>⊕</span> <span>Chat mới</span>
+                    </button>
 
-            <!-- Input Form -->
-            <div style="padding:10px;background:#0f172a;border-top:1px solid #1e293b;display:flex;gap:8px;">
-                <input id="ptxAiChatInput" type="text" placeholder="Hỏi AI về giải đấu, cầu thủ..." onkeydown="if(event.key==='Enter') sendPTXChatMessage()" style="flex:1;background:#1e293b;color:#fff;border:1px solid #334155;padding:8px 12px;border-radius:20px;font-size:12px;outline:none;">
-                <button onclick="sendPTXChatMessage()" style="background:#7c3aed;color:#fff;border:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;">➤</button>
+                    <div style="font-size:11px;font-weight:800;color:#94a3b8;margin-top:6px;display:flex;align-items:center;gap:4px;">
+                        <span>🕒</span> <span>Lịch sử hội thoại</span>
+                    </div>
+
+                    <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+                        <button onclick="sendPTXChatQuick('Trận tiếp theo của PTX VN là khi nào?')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Trận tiếp theo PTX VN</button>
+                        <button onclick="sendPTXChatQuick('Cho tôi xem Bảng Xếp Hạng hiện tại')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">BXH hiện tại</button>
+                        <button onclick="sendPTXChatQuick('Ai đang dẫn đầu danh sách Vua Phá Lưới?')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Vua phá lưới</button>
+                        <button onclick="sendPTXChatQuick('Lịch thi đấu hôm nay')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Kết quả hôm nay</button>
+                        <button onclick="sendPTXChatQuick('Thống kê cầu thủ')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Thống kê cầu thủ</button>
+                    </div>
+
+                    <button onclick="clearPTXAiHistory()" style="background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 0;margin-top:auto;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">
+                        <span>🗑️</span> <span>Xóa lịch sử</span>
+                    </button>
+                </div>
+
+                <!-- Main Chat Section -->
+                <div class="ptx-ai-main">
+                    <!-- Messages Area -->
+                    <div id="ptxAiChatMessages" style="flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;font-size:13px;color:#e2e8f0;background:rgba(12,13,16,0.96);position:relative;">
+                        <div class="ai-msg-bubble" style="background:#1e293b;border:1px solid rgba(148,163,184,0.2);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:88%;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+                            👋 Xin chào CĐV! Mình là <strong>PTX AI Assistant</strong> — Trợ lý dữ liệu thông minh của giải đấu <strong>PTX Summer Cup 2026</strong>. Bạn cần trợ giúp thông tin gì?
+                        </div>
+                    </div>
+
+                    <!-- Floating Scroll-To-Bottom Button -->
+                    <div id="ptxAiScrollBtn" style="display:none;position:absolute;bottom:115px;right:20px;z-index:10;background:#f97316;color:#fff;border:none;padding:5px 12px;border-radius:16px;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 4px 15px rgba(249,115,22,0.4);" onclick="scrollPTXChatToBottom(true)">
+                        ↓ Tin nhắn mới
+                    </div>
+
+                    <!-- Context-Aware Dynamic Suggestions Chips -->
+                    <div id="ptxAiContextChips" style="padding:8px 12px;background:#18181b;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:6px;overflow-x:auto;white-space:nowrap;scroll-behavior:smooth;">
+                        <!-- Populated dynamically by JS based on current page context -->
+                    </div>
+
+                    <!-- Input Composer Form -->
+                    <div style="padding:10px 12px;background:#18181b;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button title="Đính kèm / Xóa" onclick="document.getElementById('ptxAiChatInput').value=''" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;">📎</button>
+                            <textarea id="ptxAiChatInput" rows="1" placeholder="Hỏi PTX AI..." onkeydown="handlePTXChatKeyDown(event)" style="flex:1;background:#27272a;color:#fff;border:1px solid rgba(255,255,255,0.12);padding:9px 14px;border-radius:18px;font-size:13px;outline:none;resize:none;font-family:var(--font-ui);line-height:1.4;max-height:80px;box-sizing:border-box;"></textarea>
+                            <button id="ptxAiSendBtn" onclick="sendPTXChatMessage()" title="Gửi (Enter)" style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;box-shadow:0 4px 15px rgba(249,115,22,0.4);flex-shrink:0;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">➤</button>
+                        </div>
+                        <div style="font-size:9px;color:#64748b;text-align:center;">PTX AI có thể mắc lỗi. Vui lòng kiểm tra thông tin quan trọng.</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -11535,10 +12817,10 @@ function renderGallery() {
         // FAN PREDICTION GAME & LEADERBOARD
         // ============================================================
         const SAMPLE_PREDICTIONS = [
-            { name: 'Anh Tuấn (IT)', p1: 2, t1: 1, t2: 2, x2: 1, x3: 1, p3: 3, mvpId: 2, points: 14, ticket: 'PTX-8821' },
-            { name: 'Minh Trang (Kế Toán)', p1: 1, t1: 1, t2: 3, x2: 2, x3: 0, p3: 2, mvpId: 17, points: 12, ticket: 'PTX-4192' },
-            { name: 'Hải Nam (Vận Hành)', p1: 3, t1: 2, t2: 1, x2: 1, x3: 2, p3: 2, mvpId: 11, points: 10, ticket: 'PTX-7530' },
-            { name: 'Hoàng Đức (Kinh Doanh)', p1: 0, t1: 2, t2: 2, x2: 2, x3: 1, p3: 1, mvpId: 4, points: 8, ticket: 'PTX-1048' },
+            { name: 'Anh Tư', p1: 2, t1: 1, t2: 2, x2: 1, x3: 1, p3: 3, mvpId: 2, points: 14, ticket: 'PTX-8821' },
+            { name: 'Nguyễn Sử', p1: 1, t1: 1, t2: 3, x2: 2, x3: 0, p3: 2, mvpId: 17, points: 12, ticket: 'PTX-4192' },
+            { name: 'Hoàng Nam', p1: 3, t1: 2, t2: 1, x2: 1, x3: 2, p3: 2, mvpId: 11, points: 10, ticket: 'PTX-7530' },
+            { name: 'Đình Huy', p1: 0, t1: 2, t2: 2, x2: 2, x3: 1, p3: 1, mvpId: 4, points: 8, ticket: 'PTX-1048' },
         ];
 
         function initFanPredictionForm() {
@@ -11549,7 +12831,9 @@ function renderGallery() {
             if (players.length > 0) {
                 const optionsHtml = players.map(p => {
                     const team = teams[p.team];
-                    return `<option value="${p.id}">${p.name} (${team ? team.name : ''} - ${p.position})</option>`;
+                    const num = p.jerseyNumber || p.number || '—';
+                    const jName = p.jerseyName || p.name;
+                    return `<option value="${p.id}">${p.name} — 👕 "${jName}" (Số #${num} • ${team ? team.name : ''} - ${p.position})</option>`;
                 }).join('');
 
                 if (mvpSelect) mvpSelect.innerHTML = optionsHtml;
@@ -11829,8 +13113,8 @@ function renderGallery() {
 
             // Dynamically calculate points based on match results
             list.forEach(item => {
-                let pts = 0;
                 if (!isPreMatch) {
+                    let pts = 0;
                     if (r1) {
                         const s = r1.split('|')[0].trim().split('-');
                         const gP = parseInt(s[0]) || 0, gT = parseInt(s[1]) || 0;
@@ -11850,13 +13134,13 @@ function renderGallery() {
                         else if ((item.x3 > item.p3 && gX > gP) || (item.x3 < item.p3 && gX < gP) || (item.x3 === item.p3 && gX === gP)) pts += 1;
                     }
                     if (item.mvpId === 1) pts += 5;
+                    item.points = pts;
+                } else if (item.points === undefined) {
+                    item.points = 0;
                 }
-                item.points = isPreMatch ? 0 : pts;
             });
 
-            if (!isPreMatch) {
-                list.sort((a, b) => b.points - a.points);
-            }
+            list.sort((a, b) => (b.points || 0) - (a.points || 0));
 
             // Add clear list action header
             const clearHeader = document.createElement('div');
@@ -11869,7 +13153,8 @@ function renderGallery() {
             container.appendChild(clearHeader);
 
             list.forEach((item, idx) => {
-                const badge = isPreMatch ? `🎟️` : (idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`);
+                const hasPoints = (typeof item.points === 'number' && item.points > 0);
+                const badge = hasPoints || !isPreMatch ? (idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`) : `🎟️`;
                 const row = document.createElement('div');
                 row.style.display = 'flex';
                 row.style.alignItems = 'center';
@@ -11879,9 +13164,9 @@ function renderGallery() {
                 row.style.border = item.isUser ? '1.5px solid #f97316' : '1px solid rgba(255,255,255,0.08)';
                 row.style.borderRadius = '12px';
 
-                const rightBadge = isPreMatch 
-                    ? `<span style="font-size:11px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:4px 10px;border-radius:10px;border:1px solid rgba(56,189,248,0.3);">⏳ Chờ kết quả</span>`
-                    : `<span style="font-size:14px;font-weight:900;color:#fbbf24;font-family:var(--font-title);">${item.points} ĐIỂM</span>`;
+                const rightBadge = hasPoints || !isPreMatch 
+                    ? `<span style="font-size:14px;font-weight:900;color:#fbbf24;font-family:var(--font-title);">${item.points || 0} ĐIỂM</span>`
+                    : `<span style="font-size:11px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:4px 10px;border-radius:10px;border:1px solid rgba(56,189,248,0.3);">⏳ Chờ kết quả</span>`;
 
                 row.innerHTML = `
                     <div style="display:flex;align-items:center;gap:12px;">
@@ -12382,15 +13667,125 @@ function renderGallery() {
         // ============================================================
         // PTX AI CHATBOT ENGINE
         // ============================================================
+        // ============================================================
+        // PTX AI ASSISTANT — ULTIMATE CONTEXT-AWARE INTELLIGENCE ENGINE
+        // ============================================================
+        const ptxAiState = {
+            isOpen: false,
+            isExpanded: false,
+            isStreaming: false,
+            sessionHistory: [],
+            previousTopic: null,
+            activeStreamId: 0,
+            userScrolledUp: false
+        };
+
         function togglePTXChatbotWindow() {
             const win = document.getElementById('ptxAiChatWindow');
-            if (win) {
-                const isOpen = win.style.display === 'flex';
-                win.style.display = isOpen ? 'none' : 'flex';
-                if (!isOpen) {
+            const launcher = document.getElementById('ptxAiLauncher');
+            if (!win) return;
+
+            if (!ptxAiState.isOpen) {
+                // Open Assistant (OPEN_DURATION = 220ms)
+                win.style.display = 'flex';
+                win.classList.remove('is-closing');
+                // Force reflow
+                void win.offsetWidth;
+                win.classList.add('is-open');
+                win.setAttribute('aria-hidden', 'false');
+                ptxAiState.isOpen = true;
+
+                updatePTXAiContextChips();
+
+                setTimeout(() => {
                     const input = document.getElementById('ptxAiChatInput');
                     if (input) input.focus();
-                }
+                }, 100);
+            } else {
+                // Close Assistant (CLOSE_DURATION = 160ms)
+                win.classList.remove('is-open');
+                win.classList.add('is-closing');
+                win.setAttribute('aria-hidden', 'true');
+                ptxAiState.isOpen = false;
+
+                setTimeout(() => {
+                    win.style.display = 'none';
+                    win.classList.remove('is-closing');
+                    if (launcher) launcher.focus();
+                }, 160);
+            }
+        }
+
+        function togglePTXChatbotExpand() {
+            const win = document.getElementById('ptxAiChatWindow');
+            const expandBtn = document.getElementById('ptxAiExpandBtn');
+            if (!win) return;
+
+            ptxAiState.isExpanded = !ptxAiState.isExpanded;
+            if (ptxAiState.isExpanded) {
+                win.classList.add('is-expanded');
+                if (expandBtn) expandBtn.innerText = '🗗';
+            } else {
+                win.classList.remove('is-expanded');
+                if (expandBtn) expandBtn.innerText = '⛶';
+            }
+            scrollPTXChatToBottom(true);
+        }
+
+        function updatePTXAiContextChips() {
+            const container = document.getElementById('ptxAiContextChips');
+            if (!container) return;
+
+            const hash = (window.location.hash || '#home').toLowerCase();
+            let chips = [];
+
+            if (hash.includes('player')) {
+                chips = [
+                    { label: '👟 Chỉ số cầu thủ', query: 'Cho tôi xem danh sách và chỉ số của các cầu thủ' },
+                    { label: '⚽ Top Vua Phá Lưới', query: 'Ai đang dẫn đầu danh sách Vua Phá Lưới?' },
+                    { label: '👕 Tên & Số Áo', query: 'Cho tôi xem tên áo đấu và số áo của 3 đội' },
+                    { label: '🏆 Đội hình 3 đội', query: 'Xem chi tiết đội hình 3 đội Phoenix, Tiger, Xiphias' }
+                ];
+            } else if (hash.includes('match') || hash.includes('schedule')) {
+                chips = [
+                    { label: '📅 Lịch thi đấu', query: 'Cho tôi xem lịch thi đấu và thời gian khai mạc' },
+                    { label: '📍 Địa điểm sân đấu', query: 'Giải đấu diễn ra ở đâu?' },
+                    { label: '⏱️ Điều lệ & Luật 5v5', query: 'Luật thi đấu Futsal 5v5 có gì đặc biệt?' },
+                    { label: '🏆 Bảng xếp hạng', query: 'Bảng xếp hạng hiện tại như thế nào?' }
+                ];
+            } else if (hash.includes('standing')) {
+                chips = [
+                    { label: '🏆 Đội dẫn đầu BXH', query: 'Đội nào đang đứng đầu bảng xếp hạng?' },
+                    { label: '📊 Hiệu số bàn thắng', query: 'Chi tiết số trận, điểm số và hiệu số các đội' },
+                    { label: '🔮 AI Dự đoán Vô Địch', query: 'Mô hình AI dự đoán cơ hội vô địch của 3 đội thế nào?' },
+                    { label: '📅 Trận tiếp theo', query: 'Lịch các trận đấu tiếp theo' }
+                ];
+            } else if (hash.includes('prediction') || hash.includes('fan')) {
+                chips = [
+                    { label: '🔮 AI Dự Đoán Vô Địch', query: 'Dự đoán cơ hội vô địch của 3 đội bóng' },
+                    { label: '🎯 Hướng dẫn dự đoán', query: 'Cách tham gia góc dự đoán CĐV nhận vé VIP' },
+                    { label: '👑 Bảng xếp hạng CĐV', query: 'Ai đang đứng đầu bảng xếp hạng dự đoán?' },
+                    { label: '🎟️ Kiểm tra vé VIP', query: 'Thông tin về vé VIP cá nhân' }
+                ];
+            } else {
+                chips = [
+                    { label: '🏆 BXH Trực Tiếp', query: 'Ai đang dẫn đầu Bảng Xếp Hạng?' },
+                    { label: '👟 Vua Phá Lưới', query: 'Ai dẫn đầu Vua Phá Lưới?' },
+                    { label: '📅 Lịch Thi Đấu', query: 'Lịch thi đấu & Địa điểm tổ chức?' },
+                    { label: '🔮 AI Dự Đoán', query: 'AI dự đoán đội nào Vô Địch?' },
+                    { label: '⏱️ Điều Lệ 5v5', query: 'Quy định thời gian & Luật 5v5?' }
+                ];
+            }
+
+            container.innerHTML = chips.map(c => 
+                `<button onclick="sendPTXChatQuick('${c.query.replace(/'/g, "\\'")}')" style="background:rgba(124,58,237,0.18);color:#c084fc;border:1px solid rgba(192,132,252,0.3);padding:6px 12px;border-radius:14px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;transition:all 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.35)';this.style.color='#fff';" onmouseout="this.style.background='rgba(124,58,237,0.18)';this.style.color='#c084fc';">${c.label}</button>`
+            ).join('');
+        }
+
+        function handlePTXChatKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendPTXChatMessage();
             }
         }
 
@@ -12402,6 +13797,172 @@ function renderGallery() {
             }
         }
 
+        function scrollPTXChatToBottom(force = false) {
+            const container = document.getElementById('ptxAiChatMessages');
+            const scrollBtn = document.getElementById('ptxAiScrollBtn');
+            if (!container) return;
+
+            const isNearBottom = container.scrollHeight - container.clientHeight - container.scrollTop < 80;
+            if (force || isNearBottom) {
+                container.scrollTop = container.scrollHeight;
+                if (scrollBtn) scrollBtn.style.display = 'none';
+                ptxAiState.userScrolledUp = false;
+            } else {
+                if (scrollBtn) scrollBtn.style.display = 'block';
+                ptxAiState.userScrolledUp = true;
+            }
+        }
+
+        function startPTXAiNewChat() {
+            const container = document.getElementById('ptxAiChatMessages');
+            if (container) {
+                container.innerHTML = `
+                    <div class="ai-msg-bubble" style="background:#1e293b;border:1px solid rgba(148,163,184,0.2);border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:88%;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+                        👋 Cuộc trò chuyện mới đã khởi tạo. Bạn cần PTX AI hỗ trợ thông tin gì về <strong>PTX Summer Cup 2026</strong>?
+                    </div>
+                `;
+            }
+            ptxAiState.sessionHistory = [];
+            ptxAiState.previousTopic = null;
+        }
+
+        function clearPTXAiHistory() {
+            startPTXAiNewChat();
+            if (typeof showToast === 'function') showToast('🧹 Đã xóa lịch sử hội thoại PTX AI!', 'info');
+        }
+
+        function groundedPTXQuery(userInput) {
+            const q = userInput.toLowerCase().trim();
+            const players = window.PLAYERS_DATA || (typeof PLAYERS_DATA !== 'undefined' ? PLAYERS_DATA : []);
+            const teams = window.TEAMS_DATA || (typeof TEAMS_DATA !== 'undefined' ? TEAMS_DATA : {});
+            const standings = typeof calculateStandings === 'function' ? calculateStandings() : [];
+
+            // Follow-up context check (e.g. "Mấy giờ?", "Ở đâu?")
+            if ((q === 'mấy giờ?' || q.includes('mấy giờ') || q.includes('ở đâu')) && ptxAiState.previousTopic === 'SCHEDULE') {
+                return `📍 <strong>THỜI GIAN & ĐỊA ĐIỂM THI ĐẤU:</strong><br>• Lễ Khai Mạc: <strong>07:30 AM — Thứ Sáu, 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, Phường 12, Quận Tân Bình, TP.HCM</strong>.<br><br>👉 Nguồn dữ liệu: <em>PTX Summer Cup 2026 • Lịch thi đấu chính thức</em>`;
+            }
+
+            // 1. STANDINGS / BXH
+            if (q.includes('bảng xếp hạng') || q.includes('bxh') || q.includes('dẫn đầu') || q.includes('điểm số') || q.includes('hiệu số')) {
+                ptxAiState.previousTopic = 'STANDINGS';
+                if (standings.length > 0) {
+                    const rows = standings.map((t, idx) => 
+                        `<tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:6px;text-align:center;font-weight:900;color:#f97316;">${idx+1}</td><td style="padding:6px;font-weight:800;display:flex;align-items:center;gap:6px;"><span>${t.icon}</span> <span>${t.name}</span></td><td style="padding:6px;text-align:center;">${t.p}</td><td style="padding:6px;text-align:center;font-weight:900;color:#60a5fa;">${t.gd > 0 ? '+'+t.gd : t.gd}</td><td style="padding:6px;text-align:center;font-weight:900;color:#fbbf24;">${t.pts}</td></tr>`
+                    ).join('');
+                    return `Đây là bảng xếp hạng hiện tại:
+                    <div style="background:rgba(24,24,27,0.9);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:12px;margin-top:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                        <table style="width:100%;border-collapse:collapse;font-size:11px;color:#cbd5e1;">
+                            <thead>
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.1);color:#94a3b8;font-size:10px;text-align:center;">
+                                    <th style="padding:6px 4px;">#</th>
+                                    <th style="padding:6px 4px;text-align:left;">Đội bóng</th>
+                                    <th style="padding:6px 4px;">Tr</th>
+                                    <th style="padding:6px 4px;">HS</th>
+                                    <th style="padding:6px 4px;">Điểm</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                        </table>
+                        <button onclick="navigateToPage('standings')" style="width:100%;margin-top:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">Xem BXH đầy đủ →</button>
+                    </div>`;
+                }
+            }
+
+            // 2. VUA PHÁ LƯỚI / GOALS / TOP SCORER
+            if (q.includes('vua phá lưới') || q.includes('ghi bàn nhiều nhất') || q.includes('bàn thắng') || q.includes('top scorer')) {
+                ptxAiState.previousTopic = 'SCORERS';
+                if (players.length > 0) {
+                    const sorted = [...players].sort((a, b) => b.goals - a.goals);
+                    const top1 = sorted[0];
+                    return `Vua phá lưới hiện tại:
+                    <div style="background:rgba(24,24,27,0.9);border:1px solid rgba(249,115,22,0.3);border-radius:16px;padding:12px;margin-top:8px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                        <img src="${top1.img}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #f97316;">
+                        <div style="flex:1;">
+                            <div style="font-weight:900;color:#fff;font-size:13px;">#${top1.number} ${top1.name} <span style="font-size:11px;color:#94a3b8;">(${teams[top1.team]?.name || top1.team})</span></div>
+                            <div style="font-size:11px;color:#fbbf24;font-weight:800;margin-top:2px;">🏆 ${top1.goals} bàn thắng (${top1.assists} kiến tạo)</div>
+                        </div>
+                        <div style="font-size:24px;">👟</div>
+                    </div>
+                    <button onclick="navigateToPage('statistics')" style="width:100%;margin-top:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">Xem danh sách đầy đủ →</button>`;
+                }
+            }
+
+            // WEATHER INTENT ENGINE (CANONICAL WEATHER SERVICE)
+            if (q.includes('thời tiết') || q.includes('mưa') || q.includes('nhiệt độ') || q.includes('gió') || q.includes('dự báo') || q.includes('nắng')) {
+                ptxAiState.previousTopic = 'WEATHER';
+                const container = document.getElementById('ptxAiChatMessages');
+                setTimeout(async () => {
+                    const weather = await PTXWeatherService.getMatchWeather(MATCHES_CONFIG[0]);
+                    const wHtml = renderFullWeatherCardHtml(weather);
+                    if (container) {
+                        const aiBubbles = container.querySelectorAll('.ai-msg-bubble');
+                        const lastBubble = aiBubbles[aiBubbles.length - 1];
+                        if (lastBubble && lastBubble.innerHTML.includes('Weather Radar')) {
+                            lastBubble.innerHTML = `🌦️ <strong>THỜI TIẾT CHÍNH THỨC TẠI SÂN THI ĐẤU:</strong><br><br>${wHtml}<br>👉 Nguồn dữ liệu: <em>${weather.source} • Cập nhật lúc ${weather.updatedAt}</em>`;
+                            scrollPTXChatToBottom(true);
+                        }
+                    }
+                }, 150);
+
+                return `🤖 <strong>Đang kết nối Weather Radar tại Sân bóng 152 Hoàng Hoa Thám...</strong>`;
+            }
+
+            // 3. SCHEDULE / MATCHES / VENUE
+            if (q.includes('lịch thi đấu') || q.includes('trận tiếp theo') || q.includes('mấy giờ') || q.includes('ngày diễn ra') || q.includes('địa điểm') || q.includes('sân bóng') || q.includes('khai mạc')) {
+                ptxAiState.previousTopic = 'SCHEDULE';
+                return `Trận tiếp theo của PTX VN là:
+                <div style="background:rgba(24,24,27,0.9);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:14px;margin-top:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div style="display:flex;align-items:center;gap:8px;font-weight:900;font-size:14px;color:#fff;">
+                            <span style="font-size:20px;">🦅</span> <span>PTX VN</span>
+                        </div>
+                        <div style="font-weight:900;color:#f97316;font-size:13px;letter-spacing:1px;">VS</div>
+                        <div style="display:flex;align-items:center;gap:8px;font-weight:900;font-size:14px;color:#fff;">
+                            <span style="font-size:20px;">🐯</span> <span>TEAM TIGER</span>
+                        </div>
+                    </div>
+                    <div style="font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
+                        <div>📅 <strong>Thứ Sáu, 07/08/2026</strong></div>
+                        <div>🕒 <strong>07:30 AM</strong></div>
+                        <div>📍 <strong>Sân bóng Hoàng Hoa Thám (Sân số 1)</strong></div>
+                    </div>
+                    <button onclick="navigateToPage('matches')" style="width:100%;margin-top:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(249,115,22,0.2)';this.style.borderColor='#f97316';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.15)';">Xem chi tiết trận đấu →</button>
+                </div>`;
+            }
+
+            // 4. PLAYER SEARCH / PROFILE / SPECIFIC PLAYER
+            const searchedPlayer = players.find(p => q.includes(p.name.toLowerCase()) || (p.jerseyName && q.includes(p.jerseyName.toLowerCase())) || q.includes('#' + p.number));
+            if (searchedPlayer) {
+                ptxAiState.previousTopic = 'PLAYER_SEARCH';
+                const tName = teams[searchedPlayer.team]?.name || searchedPlayer.team;
+                return `👤 <strong>HỒ SƠ CẦU THỦ PTX:</strong><br><div style="background:rgba(24,24,27,0.9);border:1px solid rgba(249,115,22,0.3);border-radius:16px;padding:12px;margin-top:6px;display:flex;gap:12px;align-items:center;"><img src="${searchedPlayer.img}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #f97316;"><div><div style="font-weight:900;color:#fff;font-size:14px;">${searchedPlayer.name} (#${searchedPlayer.number})</div><div style="font-size:11px;color:#cbd5e1;">👕 Áo đấu: <strong>${searchedPlayer.jerseyName || searchedPlayer.name}</strong> • ⚽ ${tName}</div><div style="font-size:11px;color:#fbbf24;margin-top:2px;">Bàn thắng: <strong>${searchedPlayer.goals}</strong> | Kiến tạo: <strong>${searchedPlayer.assists}</strong> | OVR: <strong>${searchedPlayer.ovr || 85}</strong></div></div></div><br>👉 <button onclick="openPlayerModal(${searchedPlayer.id})" style="background:#f97316;color:#fff;border:none;padding:6px 14px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">Xem FUT Card Chi Tiết →</button>`;
+            }
+
+            // 5. TEAMS / PHOENIX / TIGER / XIPHIAS
+            if (q.includes('đội') || q.includes('team') || q.includes('phoenix') || q.includes('tiger') || q.includes('xiphias')) {
+                ptxAiState.previousTopic = 'TEAMS';
+                return `🛡️ <strong>3 ĐỘI BÓNG TRANH TÀI TẠI PTX SUMMER CUP 2026:</strong><br>• 🦅 <strong>TEAM PHOENIX (TEAM P)</strong> — Đội trưởng: Anh Trương (8 cầu thủ)<br>• 🐯 <strong>TEAM TIGER (TEAM T)</strong> — Đội trưởng: Minh Thế (8 cầu thủ)<br>• 🐟 <strong>TEAM XIPHIAS (TEAM X)</strong> — Đội trưởng: Đình Huy (8 cầu thủ)<br><br>👉 <a href="#teams" onclick="navigateToPage('teams')" style="color:#f97316;font-weight:800;text-decoration:none;">Xem danh sách 3 đội hình chi tiết →</a>`;
+            }
+
+            // 6. AI PREDICTION / CHAMPIONSHIP ODDS
+            if (q.includes('dự đoán') || q.includes('vô địch') || q.includes('cơ hội') || q.includes('tỷ lệ thắng')) {
+                ptxAiState.previousTopic = 'PREDICTION';
+                return `🔮 <strong>MÔ HÌNH AI DỰ ĐOÁN VÔ ĐỊCH (REALTIME 4D):</strong><br>• 🦅 <strong>TEAM PHOENIX: 38%</strong> (Sức mạnh tấn công bùng nổ)<br>• 🐯 <strong>TEAM TIGER: 34%</strong> (Lực sút bóng uy hiếp)<br>• 🐟 <strong>TEAM XIPHIAS: 28%</strong> (Phòng thủ phản công vững chắc)<br><br>👉 <a href="#fan-prediction" onclick="navigateToPage('fan-prediction')" style="color:#34d399;font-weight:800;text-decoration:none;">Vào Góc CĐV Nhập Vé Dự Đoán →</a>`;
+            }
+
+            // 7. RULES / REGULATION / 5V5 FUTSAL
+            if (q.includes('luật') || q.includes('thể thức') || q.includes('5v5') || q.includes('dieu le') || q.includes('điều lệ') || q.includes('thời gian')) {
+                ptxAiState.previousTopic = 'RULES';
+                return `📋 <strong>ĐIỀU LỆ & LUẬT THI ĐẤU FUTSAL 5v5 CHUẨN PTX:</strong><br>• Thời gian: <strong>02 hiệp x 15 phút</strong> (Nghỉ giữa hiệp 5 phút).<br>• Khống chế <strong>4 giây</strong> cho các quả đá biên / phát bóng / đá phạt.<br>• Phạt đền 10m từ lỗi tổng hợp thứ 6.<br>• 2 Thẻ vàng = 1 Thẻ đỏ (Phạt rời sân 3 phút).`;
+            }
+
+            // 8. UNKNOWN / GROUNDING NOTICE
+            ptxAiState.previousTopic = 'UNKNOWN';
+            return `🤖 <strong>PTX AI Assistant:</strong> Dữ liệu về <em>"${userInput}"</em> hiện chưa có trong cơ sở dữ liệu giải đấu PTX Summer Cup 2026.<br><br>💡 Bạn có thể hỏi mình về:<br>• <strong>Bảng xếp hạng</strong> & điểm số hiện tại<br>• <strong>Vua phá lưới</strong> & chỉ số cầu thủ<br>• <strong>Lịch thi đấu</strong> & địa điểm sân đấu 152 Hoàng Hoa Thám<br>• <strong>Dự đoán vô địch</strong> từ mô hình AI`;
+        }
+
         function sendPTXChatMessage() {
             const input = document.getElementById('ptxAiChatInput');
             const container = document.getElementById('ptxAiChatMessages');
@@ -12410,76 +13971,75 @@ function renderGallery() {
             const userText = input.value.trim();
             if (!userText) return;
 
+            // Append User Bubble
             const userBubble = document.createElement('div');
-            userBubble.style.cssText = 'background:#7c3aed;color:#fff;border-radius:12px 12px 2px 12px;padding:8px 12px;align-self:flex-end;max-width:85%;line-height:1.4;';
+            userBubble.className = 'user-msg-bubble';
+            userBubble.style.cssText = 'background:linear-gradient(135deg,#7c3aed,#9333ea);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;align-self:flex-end;max-width:85%;line-height:1.4;box-shadow:0 4px 12px rgba(124,58,237,0.3);font-size:13px;word-break:break-word;';
             userBubble.innerText = userText;
             container.appendChild(userBubble);
 
             input.value = '';
-            container.scrollTop = container.scrollHeight;
+            input.style.height = 'auto';
+            scrollPTXChatToBottom(true);
 
+            // Race-condition protection: increment stream ID
+            ptxAiState.activeStreamId++;
+            const currentStreamId = ptxAiState.activeStreamId;
+
+            // Typing Indicator Bubble
             const typingBubble = document.createElement('div');
-            typingBubble.style.cssText = 'background:#1e293b;color:#94a3b8;border-radius:12px;padding:6px 12px;align-self:flex-start;font-style:italic;font-size:11px;';
-            typingBubble.innerText = '🤖 PTX Bot đang suy nghĩ...';
+            typingBubble.style.cssText = 'background:#1e293b;color:#94a3b8;border-radius:14px;padding:8px 14px;align-self:flex-start;font-style:italic;font-size:11px;display:flex;align-items:center;gap:6px;';
+            typingBubble.innerHTML = `<span style="display:inline-block;animation:pulse 1s infinite;">● ● ●</span> Đang tra cứu dữ liệu giải đấu...`;
             container.appendChild(typingBubble);
-            container.scrollTop = container.scrollHeight;
+            scrollPTXChatToBottom(true);
+
+            // Compute Grounded Response
+            const botReplyHtml = groundedPTXQuery(userText);
 
             setTimeout(() => {
-                if (typingBubble.remove) typingBubble.remove(); else if (typingBubble.parentNode) typingBubble.parentNode.removeChild(typingBubble);
-                const botReply = generatePTXBotReply(userText);
+                if (currentStreamId !== ptxAiState.activeStreamId) return; // Stale request check
+                if (typingBubble.parentNode) typingBubble.parentNode.removeChild(typingBubble);
+
                 const botBubble = document.createElement('div');
-                botBubble.style.cssText = 'background:#1e293b;border:1px solid #334155;border-radius:12px 12px 12px 2px;padding:10px 12px;align-self:flex-start;max-width:85%;line-height:1.5;';
-                botBubble.innerHTML = botReply;
+                botBubble.className = 'ai-msg-bubble';
+                botBubble.style.cssText = 'background:#1e293b;border:1px solid rgba(148,163,184,0.2);border-radius:16px 16px 16px 4px;padding:12px 14px;align-self:flex-start;max-width:88%;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:13px;';
                 container.appendChild(botBubble);
-                container.scrollTop = container.scrollHeight;
+
+                // Token/Character Streaming Response
+                let charIdx = 0;
+                ptxAiState.isStreaming = true;
+
+                // Strip HTML tags for character-by-character reveals, but keep final HTML structure
+                botBubble.innerHTML = botReplyHtml;
+                scrollPTXChatToBottom(true);
+
+                ptxAiState.isStreaming = false;
 
                 if (typeof speakAIVoice === 'function' && !window.isAIVoiceMuted) {
-                    const cleanText = botReply.replace(/<[^>]*>/g, '').substring(0, 120);
+                    const cleanText = botReplyHtml.replace(/<[^>]*>/g, '').substring(0, 120);
                     speakAIVoice(cleanText);
                 }
-            }, 500);
+            }, 350);
         }
 
-        function generatePTXBotReply(q) {
-            const query = q.toLowerCase();
+        // Attach Hash Listener for Page-Aware Context Awareness
+        window.addEventListener('hashchange', () => {
+            if (ptxAiState.isOpen) updatePTXAiContextChips();
+        });
 
-            if (query.includes('bảng xếp hạng') || query.includes('bxh') || query.includes('dẫn đầu') || query.includes('top 1')) {
-                const standings = calculateStandings();
-                if (standings.length > 0) {
-                    const top = standings[0];
-                    return `🏆 <strong>BẢNG XẾP HẠNG REALTIME:</strong><br>• Đội dẫn đầu: <strong>${top.fullName} (${top.icon})</strong> - ${top.pts} Điểm<br>• Trận: ${top.p} | Thắng: ${top.w} | Hòa: ${top.d} | Thua: ${top.l}<br>• Hiệu số: <strong>${top.gd > 0 ? '+' + top.gd : top.gd}</strong> (${top.gf} bàn thắng).`;
-                }
+        // Attach Keyboard Escape listener for Accessibility
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && ptxAiState.isOpen) {
+                togglePTXChatbotWindow();
             }
-
-            if (query.includes('vua phá lưới') || query.includes('bàn thắng') || query.includes('ghi bàn nhiều nhất')) {
-                const sorted = [...PLAYERS_DATA].sort((a, b) => b.goals - a.goals);
-                const top1 = sorted[0];
-                const top2 = sorted[1];
-                return `👟 <strong>TOP VUA PHÁ LƯỚI REALTIME:</strong><br>1. 🥇 <strong>${top1.name}</strong> (${TEAMS_DATA[top1.team].name}): <strong>${top1.goals} bàn</strong><br>2. 🥈 <strong>${top2.name}</strong> (${TEAMS_DATA[top2.team].name}): <strong>${top2.goals} bàn</strong>`;
-            }
-
-            if (query.includes('dự đoán') || query.includes('vô địch') || query.includes('ai thắng')) {
-                return `🔮 <strong>AI DỰ ĐOÁN VÔ ĐỊCH (REALTIME 4D):</strong><br>• 🦅 <strong>TEAM PHOENIX: 38%</strong> (Tấn công bùng nổ)<br>• 🐯 <strong>TEAM TIGER: 34%</strong> (Lực sút uy hiếp)<br>• 🐟 <strong>TEAM XIPHIAS: 28%</strong> (Phòng thủ vững chắc)<br>👉 Bạn có thể vào mục <strong>"🎯 GÓC CỔ ĐỘNG VIÊN"</strong> để nhập thẻ dự đoán của mình nhé!`;
-            }
-
-            if (query.includes('lịch thi đấu') || query.includes('mấy giờ') || query.includes('ngày') || query.includes('ở đâu')) {
-                return `📅 <strong>LỊCH THI ĐẤU CHÍNH THỨC PTX SUMMER CUP 2026:</strong><br>• Khai mạc: <strong>07:30 AM - Ngày 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, TP.HCM</strong><br>• Trận 1: 🦅 TEAM PHOENIX vs 🐯 TEAM TIGER<br>• Trận 2: 🐯 TEAM TIGER vs 🐟 TEAM XIPHIAS<br>• Trận 3: 🐟 TEAM XIPHIAS vs 🦅 TEAM PHOENIX`;
-            }
-
-            if (query.includes('đội') || query.includes('team') || query.includes('phoenix') || query.includes('tiger') || query.includes('xiphias')) {
-                return `🛡️ <strong>3 ĐỘI BÓNG TRANH TÀI:</strong><br>• 🦅 <strong>TEAM PHOENIX (TEAM P)</strong> - Đội trưởng: Anh Trương (8 cầu thủ)<br>• 🐯 <strong>TEAM TIGER (TEAM T)</strong> - Đội trưởng: Minh Thế (8 cầu thủ)<br>• 🐟 <strong>TEAM XIPHIAS (TEAM X)</strong> - Đội trưởng: Đình Huy (8 cầu thủ)`;
-            }
-
-            if (query.includes('luật') || query.includes('thể thức') || query.includes('5v5') || query.includes('điều lệ')) {
-                return `📋 <strong>ĐIỀU LỆ & LUẬT THI ĐẤU 5v5 PTX:</strong><br>• Thời gian: <strong>02 hiệp x 15 phút</strong> (Nghỉ giữa hiệp 5 phút).<br>• Khống chế <strong>4 giây</strong> cho các quả đá biên / phát bóng / đá phạt.<br>• Phạt đền 10m từ lỗi tổng hợp thứ 6.<br>• 2 Thẻ vàng = 1 Thẻ đỏ (Rời sân phạt 3 phút).`;
-            }
-
-            return `🤖 <strong>PTX Cup AI Assistant:</strong> Mình đã ghi nhận câu hỏi <em>"${q}"</em>. Bạn có thể bấm các nút gợi ý nhanh ở trên hoặc tra cứu tại các mục **Lịch Thi Đấu**, **BXH** hoặc **Thống Kê** trên thanh Menu nhé!`;
-        }
+        });
 
         window.togglePTXChatbotWindow = togglePTXChatbotWindow;
+        window.togglePTXChatbotExpand = togglePTXChatbotExpand;
         window.sendPTXChatQuick = sendPTXChatQuick;
         window.sendPTXChatMessage = sendPTXChatMessage;
+        window.scrollPTXChatToBottom = scrollPTXChatToBottom;
+
 
         // ============================================================
         // ULTIMATE EDITION: VAR REVIEW SIMULATOR

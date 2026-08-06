@@ -9,6 +9,7 @@ const runMediaIntegrityTests = require('./media-integrity.test.js');
 const runNavigationTests = require('./navigation.test.js');
 const runAdminLoginTests = require('./admin-login.test.js');
 const runResetAdminTests = require('./reset-admin.test.js');
+const runWeatherCardTests = require('./weather-card.test.js');
 
 async function main() {
     console.log('🧪 PTX Summer Cup 2026 — Bộ test tự động\n' + '='.repeat(50));
@@ -22,6 +23,7 @@ async function main() {
         const browser = await chromium.launch();
         try {
             await runNavigationTests(browser);
+            await runWeatherCardTests(browser);
             await runAdminLoginTests(browser);
             await runResetAdminTests(browser);
         } finally {

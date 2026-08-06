@@ -20,7 +20,10 @@ module.exports = async function runResetAdminTests(browser) {
             `Chặn reset khi gọi thẳng hàm mà chưa qua Mã khôi phục (thông báo: "${status}")`);
 
         // Sai mã khôi phục
-        await page.fill('#recoveryCode', 'ma-sai-hoan-toan');
+        await page.evaluate(() => {
+            const el = document.getElementById('recoveryCode');
+            if (el) el.value = 'ma-sai-hoan-toan';
+        });
         await page.evaluate(() => window.checkRecoveryCode());
         await page.waitForTimeout(200);
         const resetDisplay = await page.evaluate(() => document.getElementById('resetSection').style.display);

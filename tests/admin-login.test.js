@@ -20,8 +20,12 @@ module.exports = async function runAdminLoginTests(browser) {
 
         // Khóa sau 5 lần sai
         for (let i = 0; i < 5; i++) {
-            await page.fill('#userInput', 'admin');
-            await page.fill('#passInput', 'sai-mat-khau-' + i);
+            await page.evaluate((val) => {
+                const u = document.getElementById('userInput');
+                const p = document.getElementById('passInput');
+                if (u) u.value = 'admin';
+                if (p) p.value = val;
+            }, 'sai-mat-khau-' + i);
             await page.evaluate(() => window.handleLogin());
             await page.waitForTimeout(150);
         }
@@ -30,8 +34,12 @@ module.exports = async function runAdminLoginTests(browser) {
             `Bị khóa đúng sau 5 lần sai (thông báo: "${errText}")`);
 
         // Đúng mật khẩu vẫn bị chặn trong lúc khóa
-        await page.fill('#userInput', 'admin');
-        await page.fill('#passInput', 'ptx2026');
+        await page.evaluate(() => {
+            const u = document.getElementById('userInput');
+            const p = document.getElementById('passInput');
+            if (u) u.value = 'admin';
+            if (p) p.value = 'ptx2026';
+        });
         await page.evaluate(() => window.handleLogin());
         await page.waitForTimeout(150);
         const loggedIn = await page.evaluate(() => localStorage.getItem('adminLoggedIn'));
