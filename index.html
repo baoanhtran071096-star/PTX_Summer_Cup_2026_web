@@ -9789,11 +9789,33 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             t.gd = t.goalsFor - t.goalsAgainst;
             x.gd = x.goalsFor - x.goalsAgainst;
 
-            const teams = [
-                { id: 'p', label: 'TEAM P', icon: '⚡', obj: p, color: '#1A5BB5' },
-                { id: 't', label: 'TEAM T', icon: '🔥', obj: t, color: '#D32F2F' },
-                { id: 'x', label: 'TEAM X', icon: '💎', obj: x, color: '#F5A623' }
-            ].sort((a, b) => b.obj.pts - a.obj.pts || b.obj.gd - a.obj.gd);
+            // Identity (name, emblem, colour) comes from TEAMS_DATA — the single source of
+            // truth — rather than being restated here, which is how the standings table
+            // ended up showing ⚡/🔥/💎 instead of each team's real emblem.
+            //
+            // Stats are exposed BOTH nested (obj.*, used by the standings cards and the
+            // road-to-champion strip) and flattened (pts/gd/p, used by the AI assistant,
+            // the championship-odds branch and the end-of-tournament report). Those
+            // callers were already reading the flat names, which simply did not exist —
+            // the assistant's standings table rendered "undefined" in every cell.
+            const decorate = (id, o) => {
+                const d = (typeof TEAMS_DATA !== 'undefined' && TEAMS_DATA[id]) || {};
+                return {
+                    id,
+                    label: d.name || ('TEAM ' + id.toUpperCase()),
+                    name: d.name || ('TEAM ' + id.toUpperCase()),
+                    fullName: d.fullName || d.name || ('TEAM ' + id.toUpperCase()),
+                    icon: d.icon || '',
+                    logo: d.logo || '',
+                    color: d.color || 'var(--ptx-orange)',
+                    obj: o,
+                    p: o.played, pts: o.pts, gd: o.gd,
+                    wins: o.wins, draws: o.draws, losses: o.losses,
+                    goalsFor: o.goalsFor, goalsAgainst: o.goalsAgainst
+                };
+            };
+            const teams = [decorate('p', p), decorate('t', t), decorate('x', x)]
+                .sort((a, b) => b.obj.pts - a.obj.pts || b.obj.gd - a.obj.gd);
 
             return teams;
         }
@@ -9821,7 +9843,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 card.className = 'standing-card reveal';
                 card.innerHTML = `
                     <div class="rank ${rankClass}">${rank}</div>
-                    <div class="team-icon" style="overflow:hidden; padding:0; display:flex; justify-content:center; align-items:center;">${team.obj.logo ? `<img src="${team.obj.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : team.icon}</div>
+                    <div class="team-icon" style="overflow:hidden; padding:0; display:flex; justify-content:center; align-items:center;">${team.logo ? `<img src="${team.logo}" alt="${team.label}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : team.icon}</div>
                     <div class="team-info">
                         <div class="name">${team.label} ${crown ? `<span class="crown">${crown}</span>` : ''}</div>
                         <div class="stats-row">
@@ -9881,7 +9903,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     labelTitle: 'Đội dẫn đầu',
                     sub: leader ? leader.obj.pts + ' điểm • Hạng 1' : 'Chưa có trận nào kết thúc',
                     borderColor: '#fbbf24',
-                    avatar: leader && leader.obj ? leader.obj.logo : null
+                    avatar: leader ? leader.logo : null
                 },
                 {
                     icon: '👟',
