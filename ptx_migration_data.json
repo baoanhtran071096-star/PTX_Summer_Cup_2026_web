@@ -1,6 +1,23 @@
 {
-  "exportVersion": "2.4",
-  "exportedAt": "2026-07-30T14:13:00.000Z",
+  "exportVersion": "2.5",
+  "exportedAt": "2026-08-07T00:00:00.000Z",
+  "tournament": {
+    "name": "PTX Summer Cup 2026",
+    "date": "2026-08-07",
+    "venue": {
+      "name": "Sân bóng Hoàng Hoa Thám",
+      "pitch": "Sân số 1"
+    },
+    "slogan": "Làm hết sức - Chơi hết mình",
+    "spirit": ["Đoàn kết", "Vui vẻ"],
+    "startTime": "16:15",
+    "endTime": "18:20",
+    "matchDurationMinutes": 35,
+    "breakDurationMinutes": 10,
+    "teamCount": 3,
+    "playerCount": 24,
+    "matchCount": 3
+  },
   "teams": {
     "p": {
       "id": "p",
@@ -9,12 +26,7 @@
       "icon": "🦅",
       "color": "#1A5BB5",
       "captain": "Anh Trương",
-      "stats": {
-        "attack": 92,
-        "defense": 88,
-        "speed": 90,
-        "power": 85
-      },
+      "stats": { "attack": 92, "defense": 88, "speed": 90, "power": 85 },
       "ovr": 89
     },
     "t": {
@@ -24,12 +36,7 @@
       "icon": "🐯",
       "color": "#D32F2F",
       "captain": "Minh Thế",
-      "stats": {
-        "attack": 88,
-        "defense": 85,
-        "speed": 80,
-        "power": 90
-      },
+      "stats": { "attack": 88, "defense": 85, "speed": 80, "power": 90 },
       "ovr": 86
     },
     "x": {
@@ -39,285 +46,40 @@
       "icon": "🐟",
       "color": "#F5A623",
       "captain": "Đình Huy",
-      "stats": {
-        "attack": 85,
-        "defense": 90,
-        "speed": 95,
-        "power": 82
-      },
+      "stats": { "attack": 85, "defense": 90, "speed": 95, "power": 82 },
       "ovr": 88
     }
   },
   "players": [
-    {
-      "id": 1,
-      "name": "Anh Trương",
-      "team": "p",
-      "position": "FW",
-      "avatar": "https://i.postimg.cc/VLrMX52J/Anh-Truong.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 2,
-      "name": "Phan Hiền",
-      "team": "p",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/sDkWmsR9/Phan-Hien.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 3,
-      "name": "Thanh Long",
-      "team": "p",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/X7R5L402/Thanh-Long.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 4,
-      "name": "Thanh Trúc",
-      "team": "p",
-      "position": "GK",
-      "avatar": "https://i.postimg.cc/Dy9G6nKD/Thanh-Truc.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 5,
-      "name": "Mậu Quốc",
-      "team": "p",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/wTCN2gdm/Mau-Quoc.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 6,
-      "name": "Quang Minh",
-      "team": "p",
-      "position": "FW",
-      "avatar": "https://i.postimg.cc/5NhzgbM7/Quang-Minh.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 7,
-      "name": "Khánh Hưng",
-      "team": "p",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/BQrFp4Gj/Khanh-Hung.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 8,
-      "name": "Mạnh Tuấn",
-      "team": "p",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/Dy9G6nK4/Manh-Tuan.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 9,
-      "name": "Minh Thế",
-      "team": "t",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/VLxtgmcM/Minh-The.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 10,
-      "name": "Tường Khánh",
-      "team": "t",
-      "position": "GK",
-      "avatar": "https://i.postimg.cc/YCQWyZpX/Tuong-Khanh.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 11,
-      "name": "Hoàng Nam",
-      "team": "t",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/WbBZ8TPD/Hoang-Nam.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 12,
-      "name": "Đăng Quân",
-      "team": "t",
-      "position": "FW",
-      "avatar": "https://i.postimg.cc/zXbWT34L/Dang-Quan.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 13,
-      "name": "Thanh Tú",
-      "team": "t",
-      "position": "FW",
-      "avatar": "https://i.postimg.cc/wjDmbZ6w/Thanh-Tu.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 14,
-      "name": "Chí Đại",
-      "team": "t",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/Nf9TRLZ2/Chi-Dai.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 15,
-      "name": "Quang Toàn",
-      "team": "t",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/SNB9dkpg/Quang-Toan.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 16,
-      "name": "Phát Tài",
-      "team": "t",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/7YFz9wyV/Phat-Tai.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 17,
-      "name": "Đình Huy",
-      "team": "x",
-      "position": "GK",
-      "avatar": "https://i.postimg.cc/J4fXxMWD/Dinh-Huy.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 18,
-      "name": "Xuân Sử",
-      "team": "x",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/L6cPD2Mj/Nguyen-Su.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 19,
-      "name": "Văn Lân",
-      "team": "x",
-      "position": "FW",
-      "avatar": "https://i.postimg.cc/VkXCHpYH/Van-Lan.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 20,
-      "name": "Thiên Phú",
-      "team": "x",
-      "position": "DF",
-      "avatar": "https://i.postimg.cc/Z56dD2TV/Thien-Phu.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 21,
-      "name": "Bảo Anh",
-      "team": "x",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/L6YfjhGY/Bao-Anh.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 22,
-      "name": "Phương Toàn",
-      "team": "x",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/dtbC6wKn/Phuong-Toan.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 23,
-      "name": "Minh Hiếu",
-      "team": "x",
-      "position": "FW",
-      "avatar": "https://i.postimg.cc/7YFz9wyz/Minh-Hieu.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    },
-    {
-      "id": 24,
-      "name": "Thành Thái",
-      "team": "x",
-      "position": "MF",
-      "avatar": "https://i.postimg.cc/PrgDyTkF/Thanh-Thai.jpg",
-      "goals": 0,
-      "assists": 0,
-      "mvp": 0
-    }
+    { "id": 1, "name": "Anh Trương", "jerseyName": "Anh Trương", "jerseyNumber": "05", "team": "p", "position": "FW", "avatar": "thư viện/Ảnh cầu thủ/Anh Trương.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 2, "name": "Phan Hiền", "jerseyName": "ANH TƯ", "jerseyNumber": "7", "team": "p", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Phan Hiền.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 3, "name": "Thanh Long", "jerseyName": "Long Phạm", "jerseyNumber": "13", "team": "p", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Thanh Long.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 4, "name": "Thanh Trúc", "jerseyName": "Jub", "jerseyNumber": "19", "team": "p", "position": "GK", "avatar": "thư viện/Ảnh cầu thủ/Thanh Trúc.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 5, "name": "Mậu Quốc", "jerseyName": "Mr.Cry", "jerseyNumber": "76", "team": "p", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Mậu Quốc.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 6, "name": "Quang Minh", "jerseyName": "M", "jerseyNumber": "∞", "team": "p", "position": "FW", "avatar": "thư viện/Ảnh cầu thủ/Quang Minh.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 7, "name": "Khánh Hưng", "jerseyName": "De", "jerseyNumber": "79", "team": "p", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Khánh Hưng.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 8, "name": "Mạnh Tuấn", "jerseyName": "Mạnh Tún", "jerseyNumber": "02", "team": "p", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Mạnh Tuấn.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 9, "name": "Minh Thế", "jerseyName": "Minh Thế", "jerseyNumber": "∞", "team": "t", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Minh Thế.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 10, "name": "Tường Khánh", "jerseyName": "Mon Trésor", "jerseyNumber": "13", "team": "t", "position": "GK", "avatar": "thư viện/Ảnh cầu thủ/Tường Khánh.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 11, "name": "Hoàng Nam", "jerseyName": "Nam Kun", "jerseyNumber": "70", "team": "t", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Hoàng Nam.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 12, "name": "Đăng Quân", "jerseyName": "ĐQ", "jerseyNumber": "04", "team": "t", "position": "FW", "avatar": "thư viện/Ảnh cầu thủ/Đăng Quân.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 13, "name": "Thanh Tú", "jerseyName": "M.Marquez", "jerseyNumber": "93", "team": "t", "position": "FW", "avatar": "thư viện/Ảnh cầu thủ/Thanh Tú.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 14, "name": "Chí Đại", "jerseyName": "Dylan Luu", "jerseyNumber": "22", "team": "t", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Chí Đại.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 15, "name": "Quang Toàn", "jerseyName": "TọQ", "jerseyNumber": "∞", "team": "t", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Quang Toàn.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 16, "name": "Phát Tài", "jerseyName": "Phát Tài", "jerseyNumber": "∞", "team": "t", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Phát Tài.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 17, "name": "Đình Huy", "jerseyName": "Đình Huy", "jerseyNumber": "14", "team": "x", "position": "GK", "avatar": "thư viện/Ảnh cầu thủ/Đình Huy.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 18, "name": "Xuân Sử", "jerseyName": "Nguyễn Sử", "jerseyNumber": "10", "team": "x", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Nguyễn Sử.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 19, "name": "Văn Lân", "jerseyName": "VERL", "jerseyNumber": "11", "team": "x", "position": "FW", "avatar": "thư viện/Ảnh cầu thủ/Văn Lân.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 20, "name": "Thiên Phú", "jerseyName": "AmphetamiN", "jerseyNumber": "24", "team": "x", "position": "DF", "avatar": "thư viện/Ảnh cầu thủ/Thiên Phú.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 21, "name": "Bảo Anh", "jerseyName": "Kylian mBAppé", "jerseyNumber": "9.5", "team": "x", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Bảo Anh.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 22, "name": "Phương Toàn", "jerseyName": "Phương Toàn", "jerseyNumber": "21", "team": "x", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Phương Toàn.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 23, "name": "Minh Hiếu", "jerseyName": "Marcus", "jerseyNumber": "12", "team": "x", "position": "FW", "avatar": "thư viện/Ảnh cầu thủ/Minh Hiếu.webp", "goals": 0, "assists": 0, "mvp": 0 },
+    { "id": 24, "name": "Thành Thái", "jerseyName": "Erling HaaTháiLan", "jerseyNumber": "9", "team": "x", "position": "MF", "avatar": "thư viện/Ảnh cầu thủ/Thành Thái.webp", "goals": 0, "assists": 0, "mvp": 0 }
   ],
   "matches": [
-    {
-      "id": 1,
-      "startH": 17,
-      "startM": 0,
-      "endH": 17,
-      "endM": 35,
-      "home": "p",
-      "away": "t"
-    },
-    {
-      "id": 2,
-      "startH": 17,
-      "startM": 50,
-      "endH": 18,
-      "endM": 25,
-      "home": "p",
-      "away": "x"
-    },
-    {
-      "id": 3,
-      "startH": 18,
-      "startM": 40,
-      "endH": 19,
-      "endM": 15,
-      "home": "x",
-      "away": "t"
-    }
+    { "id": 1, "matchNumber": 1, "startTime": "16:15", "endTime": "16:50", "homeTeam": "p", "awayTeam": "x", "pitch": "Sân số 1" },
+    { "id": 2, "matchNumber": 2, "startTime": "17:00", "endTime": "17:35", "homeTeam": "p", "awayTeam": "t", "pitch": "Sân số 1" },
+    { "id": 3, "matchNumber": 3, "startTime": "17:45", "endTime": "18:20", "homeTeam": "x", "awayTeam": "t", "pitch": "Sân số 1" }
   ],
   "localStorage": {
     "ptx_stat_goals": "0",
@@ -325,11 +87,9 @@
     "ptx_stat_players": "24",
     "ptx_stat_yellow": "0",
     "ptx_stat_red": "0",
-    "ptx_slogan": "Làm hết sức – Chơi hết mình",
+    "ptx_slogan": "Làm hết sức - Chơi hết mình",
     "ptx_msg": "Giải bóng đá truyền thống do Công đoàn PTX Group Việt Nam tổ chức",
     "ptx_date": "07/08/2026",
-    "ptx_location": "152 Hoàng Hoa Thám, Bảy Hiền, Hồ Chí Minh, Việt Nam",
-    "hof_2025": "TEAM P (PHOENIX) | Chưa đủ dữ liệu (Cập nhật sau) | Chưa đủ dữ liệu (Cập nhật sau) | Chưa đủ dữ liệu (Cập nhật sau) | Chưa đủ dữ liệu (Cập nhật sau)",
-    "gallery_2025": "https://i.postimg.cc/J4BFgJp7/CD.jpg"
+    "ptx_location": "Sân bóng Hoàng Hoa Thám - Sân số 1 (152 Hoàng Hoa Thám, TP.HCM)"
   }
 }
