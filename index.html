@@ -6130,7 +6130,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                     <!-- Card 3: Bản Đồ Google Maps -->
                     <div style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(37,99,235,0.25));border:1.5px solid #3b82f6;border-radius:18px;padding:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px;box-shadow:0 8px 20px rgba(59,130,246,0.2);transition:transform 0.25s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="font-size:12px;font-weight:900;color:#93c5fd;text-transform:uppercase;letter-spacing:0.5px;">GPS DẪN ĐƯỜNG</div>
+                        <div style="font-size:12px;font-weight:900;color:#93c5fd;text-transform:uppercase;letter-spacing:0.5px;" data-i18n="gps_title">GPS DẪN ĐƯỜNG</div>
                         <a href="https://maps.app.goo.gl/WcMGu8BE8Ufo3XYm7" target="_blank" class="map-btn" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:8px 18px;border-radius:12px;font-weight:900;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(59,130,246,0.5);">
                             📍 MỞ GOOGLE MAPS DẪN ĐƯỜNG
                         </a>
@@ -6142,10 +6142,10 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:20px;">
                 <!-- Round Tabs -->
                 <div style="display:flex;gap:8px;flex-wrap:wrap;" id="matchRoundTabBox">
-                    <button class="match-round-tab active" onclick="filterMatchRound('all', this)" style="background:#1D4ED8;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;">🏆 Tất cả trận</button>
-                    <button class="match-round-tab" onclick="filterMatchRound(1, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;">⚽ Trận 1 (Mở Màn)</button>
-                    <button class="match-round-tab" onclick="filterMatchRound(2, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;">⚽ Trận 2 (Bán kết)</button>
-                    <button class="match-round-tab" onclick="filterMatchRound(3, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;">🔥 Trận 3 (Chung kết)</button>
+                    <button class="match-round-tab active" onclick="filterMatchRound('all', this)" style="background:#1D4ED8;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_all_matches">🏆 Tất cả trận</button>
+                    <button class="match-round-tab" onclick="filterMatchRound(1, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match1">⚽ Trận 1 (Mở Màn)</button>
+                    <button class="match-round-tab" onclick="filterMatchRound(2, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match2">⚽ Trận 2 (Bán kết)</button>
+                    <button class="match-round-tab" onclick="filterMatchRound(3, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match3">🔥 Trận 3 (Chung kết)</button>
                 </div>
 
                 <!-- Filter By Team Select -->
@@ -6219,7 +6219,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- Prediction Form Card -->
                 <div class="card" style="padding:24px;background:linear-gradient(145deg,#0f172a,#1e293b);border:1.5px solid rgba(249,115,22,0.4);border-radius:20px;">
                     <div style="font-size:18px;font-weight:900;color:var(--ptx-orange);font-family:var(--font-title);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                        <span>🎯 GỬI THẺ DỰ ĐOÁN CÁ NHÂN</span>
+                        <span data-i18n="pred_card_title">🎯 GỬI THẺ DỰ ĐOÁN CÁ NHÂN</span>
                     </div>
                     
                     <div style="margin-bottom:16px;">
@@ -6294,12 +6294,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- Leaderboard Card -->
                 <div class="card" style="padding:24px;background:linear-gradient(145deg,#0f172a,#1e293b);border:1px solid rgba(255,255,255,0.1);border-radius:20px;">
                     <div style="font-size:18px;font-weight:900;color:#fbbf24;font-family:var(--font-title);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
-                        <span>🏆 BẢNG XẾP HẠNG THÁNH DỰ ĐOÁN</span>
-                        <span style="font-size:11px;font-weight:600;color:#94a3b8;background:rgba(255,255,255,0.06);padding:3px 10px;border-radius:12px;">Cập nhật tự động</span>
+                        <span data-i18n="pred_lb_title">🏆 BẢNG XẾP HẠNG THÁNH DỰ ĐOÁN</span>
+                        <span style="font-size:11px;font-weight:600;color:#94a3b8;background:rgba(255,255,255,0.06);padding:3px 10px;border-radius:12px;" data-i18n="upd_auto">Cập nhật tự động</span>
                     </div>
 
                     <div style="font-size:11px;color:#94a3b8;margin-bottom:14px;background:rgba(251,191,36,0.08);padding:8px 12px;border-radius:8px;border-left:3px solid #fbbf24;line-height:1.5;">
-                        <strong>Quy tắc tính điểm:</strong> Đúng tỷ số (+3đ) • Đúng đội thắng (+1đ) • Đúng MVP (+5đ) • Đúng Vua phá lưới (+5đ).
+                        <strong data-i18n="pred_rules_label">Quy tắc tính điểm:</strong> Đúng tỷ số (+3đ) • Đúng đội thắng (+1đ) • Đúng MVP (+5đ) • Đúng Vua phá lưới (+5đ).
                     </div>
 
                     <div id="predictionLeaderboardList" style="display:flex;flex-direction:column;gap:10px;">
@@ -6708,7 +6708,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                     <!-- Card 3: Bản Đồ Google Maps -->
                     <div style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(37,99,235,0.25));border:1.5px solid #3b82f6;border-radius:18px;padding:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:8px;box-shadow:0 8px 20px rgba(59,130,246,0.2);transition:transform 0.25s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="font-size:12px;font-weight:900;color:#93c5fd;text-transform:uppercase;letter-spacing:0.5px;">GPS DẪN ĐƯỜNG</div>
+                        <div style="font-size:12px;font-weight:900;color:#93c5fd;text-transform:uppercase;letter-spacing:0.5px;" data-i18n="gps_title">GPS DẪN ĐƯỜNG</div>
                         <a href="https://maps.app.goo.gl/WcMGu8BE8Ufo3XYm7" target="_blank" class="map-btn" style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;padding:8px 18px;border-radius:12px;font-weight:900;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(59,130,246,0.5);">
                             📍 MỞ GOOGLE MAPS DẪN ĐƯỜNG
                         </a>
@@ -6866,7 +6866,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <p style="font-family:var(--font-ui);">📞 <a href="tel:0867871687" style="color:var(--ptx-orange);text-decoration:none;">0867871687</a></p>
                         <p style="font-family:var(--font-ui);">📍 <a href="https://maps.app.goo.gl/WcMGu8BE8Ufo3XYm7" target="_blank" style="color:var(--ptx-orange);text-decoration:none;">152 Hoàng Hoa Thám, HCM</a></p>
                     </div>
-                    <button onclick="shareResult()" style="margin-top:20px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border:none;padding:12px 28px;border-radius:24px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font-title);">📣 Chia sẻ trang</button>
+                    <button onclick="shareResult()" style="margin-top:20px;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border:none;padding:12px 28px;border-radius:24px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font-title);" data-i18n="share_title">📣 Chia sẻ trang</button>
                 </div>
                 <div class="card" style="padding:32px;text-align:center;">
                     <h3 style="font-family:var(--font-title);color:var(--text-primary);margin-bottom:8px;">📲 QR Trang Web</h3>
@@ -7007,7 +7007,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     <button class="fifa-team-btn" onclick="filterFifaByTeam('t',this)">🐯 Team T (8)</button>
                     <button class="fifa-team-btn" onclick="filterFifaByTeam('x',this)">🐟 Team X (8)</button>
                 </div>
-                <button onclick="openComparePlayersModal(); return false;" style="background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 4px 15px rgba(124,58,237,0.4);font-family:var(--font-title);letter-spacing:0.5px;">⚔️ SO SÁNH 2 CẦU THỦ (HEAD TO HEAD)</button>
+                <button onclick="openComparePlayersModal(); return false;" style="background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;border:none;padding:9px 20px;border-radius:20px;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 4px 15px rgba(124,58,237,0.4);font-family:var(--font-title);letter-spacing:0.5px;" data-i18n="cmp_title">⚔️ SO SÁNH 2 CẦU THỦ (HEAD TO HEAD)</button>
             </div>
 
             <!-- FIFA Cards Grid Container -->
@@ -7051,10 +7051,10 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <div class="container section-gap">
             <!-- Gallery Filter Tabs -->
             <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:28px;">
-                <button class="gallery-filter-btn active" onclick="filterGalleryPage('all',this)">🖼️ Tất cả</button>
-                <button class="gallery-filter-btn" onclick="filterGalleryPage('team',this)">👥 Đội bóng</button>
-                <button class="gallery-filter-btn" onclick="filterGalleryPage('ceremony',this)">🏆 Lễ khai mạc</button>
-                <button class="gallery-filter-btn" onclick="filterGalleryPage('fan',this)">📣 Cổ động viên</button>
+                <button class="gallery-filter-btn active" onclick="filterGalleryPage('all',this)" data-i18n="g_all">🖼️ Tất cả</button>
+                <button class="gallery-filter-btn" onclick="filterGalleryPage('team',this)" data-i18n="g_teams">👥 Đội bóng</button>
+                <button class="gallery-filter-btn" onclick="filterGalleryPage('ceremony',this)" data-i18n="g_opening">🏆 Lễ khai mạc</button>
+                <button class="gallery-filter-btn" onclick="filterGalleryPage('fan',this)" data-i18n="g_fans">📣 Cổ động viên</button>
             </div>
             <!-- Gallery Grid -->
             <div id="galleryPageGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;"></div>
@@ -8530,6 +8530,35 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 w_humidity: 'Độ ẩm',
                 w_wind: 'Gió',
                 w_gust: 'Gió giật',
+                st_no_result: '⏳ Chưa có kết quả',
+                st_not_played: '⏳ Chưa thi đấu',
+                st_no_goals_long: '⏳ Chưa có bàn thắng nào được ghi nhận',
+                gps_title: 'GPS DẪN ĐƯỜNG',
+                f_all_matches: '🏆 Tất cả trận',
+                f_match1: '⚽ Trận 1 (Mở Màn)',
+                f_match2: '⚽ Trận 2 (Bán kết)',
+                f_match3: '🔥 Trận 3 (Chung kết)',
+                g_all: '🖼️ Tất cả',
+                g_teams: '👥 Đội bóng',
+                g_opening: '🏆 Lễ khai mạc',
+                g_fans: '📣 Cổ động viên',
+                sq_starting: '🟢 CHÍNH',
+                sq_bench: '🟡 DỰ BỊ',
+                upd_realtime: 'Cập nhật realtime',
+                upd_auto: 'Cập nhật tự động',
+                th_rank: 'HẠNG',
+                th_club: 'ĐỘI BÓNG',
+                th_gd: 'HIỆU SỐ',
+                th_points_long: 'ĐIỂM SỐ',
+                th_ai_odds: 'XÁC SUẤT VÔ ĐỊCH AI',
+                w_title: '🌦️ THỜI TIẾT TRẬN ĐẤU',
+                ai_subtitle: 'Trợ lý giải đấu',
+                pred_card_title: '🎯 GỬI THẺ DỰ ĐOÁN CÁ NHÂN',
+                pred_lb_title: '🏆 BẢNG XẾP HẠNG THÁNH DỰ ĐOÁN',
+                pred_rules_label: 'Quy tắc tính điểm:',
+                cmp_title: '⚔️ SO SÁNH 2 CẦU THỦ (HEAD TO HEAD)',
+                share_title: '📣 Chia sẻ trang',
+                hof_top_scorer: 'Vua phá lưới',
                 live_none: 'Chưa có trận đấu nào đang diễn ra',
                 live_none_sub: 'Hãy quay lại đúng giờ để theo dõi trực tiếp!'
             },
@@ -8735,6 +8764,35 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 w_humidity: 'Humidity',
                 w_wind: 'Wind',
                 w_gust: 'Gusts',
+                st_no_result: '⏳ No result yet',
+                st_not_played: '⏳ Not played',
+                st_no_goals_long: '⏳ No goals recorded yet',
+                gps_title: 'GPS DIRECTIONS',
+                f_all_matches: '🏆 All matches',
+                f_match1: '⚽ Match 1 (Opener)',
+                f_match2: '⚽ Match 2 (Semi-final)',
+                f_match3: '🔥 Match 3 (Final)',
+                g_all: '🖼️ All',
+                g_teams: '👥 Teams',
+                g_opening: '🏆 Opening ceremony',
+                g_fans: '📣 Supporters',
+                sq_starting: '🟢 STARTING',
+                sq_bench: '🟡 BENCH',
+                upd_realtime: 'Live updates',
+                upd_auto: 'Auto-updating',
+                th_rank: 'RANK',
+                th_club: 'TEAM',
+                th_gd: 'GD',
+                th_points_long: 'POINTS',
+                th_ai_odds: 'AI TITLE ODDS',
+                w_title: '🌦️ MATCH WEATHER',
+                ai_subtitle: 'Tournament assistant',
+                pred_card_title: '🎯 SUBMIT YOUR PREDICTION CARD',
+                pred_lb_title: '🏆 PREDICTION LEADERBOARD',
+                pred_rules_label: 'Scoring rules:',
+                cmp_title: '⚔️ COMPARE TWO PLAYERS (HEAD TO HEAD)',
+                share_title: '📣 Share this page',
+                hof_top_scorer: 'Top scorer',
                 live_none: 'No match is currently live',
                 live_none_sub: 'Check back at kick-off to follow it live!'
             }
@@ -9401,7 +9459,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 <div class="ptx-weather-card">
                     <div class="weather-card-header" style="flex-wrap:wrap;gap:8px;">
                         <div class="title">
-                            <span>🌦️ THỜI TIẾT TRẬN ĐẤU</span>
+                            <span data-i18n="w_title">🌦️ THỜI TIẾT TRẬN ĐẤU</span>
                             <span style="font-size:11px;color:#94a3b8;font-weight:700;">• ${weather.location}</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -10994,7 +11052,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                                         <span style="color:#f97316;font-weight:700;">👕 ${jName}</span>
                                         <span style="color:#475569;">•</span>
                                         <span>[<strong style="color:#cbd5e1">${p.position}</strong>]</span>
-                                        ${isStarter ? '<span style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟢 CHÍNH</span>' : '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;">🟡 DỰ BỊ</span>'}
+                                        ${isStarter ? '<span style="background:rgba(34,197,94,0.2);color:#4ade80;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;" data-i18n="sq_starting">🟢 CHÍNH</span>' : '<span style="background:rgba(245,158,11,0.2);color:#fbbf24;font-size:9px;font-weight:800;padding:1px 6px;border-radius:6px;" data-i18n="sq_bench">🟡 DỰ BỊ</span>'}
                                     </div>
                                 </div>
                             </div>
@@ -11429,7 +11487,7 @@ function renderGallery() {
             if (!container) return;
             const sorted = [...PLAYERS_DATA].filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists);
             if (sorted.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px;">⏳ Chưa có bàn thắng nào được ghi nhận</div>';
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px;" data-i18n="st_no_goals_long">⏳ Chưa có bàn thắng nào được ghi nhận</div>';
                 return;
             }
             const medals = ['🥇','🥈','🥉'];
@@ -11703,7 +11761,7 @@ function renderGallery() {
             const isPreMatch = (leaderObj && leaderObj.played === 0);
             const aiWinOdds = isPreMatch ? [33.3, 33.3, 33.3] : [68, 22, 10];
             const formBadgesList = isPreMatch 
-                ? ['<span style="color:#94a3b8;font-weight:700;">⏳ Chưa thi đấu</span>', '<span style="color:#94a3b8;font-weight:700;">⏳ Chưa thi đấu</span>', '<span style="color:#94a3b8;font-weight:700;">⏳ Chưa thi đấu</span>']
+                ? ['<span style="color:#94a3b8;font-weight:700;" data-i18n="st_not_played">⏳ Chưa thi đấu</span>', '<span style="color:#94a3b8;font-weight:700;" data-i18n="st_not_played">⏳ Chưa thi đấu</span>', '<span style="color:#94a3b8;font-weight:700;" data-i18n="st_not_played">⏳ Chưa thi đấu</span>']
                 : [
                     '<span style="color:#22c55e;font-weight:900;">🟢 W</span> <span style="color:#eab308;font-weight:900;">🟡 D</span>',
                     '<span style="color:#eab308;font-weight:900;">🟡 D</span> <span style="color:#eab308;font-weight:900;">🟡 D</span>',
@@ -11731,11 +11789,11 @@ function renderGallery() {
                         </div>
                     </div>
                     <div style="display:flex;gap:16px;align-items:center;background:rgba(0,0,0,0.4);padding:8px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);">
-                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">ĐIỂM SỐ</div><div style="font-size:16px;font-weight:900;color:#fbbf24;">${leaderObj.pts} ĐIỂM</div></div>
+                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;" data-i18n="th_points_long">ĐIỂM SỐ</div><div style="font-size:16px;font-weight:900;color:#fbbf24;">${leaderObj.pts} ĐIỂM</div></div>
                         <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);"></div>
-                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">HIỆU SỐ</div><div style="font-size:16px;font-weight:900;color:#4ade80;">${leaderObj.gd > 0 ? '+' + leaderObj.gd : leaderObj.gd}</div></div>
+                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;" data-i18n="th_gd">HIỆU SỐ</div><div style="font-size:16px;font-weight:900;color:#4ade80;">${leaderObj.gd > 0 ? '+' + leaderObj.gd : leaderObj.gd}</div></div>
                         <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);"></div>
-                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;">XÁC SUẤT VÔ ĐỊCH AI</div><div style="font-size:16px;font-weight:900;color:#60a5fa;">${statusBadge}</div></div>
+                        <div style="text-align:center;"><div style="font-size:10px;color:#94a3b8;font-weight:700;" data-i18n="th_ai_odds">XÁC SUẤT VÔ ĐỊCH AI</div><div style="font-size:16px;font-weight:900;color:#60a5fa;">${statusBadge}</div></div>
                     </div>
                 `;
                 container.appendChild(spotlight);
@@ -11745,8 +11803,8 @@ function renderGallery() {
             const header = document.createElement('div');
             header.className = 'std-page-header';
             header.innerHTML = `
-                <span>HẠNG</span>
-                <span>ĐỘI BÓNG</span>
+                <span data-i18n="th_rank">HẠNG</span>
+                <span data-i18n="th_club">ĐỘI BÓNG</span>
                 <span>TR</span>
                 <span>W</span>
                 <span>D</span>
@@ -11765,7 +11823,7 @@ function renderGallery() {
                 const gdStr = o.gd > 0 ? '+' + o.gd : '' + o.gd;
                 const ptsColor = idx === 0 ? '#fbbf24' : idx === 1 ? '#94a3b8' : '#cd7c4a';
                 const odds = aiWinOdds[idx] || 33.3;
-                const formBadges = formBadgesList[idx] || '<span style="color:#94a3b8;">⏳ Chưa thi đấu</span>';
+                const formBadges = formBadgesList[idx] || '<span style="color:#94a3b8;" data-i18n="st_not_played">⏳ Chưa thi đấu</span>';
 
                 row.innerHTML = `
                     <div class="std-rank">${medals[idx]}</div>
@@ -11790,7 +11848,7 @@ function renderGallery() {
             const maxPts = Math.max(1, ...teams.map(t => t.obj.pts));
             const barSection = document.createElement('div');
             barSection.style.cssText = 'margin-top:24px;padding:20px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:18px;';
-            barSection.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><span style="font-size:13px;font-weight:900;color:#fbbf24;letter-spacing:1px;text-transform:uppercase;">📊 BIỂU ĐỒ SO SÁNH ĐIỂM SỐ & TỔNG BÀN THẮNG</span><span style="font-size:11px;color:#94a3b8;">Cập nhật realtime</span></div>';
+            barSection.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><span style="font-size:13px;font-weight:900;color:#fbbf24;letter-spacing:1px;text-transform:uppercase;">📊 BIỂU ĐỒ SO SÁNH ĐIỂM SỐ & TỔNG BÀN THẮNG</span><span style="font-size:11px;color:#94a3b8;" data-i18n="upd_realtime">Cập nhật realtime</span></div>';
             teams.forEach((team, idx) => {
                 const t = TEAMS_DATA[team.id];
                 const pct = maxPts > 0 ? (team.obj.pts / maxPts) * 100 : 0;
@@ -11835,7 +11893,7 @@ function renderGallery() {
                     ${ result
                         ? `<div class="mrs-score" style="color:${home.color};">${result.homeScore}<span style="color:#475569;margin:0 8px;font-size:24px;">—</span><span style="color:${away.color};">${result.awayScore}</span></div>
                            <div class="mrs-scorers">${scorersHtml || '<span style="color:#475569;">Chưa có thông tin ghi bàn</span>'}</div>`
-                        : `<div class="mrs-no-result">⏳ Chưa có kết quả</div>`
+                        : `<div class="mrs-no-result" data-i18n="st_no_result">⏳ Chưa có kết quả</div>`
                     }
                     <div style="font-size:10px;color:#475569;margin-top:10px;font-weight:700;">TRẬN ${match.id} • ${String(match.startH).padStart(2,'0')}:${String(match.startM).padStart(2,'0')}</div>
                 `;
@@ -13212,7 +13270,7 @@ function renderGallery() {
             <span style="font-size:18px;">🤖</span>
             <div style="display:flex;flex-direction:column;text-align:left;line-height:1.1;">
                 <span style="font-size:13px;font-weight:900;">PTX AI</span>
-                <span style="font-size:9px;opacity:0.85;font-weight:700;">Trợ lý giải đấu</span>
+                <span style="font-size:9px;opacity:0.85;font-weight:700;" data-i18n="ai_subtitle">Trợ lý giải đấu</span>
             </div>
         </button>
 
@@ -13251,7 +13309,7 @@ function renderGallery() {
                     <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
                         <button onclick="sendPTXChatQuick('Trận tiếp theo của PTX VN là khi nào?')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Trận tiếp theo PTX VN</button>
                         <button onclick="sendPTXChatQuick('Cho tôi xem Bảng Xếp Hạng hiện tại')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">BXH hiện tại</button>
-                        <button onclick="sendPTXChatQuick('Ai đang dẫn đầu danh sách Vua Phá Lưới?')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Vua phá lưới</button>
+                        <button onclick="sendPTXChatQuick('Ai đang dẫn đầu danh sách Vua Phá Lưới?')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'" data-i18n="hof_top_scorer">Vua phá lưới</button>
                         <button onclick="sendPTXChatQuick('Lịch thi đấu hôm nay')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Kết quả hôm nay</button>
                         <button onclick="sendPTXChatQuick('Thống kê cầu thủ')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#cbd5e1;padding:8px 10px;border-radius:10px;font-size:11px;text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" onmouseover="this.style.background='rgba(249,115,22,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">Thống kê cầu thủ</button>
                     </div>
@@ -14469,7 +14527,7 @@ function renderGallery() {
         }
 
         function ptxAiNoDataMessage(userInput) {
-            return `🤖 <strong>PTX AI Assistant:</strong> Dữ liệu về <em>"${userInput}"</em> hiện chưa có trong cơ sở dữ liệu giải đấu PTX Summer Cup 2026.<br><br>💡 Bạn có thể hỏi mình về:<br>• <strong>Bảng xếp hạng</strong> & điểm số hiện tại<br>• <strong>Vua phá lưới</strong> & chỉ số cầu thủ<br>• <strong>Lịch thi đấu</strong> & địa điểm sân đấu 152 Hoàng Hoa Thám<br>• <strong>Dự đoán vô địch</strong> từ mô hình AI`;
+            return `🤖 <strong>PTX AI Assistant:</strong> Dữ liệu về <em>"${userInput}"</em> hiện chưa có trong cơ sở dữ liệu giải đấu PTX Summer Cup 2026.<br><br>💡 Bạn có thể hỏi mình về:<br>• <strong>Bảng xếp hạng</strong> & điểm số hiện tại<br>• <strong data-i18n="hof_top_scorer">Vua phá lưới</strong> & chỉ số cầu thủ<br>• <strong>Lịch thi đấu</strong> & địa điểm sân đấu 152 Hoàng Hoa Thám<br>• <strong>Dự đoán vô địch</strong> từ mô hình AI`;
         }
 
         // ============================================================
