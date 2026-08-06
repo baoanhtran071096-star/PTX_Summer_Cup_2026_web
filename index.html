@@ -4012,9 +4012,87 @@
 
         /* NAV DROPDOWN UTILITY & SINGLE LINE OPTIMIZATION */
         .nav-links { flex-wrap: nowrap !important; gap: clamp(4px, 0.7vw, 12px) !important; align-items: center !important; flex: 1; justify-content: space-evenly; }
-        .nav-links li a { font-size: 13px !important; padding: 6px 10px !important; white-space: nowrap !important; border-radius: 8px; transition: all 0.2s ease; }
+        .nav-links li a { font-size: 13px !important; padding: 6px 10px !important; white-space: nowrap !important; border-radius: 10px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .nav-links li a:hover { background: rgba(255,255,255,0.08); }
         .lang-switch { margin-left: 12px; flex-shrink: 0; }
+        
+        /* Action Pill Buttons in Header */
+        .nav-pill-btn {
+            border-radius: 12px !important;
+            padding: 5px 11px !important;
+            font-weight: 800 !important;
+            font-size: 12px !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+        }
+        .prediction-btn {
+            color: #f97316 !important;
+            background: rgba(249, 115, 22, 0.12) !important;
+            border: 1px solid rgba(249, 115, 22, 0.35) !important;
+        }
+        .prediction-btn:hover {
+            background: rgba(249, 115, 22, 0.25) !important;
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .live-btn {
+            color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.12) !important;
+            border: 1px solid rgba(239, 68, 68, 0.35) !important;
+        }
+        .live-btn:hover {
+            background: rgba(239, 68, 68, 0.25) !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .live-dot-pulse {
+            width: 7px;
+            height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #ef4444;
+            animation: livePulse 1.5s infinite;
+        }
+        @keyframes livePulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .vip-btn {
+            color: #fbbf24 !important;
+            background: rgba(251, 191, 36, 0.12) !important;
+            border: 1px solid rgba(251, 191, 36, 0.35) !important;
+        }
+        .vip-btn:hover {
+            background: rgba(251, 191, 36, 0.25) !important;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .admin-btn {
+            color: #fdba74 !important;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(239, 68, 68, 0.2)) !important;
+            border: 1px solid rgba(249, 115, 22, 0.45) !important;
+            font-weight: 900 !important;
+        }
+        .admin-btn:hover {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.38), rgba(239, 68, 68, 0.38)) !important;
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.45) !important;
+            transform: translateY(-1px) !important;
+        }
+        .util-btn {
+            color: #60a5fa !important;
+            background: rgba(59, 130, 246, 0.12) !important;
+            border: 1px solid rgba(59, 130, 246, 0.35) !important;
+        }
+        .util-btn:hover {
+            background: rgba(59, 130, 246, 0.25) !important;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+
         .nav-dropdown-content summary::-webkit-details-marker { display: none; }
         .nav-dropdown-content summary::marker { content: ""; }
         .nav-dropdown-content details[open] summary span:last-child { transform: rotate(180deg); display: inline-block; }
@@ -4748,31 +4826,31 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <li><a href="#contact" data-i18n="contact_nav">Liên hệ</a></li>
 
                 <li>
-                    <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link" style="color:#f97316;font-weight:900;background:rgba(249,115,22,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(249,115,22,0.4);" data-i18n="nav_prediction">
+                    <a href="#fan-prediction" onclick="scrollToPredictionSection(); return false;" class="nav-link nav-pill-btn prediction-btn" data-i18n="nav_prediction">
                         🎯 DỰ ĐOÁN
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="openLiveStreamHubModal(); return false;" class="nav-link" style="color:#ef4444;font-weight:900;background:rgba(239,68,68,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(239,68,68,0.4);">
-                        <span style="display:inline-block;width:8px;height:8px;background:#ef4444;border-radius:50%;margin-right:4px;"></span>📺 LIVESTREAM
+                    <a href="#" onclick="openLiveStreamHubModal(); return false;" class="nav-link nav-pill-btn live-btn">
+                        <span class="live-dot-pulse"></span>📺 LIVESTREAM
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link" style="color:#fbbf24;font-weight:900;background:rgba(251,191,36,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(251,191,36,0.4);">
+                    <a href="#" onclick="openVipTicketModal(); return false;" class="nav-link nav-pill-btn vip-btn">
                         🎟️ VÉ VÀNG VIP
                     </a>
                 </li>
                 
-                <!-- Utility & Extra Pages Dropdown Menu -->
-                
-                <li id="headerControlCenterBtn" style="display:none;">
-                    <a href="#admin" onclick="navigateToPage('admin'); return false;" class="nav-link" style="color:#fdba74;font-weight:900;background:rgba(249,115,22,0.15);padding:5px 12px !important;border-radius:12px;border:1px solid rgba(249,115,22,0.4);">
-                        <span style="margin-right:4px;">🛡️</span> CONTROL CENTER <span style="font-size:9px;background:#f97316;color:#fff;padding:1px 5px;border-radius:4px;margin-left:4px;">ADMIN</span>
+                <!-- Admin Control Center Header Button (ALWAYS VISIBLE & PROMINENT) -->
+                <li>
+                    <a href="#admin" onclick="navigateToPage('admin'); return false;" class="nav-link nav-pill-btn admin-btn" id="headerAdminNavBtn">
+                        <span style="font-size:13px;">🛡️</span> ADMIN <span style="font-size:9px;background:#f97316;color:#fff;padding:1px 5px;border-radius:4px;margin-left:2px;font-weight:900;">HUB</span>
                     </a>
                 </li>
 
+                <!-- Utility Dropdown Menu -->
                 <li class="nav-dropdown">
-                    <a href="#" class="nav-link nav-dropdown-toggle" onclick="return false;" style="color:#60a5fa;font-weight:800;display:flex;align-items:center;gap:4px;" data-i18n="nav_utilities">
+                    <a href="#" class="nav-link nav-dropdown-toggle nav-pill-btn util-btn" onclick="return false;" data-i18n="nav_utilities">
                         ⚡ TIỆN ÍCH <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
                     

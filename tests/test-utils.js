@@ -60,11 +60,26 @@ async function withServer(fn) {
         });
     });
 
-    await new Promise(resolve => server.listen(PORT, resolve));
+    let started = false;
     try {
+        await new Promise((resolve, reject) => {
+            server.on('error', (err) => {
+                if (err.code === 'EADDRINUSE') {
+                    resolve(); // Port already in use by running server, proceed to test
+                } else {
+                    reject(err);
+                }
+            });
+            server.listen(PORT, () => {
+                started = true;
+                resolve();
+            });
+        });
         await fn();
     } finally {
-        await new Promise(resolve => server.close(resolve));
+        if (started) {
+            await new Promise(resolve => server.close(resolve));
+        }
     }
 }
 
