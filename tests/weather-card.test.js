@@ -9,8 +9,8 @@ module.exports = async function runWeatherCardTests(browser) {
 
         // 1. Coordinates grounded check
         const venueCoords = await page.evaluate(() => window.PTX_VENUE_COORDS);
-        assert(venueCoords && venueCoords.lat === 10.8016 && venueCoords.lng === 106.6508,
-            `Tọa độ venue chuẩn hóa tại Sân 152 Hoàng Hoa Thám (10.8016, 106.6508)`);
+        assert(venueCoords && venueCoords.lat === 10.8057 && venueCoords.lng === 106.6478,
+            `Tọa độ venue chuẩn hóa tại Sân 152 Hoàng Hoa Thám, Phường Bảy Hiền (10.8057, 106.6478)`);
 
         // 2. Weather Service calculation check
         const riskLevels = await page.evaluate(() => {

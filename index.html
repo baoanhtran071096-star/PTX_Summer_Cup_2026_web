@@ -2939,6 +2939,170 @@
             font-family: var(--font-ui);
         }
 
+        /* ===== ULTRA-PREMIUM 3-COLUMN TIMELINE SPEC ===== */
+        .timeline-v3-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 26px;
+            position: relative;
+            padding: 24px 0;
+        }
+
+        @media (max-width: 991px) {
+            .timeline-v3-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .timeline-v3-col {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.75));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 26px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .timeline-v3-col:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .timeline-v3-col.col-ptx {
+            background: linear-gradient(145deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.85));
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .timeline-v3-col.col-union {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.25), rgba(15, 23, 42, 0.85));
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .timeline-v3-col.col-cup {
+            background: linear-gradient(145deg, rgba(249, 115, 22, 0.3), rgba(15, 23, 42, 0.9));
+            border-color: rgba(249, 115, 22, 0.5);
+            box-shadow: 0 16px 40px rgba(249, 115, 22, 0.18);
+        }
+
+        .timeline-v3-col .col-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            margin-bottom: 4px;
+        }
+
+        .timeline-v3-col.col-ptx .col-header { border-bottom-color: #3b82f6; }
+        .timeline-v3-col.col-union .col-header { border-bottom-color: #10b981; }
+        .timeline-v3-col.col-cup .col-header { border-bottom-color: #f97316; }
+
+        .timeline-v3-col h3 {
+            font-size: 19px;
+            font-weight: 900;
+            color: #ffffff;
+            font-family: var(--font-title);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .timeline-v3-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4.5px solid #f97316;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .timeline-v3-col.col-ptx .timeline-v3-card { border-left-color: #3b82f6; }
+        .timeline-v3-col.col-union .timeline-v3-card { border-left-color: #10b981; }
+        .timeline-v3-col.col-cup .timeline-v3-card { border-left-color: #f97316; }
+
+        .timeline-v3-card:hover {
+            transform: translateX(4px) translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .timeline-v3-card .year-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(249, 115, 22, 0.18);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, 0.4);
+            padding: 3px 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline-v3-col.col-ptx .year-badge {
+            background: rgba(59, 130, 246, 0.18);
+            color: #93c5fd;
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .timeline-v3-col.col-union .year-badge {
+            background: rgba(16, 185, 129, 0.18);
+            color: #6ee7b7;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .timeline-v3-card .card-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 6px;
+            font-family: var(--font-title);
+            letter-spacing: 0.3px;
+        }
+
+        .timeline-v3-card .card-desc {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.55;
+            font-family: var(--font-ui);
+        }
+
+        /* Light Mode Theme Adjustments */
+        [data-theme="light"] .timeline-v3-col {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .timeline-v3-col h3 {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .timeline-v3-card {
+            background: #f8fafc !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .timeline-v3-card .card-title {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .timeline-v3-card .card-desc {
+            color: #475569 !important;
+        }
+
         .committee-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -6264,10 +6428,61 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 </div>
             </div>
             <div style="margin-top:60px;">
-                <div class="section-header"><div class="icon">⏳</div><h2 data-i18n="timeline_title">HÀNH TRÌNH <span>PHÁT TRIỂN</span></h2><div class="sub" data-i18n="timeline_sub">Company & Tournament Timeline</div></div>
-                <div class="timeline-grid">
-                    <div class="timeline-col left"><h3 data-i18n="timeline_ptx">🏢 PTX Group Việt Nam</h3><div class="timeline-item"><div class="dot"></div><div class="title">8/8/2016</div><div class="desc" data-i18n="timeline_ptx1">Thành lập Công ty</div></div><div class="timeline-item"><div class="dot"></div><div class="title">2026</div><div class="desc" data-i18n="timeline_ptx2">Kỷ niệm 10 năm thành lập</div></div></div>
-                    <div class="timeline-col right"><h3 data-i18n="timeline_union">🏛️ Công đoàn PTX Group</h3><div class="timeline-item"><div class="dot"></div><div class="title">28/7/1929</div><div class="desc" data-i18n="timeline_union1">Ngày thành lập Công đoàn Việt Nam</div></div><div class="timeline-item"><div class="dot"></div><div class="title">2026</div><div class="desc" data-i18n="timeline_union2">97 năm Công đoàn Việt Nam & Summer Cup 2026</div></div></div>
+                <div class="section-header"><div class="icon">⏳</div><h2 data-i18n="timeline_title">HÀNH TRÌNH <span>PHÁT TRIỂN & GIẢI ĐẤU</span></h2><div class="sub" data-i18n="timeline_sub">PTX Group • Trade Union • Summer Cup Timeline</div></div>
+                <div class="timeline-v3-grid">
+                    <!-- Dãy 1: PTX Group Việt Nam -->
+                    <div class="timeline-v3-col col-ptx">
+                        <div class="col-header">
+                            <h3 data-i18n="timeline_ptx">🏢 PTX Group Việt Nam</h3>
+                            <span style="font-size:11px;font-weight:900;color:#60a5fa;background:rgba(59,130,246,0.18);padding:3px 10px;border-radius:12px;border:1px solid rgba(59,130,246,0.3);">10 NĂM</span>
+                        </div>
+                        <div class="timeline-v3-card">
+                            <span class="year-badge">📅 8/8/2016</span>
+                            <div class="card-title" data-i18n="timeline_ptx1">Khai Phá & Thành Lập Công Ty</div>
+                            <div class="card-desc">Chính thức thành lập PTX Group Việt Nam, khởi đầu hành trình kiến tạo những giá trị bền vững.</div>
+                        </div>
+                        <div class="timeline-v3-card">
+                            <span class="year-badge">🌟 2026</span>
+                            <div class="card-title" data-i18n="timeline_ptx2">Kỷ Niệm 10 Năm Thành Lập</div>
+                            <div class="card-desc">Cột mốc vinh quang 10 năm bứt phá, khẳng định vị thế thương hiệu hàng đầu và vươn tầm cao mới.</div>
+                        </div>
+                    </div>
+
+                    <!-- Dãy 2: Công đoàn PTX Group -->
+                    <div class="timeline-v3-col col-union">
+                        <div class="col-header">
+                            <h3 data-i18n="timeline_union">🏛️ Công Đoàn PTX Group</h3>
+                            <span style="font-size:11px;font-weight:900;color:#34d399;background:rgba(16,185,129,0.18);padding:3px 10px;border-radius:12px;border:1px solid rgba(16,185,129,0.3);">97 NĂM</span>
+                        </div>
+                        <div class="timeline-v3-card">
+                            <span class="year-badge">📜 28/7/1929</span>
+                            <div class="card-title" data-i18n="timeline_union1">Thành Lập Công Đoàn Việt Nam</div>
+                            <div class="card-desc">Khởi nguồn truyền thống vẻ vang bảo vệ quyền lợi hợp pháp, chăm lo đời sống cho người lao động.</div>
+                        </div>
+                        <div class="timeline-v3-card">
+                            <span class="year-badge">🤝 2026</span>
+                            <div class="card-title" data-i18n="timeline_union2">97 Năm Công Đoàn Việt Nam</div>
+                            <div class="card-desc">Kỷ niệm 97 năm Ngày thành lập Công đoàn Việt Nam & đồng hành xây dựng văn hóa doanh nghiệp PTX.</div>
+                        </div>
+                    </div>
+
+                    <!-- Dãy 3: PTX Summer Cup (TÁCH RIÊNG DÃY THỨ 3 ULTIMATE) -->
+                    <div class="timeline-v3-col col-cup">
+                        <div class="col-header">
+                            <h3 style="color:#f97316;">⚽ PTX Summer Cup</h3>
+                            <span style="font-size:11px;font-weight:900;color:#fdba74;background:rgba(249,115,22,0.2);padding:3px 10px;border-radius:12px;border:1px solid rgba(249,115,22,0.5);">SEASON 2</span>
+                        </div>
+                        <div class="timeline-v3-card">
+                            <span class="year-badge" style="background:rgba(56,189,248,0.18);color:#7dd3fc;border-color:rgba(56,189,248,0.4);">🏆 2025</span>
+                            <div class="card-title">PTX Summer Cup Season 1 2025</div>
+                            <div class="card-desc">Khởi tranh mùa giải đầu tiên thành công rực rỡ, đặt nền móng vững chắc cho giải bóng đá truyền thống hàng năm.</div>
+                        </div>
+                        <div class="timeline-v3-card">
+                            <span class="year-badge" style="background:rgba(249,115,22,0.25);color:#ffedd5;border-color:#f97316;">🔥 2026</span>
+                            <div class="card-title">PTX Summer Cup Season 2 2026</div>
+                            <div class="card-desc">Mùa giải thứ 2 bùng nổ 4K, chào mừng Kỷ niệm 10 năm Công ty & 97 năm Công đoàn Việt Nam.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div style="margin-top:60px;">
@@ -8747,9 +8962,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         // PTX CANONICAL WEATHER SERVICE & RISK ENGINE
         // ============================================================
         const PTX_VENUE_COORDS = {
-            lat: 10.8016,
-            lng: 106.6508,
-            name: "Sân bóng 152 Hoàng Hoa Thám, Phường 12, Quận Tân Bình, TP.HCM",
+            lat: 10.8057,
+            lng: 106.6478,
+            name: "Sân bóng 152 Hoàng Hoa Thám, Phường Bảy Hiền, TP.HCM",
             shortName: "Sân bóng 152 Hoàng Hoa Thám"
         };
 
@@ -13840,7 +14055,7 @@ function renderGallery() {
 
             // Follow-up context check (e.g. "Mấy giờ?", "Ở đâu?")
             if ((q === 'mấy giờ?' || q.includes('mấy giờ') || q.includes('ở đâu')) && ptxAiState.previousTopic === 'SCHEDULE') {
-                return `📍 <strong>THỜI GIAN & ĐỊA ĐIỂM THI ĐẤU:</strong><br>• Lễ Khai Mạc: <strong>16:00 — Thứ Sáu, 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, Phường 12, Quận Tân Bình, TP.HCM</strong>.<br><br>👉 Nguồn dữ liệu: <em>PTX Summer Cup 2026 • Lịch thi đấu chính thức</em>`;
+                return `📍 <strong>THỜI GIAN & ĐỊA ĐIỂM THI ĐẤU:</strong><br>• Lễ Khai Mạc: <strong>16:00 — Thứ Sáu, 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, Phường Bảy Hiền, TP.HCM</strong>.<br><br>👉 Nguồn dữ liệu: <em>PTX Summer Cup 2026 • Lịch thi đấu chính thức</em>`;
             }
 
             // 1. STANDINGS / BXH
