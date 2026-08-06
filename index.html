@@ -5270,6 +5270,28 @@
 
         /* Brand orange as small text on dark cards (team stat values): 4.34:1. */
         .team-stat-card .stat-row .stat-label .val { color: var(--brand-text); }
+
+        /* ============================================================
+           NAVBAR OVERFLOW
+           .nav-links sized to its content and could not shrink, so the row overflowed
+           .nav-inner and pushed .nav-right-actions past the viewport edge. In Vietnamese
+           that cost 81px and the language switcher only just survived; in English the
+           longer labels pushed it to 124px and the switcher went off-screen entirely —
+           with body{overflow-x:hidden} clipping it, a visitor who selected English could
+           not get back to Vietnamese. Let the link row shrink and scroll instead; the
+           right-hand actions never shrink, so the switcher stays reachable at any width.
+           ============================================================ */
+        @media (min-width: 769px) {
+            .nav-inner > .nav-links {
+                flex: 1 1 auto;
+                min-width: 0;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+            .nav-inner > .nav-links::-webkit-scrollbar { display: none; }
+            .nav-inner > .nav-links > li { flex: 0 0 auto; }
+        }
 </style>
 </head>
 <body>
@@ -5774,35 +5796,35 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- 2. TOURNAMENT DROPDOWN -->
                 <li class="nav-dropdown">
                     <a href="#schedule" class="nav-link nav-dropdown-toggle" onclick="return false;">
-                        GIẢI ĐẤU <span style="font-size:10px;opacity:0.7;">▼</span>
+                        <span data-i18n="nav_dd_tournament">GIẢI ĐẤU</span> <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
                     <div class="nav-dropdown-content dropdown-simple">
                         <a href="#about" class="dropdown-link-item" onclick="navigateToPage('about'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(249,115,22,0.15);color:#f97316;">ℹ️</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Giới thiệu giải đấu</span>
-                                <span class="dropdown-link-sub">Thể thức, cơ cấu giải thưởng</span>
+                                <span class="dropdown-link-title" data-i18n="dd_about_t">Giới thiệu giải đấu</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_about_s">Thể thức, cơ cấu giải thưởng</span>
                             </span>
                         </a>
                         <a href="#schedule" class="dropdown-link-item" onclick="navigateToPage('schedule'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(59,130,246,0.15);color:var(--accent-blue);">📅</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Lịch thi đấu & Kết quả</span>
-                                <span class="dropdown-link-sub">3 Trận đấu Vòng tròn 35'</span>
+                                <span class="dropdown-link-title" data-i18n="dd_sched_t">Lịch thi đấu & Kết quả</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_sched_s">3 Trận đấu Vòng tròn 35'</span>
                             </span>
                         </a>
                         <a href="#standings" class="dropdown-link-item" onclick="navigateToPage('standings'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(234,179,8,0.15);color:#facc15;">🏆</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Bảng xếp hạng</span>
-                                <span class="dropdown-link-sub">Điểm số, hiệu số & Fair-play</span>
+                                <span class="dropdown-link-title" data-i18n="dd_stand_t">Bảng xếp hạng</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_stand_s">Điểm số, hiệu số & Fair-play</span>
                             </span>
                         </a>
                         <a href="#rules" class="dropdown-link-item" onclick="navigateToPage('rules'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(148,163,184,0.15);color:#cbd5e1;">📖</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Điều lệ 5v5</span>
-                                <span class="dropdown-link-sub">Luật thi đấu chính thức</span>
+                                <span class="dropdown-link-title" data-i18n="dd_rules_t">Điều lệ 5v5</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_rules_s">Luật thi đấu chính thức</span>
                             </span>
                         </a>
                     </div>
@@ -5811,28 +5833,28 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- 3. TEAMS & PLAYERS DROPDOWN -->
                 <li class="nav-dropdown">
                     <a href="#teams" class="nav-link nav-dropdown-toggle" onclick="return false;">
-                        ĐỘI & CẦU THỦ <span style="font-size:10px;opacity:0.7;">▼</span>
+                        <span data-i18n="nav_dd_teams">ĐỘI & CẦU THỦ</span> <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
                     <div class="nav-dropdown-content dropdown-simple">
                         <a href="#teams" class="dropdown-link-item" onclick="navigateToPage('teams'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(59,130,246,0.15);color:var(--accent-blue);">⚽</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Các Đội Bóng</span>
-                                <span class="dropdown-link-sub">Phoenix • Tiger • Xiphias</span>
+                                <span class="dropdown-link-title" data-i18n="dd_teams_t">Các Đội Bóng</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_teams_s">Phoenix • Tiger • Xiphias</span>
                             </span>
                         </a>
                         <a href="#players" class="dropdown-link-item" onclick="navigateToPage('players'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(234,179,8,0.15);color:#facc15;">🏃</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Cầu Thủ FIFA</span>
-                                <span class="dropdown-link-sub">24 Cầu thủ chỉ số FUT 3D</span>
+                                <span class="dropdown-link-title" data-i18n="dd_players_t">Cầu Thủ FIFA</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_players_s">24 Cầu thủ chỉ số FUT 3D</span>
                             </span>
                         </a>
                         <a href="#statistics" class="dropdown-link-item" onclick="navigateToPage('statistics'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(34,197,94,0.15);color:#4ade80;">📊</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Thống kê chi tiết</span>
-                                <span class="dropdown-link-sub">Vua phá lưới & Kiến tạo</span>
+                                <span class="dropdown-link-title" data-i18n="dd_stats_t">Thống kê chi tiết</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_stats_s">Vua phá lưới & Kiến tạo</span>
                             </span>
                         </a>
                     </div>
@@ -5841,28 +5863,28 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- 4. MEDIA DROPDOWN -->
                 <li class="nav-dropdown">
                     <a href="#gallery" class="nav-link nav-dropdown-toggle" onclick="return false;">
-                        TRUYỀN THÔNG <span style="font-size:10px;opacity:0.7;">▼</span>
+                        <span data-i18n="nav_dd_media">TRUYỀN THÔNG</span> <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
                     <div class="nav-dropdown-content dropdown-simple">
                         <a href="#gallery" class="dropdown-link-item" onclick="navigateToPage('gallery'); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(236,72,153,0.15);color:#ec4899;">🖼️</span>
                             <span class="dropdown-link-text">
-                                <span class="dropdown-link-title">Thư viện Ảnh & Video</span>
-                                <span class="dropdown-link-sub">Bộ sưu tập khoảnh khắc giải</span>
+                                <span class="dropdown-link-title" data-i18n="dd_gallery_t">Thư viện Ảnh & Video</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_gallery_s">Bộ sưu tập khoảnh khắc giải</span>
                             </span>
                         </a>
                         <a href="#" class="dropdown-link-item" onclick="openLiveStreamHubModal(); return false;">
                             <span class="dropdown-link-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">📺</span>
                             <span class="dropdown-link-text">
                                 <span class="dropdown-link-title">Livestream Hub</span>
-                                <span class="dropdown-link-sub">Phát sóng trực tiếp trận đấu</span>
+                                <span class="dropdown-link-sub" data-i18n="dd_live_s">Phát sóng trực tiếp trận đấu</span>
                             </span>
                         </a>
                     </div>
                 </li>
 
                 <!-- 5. HALL OF FAME -->
-                <li><a href="#hall-of-fame" onclick="navigateToPage('hall-of-fame'); return false;">Vinh danh</a></li>
+                <li><a href="#hall-of-fame" onclick="navigateToPage('hall-of-fame'); return false;" data-i18n="hof_nav">Vinh danh</a></li>
 
                 <!-- FEATURE ACTION BUTTONS -->
                 <li>
@@ -5884,7 +5906,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- UTILITIES MEGA MENU -->
                 <li class="nav-dropdown">
                     <a href="#" class="nav-link nav-dropdown-toggle nav-pill-btn util-btn" onclick="return false;">
-                        ⚡ TIỆN ÍCH <span style="font-size:10px;opacity:0.7;">▼</span>
+                        <span data-i18n="nav_dd_utilities">⚡ TIỆN ÍCH</span> <span style="font-size:10px;opacity:0.7;">▼</span>
                     </a>
                     <div class="nav-dropdown-content dropdown-mega">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
@@ -5896,36 +5918,36 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                                 <a href="#" onclick="openVipTicketModal(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(253,224,71,0.15);color:#fde047;">🎫</span>
                                     <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#fde047;">Tạo Vé VIP</span>
-                                        <span class="util-desc">Tạo vé điện tử cá nhân hóa</span>
+                                        <span class="util-title" style="color:#fde047;" data-i18n="ut_vip_t">Tạo Vé VIP</span>
+                                        <span class="util-desc" data-i18n="ut_vip_s">Tạo vé điện tử cá nhân hóa</span>
                                     </span>
                                 </a>
                                 <a href="#" onclick="openComparePlayersModal(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(192,132,252,0.15);color:#c084fc;">⚔️</span>
                                     <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#c084fc;">So Sánh Cầu Thủ</span>
-                                        <span class="util-desc">Đối chiếu chỉ số 2 cầu thủ</span>
+                                        <span class="util-title" style="color:#c084fc;" data-i18n="ut_cmp_t">So Sánh Cầu Thủ</span>
+                                        <span class="util-desc" data-i18n="ut_cmp_s">Đối chiếu chỉ số 2 cầu thủ</span>
                                     </span>
                                 </a>
                                 <a href="#sponsor" onclick="navigateToPage('sponsor'); return false;" class="util-card-item" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);">
                                     <span class="util-icon-badge" style="background:rgba(251,191,36,0.25);color:#fbbf24;">🤝</span>
                                     <span class="util-text-wrap">
                                         <span class="util-title" style="color:#fbbf24;">Đồng Hành Cùng Giải <span style="font-size:9px; background:#fbbf24; color:#0f172a; padding:1px 6px; border-radius:6px; font-weight:900;">HOT</span></span>
-                                        <span class="util-desc">Tài trợ & ủng hộ giải đấu</span>
+                                        <span class="util-desc" data-i18n="ut_sponsor_s">Tài trợ & ủng hộ giải đấu</span>
                                     </span>
                                 </a>
                                 <a href="#rules" onclick="navigateToPage('rules'); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(226,232,240,0.12);color:#e2e8f0;">📖</span>
                                     <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#e2e8f0;">Điều Lệ 5v5</span>
-                                        <span class="util-desc">Luật thi đấu chính thức</span>
+                                        <span class="util-title" style="color:#e2e8f0;" data-i18n="ut_rules_t">Điều Lệ 5v5</span>
+                                        <span class="util-desc" data-i18n="ut_rules_s">Luật thi đấu chính thức</span>
                                     </span>
                                 </a>
                                 <a href="#" onclick="openRefereeToolkit(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(16,185,129,0.15);color:#10b981;">🏁</span>
                                     <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#10b981;">Sổ Tay Trọng Tài</span>
-                                        <span class="util-desc">Cẩm nang cho trọng tài</span>
+                                        <span class="util-title" style="color:#10b981;" data-i18n="ut_ref_t">Sổ Tay Trọng Tài</span>
+                                        <span class="util-desc" data-i18n="ut_ref_s">Cẩm nang cho trọng tài</span>
                                     </span>
                                 </a>
                             </div>
@@ -5939,28 +5961,28 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                                     <span class="util-icon-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">🤖</span>
                                     <span class="util-text-wrap">
                                         <span class="util-title" style="color:#60a5fa;">AI Media Center <span style="font-size:9px; background:#3b82f6; color:#fff; padding:1px 6px; border-radius:6px; font-weight:900;">AI</span></span>
-                                        <span class="util-desc">Tạo nội dung truyền thông AI</span>
+                                        <span class="util-desc" data-i18n="ut_ai_s">Tạo nội dung truyền thông AI</span>
                                     </span>
                                 </a>
                                 <a href="#" onclick="openAudioCenterModal(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(236,72,153,0.15);color:#ec4899;">🎧</span>
                                     <span class="util-text-wrap">
                                         <span class="util-title" style="color:#ec4899;">Matchday Audio Center</span>
-                                        <span class="util-desc">Âm thanh không khí sân đấu</span>
+                                        <span class="util-desc" data-i18n="ut_audio_s">Âm thanh không khí sân đấu</span>
                                     </span>
                                 </a>
                                 <a href="#" onclick="openVarSimulatorModal(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(244,63,94,0.15);color:#f43f5e;">🖥️</span>
                                     <span class="util-text-wrap">
                                         <span class="util-title" style="color:#f43f5e;">VAR Replay Simulator <span style="font-size:9px; background:#a855f7; color:#fff; padding:1px 6px; border-radius:6px; font-weight:900;">MÔ PHỎNG</span></span>
-                                        <span class="util-desc">Xem lại tình huống kiểu VAR</span>
+                                        <span class="util-desc" data-i18n="ut_var_s">Xem lại tình huống kiểu VAR</span>
                                     </span>
                                 </a>
                                 <a href="#" onclick="openExportCenterModal(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(52,211,153,0.15);color:#34d399;">📤</span>
                                     <span class="util-text-wrap">
                                         <span class="util-title" style="color:#34d399;">Export Center</span>
-                                        <span class="util-desc">Xuất dữ liệu giải đấu</span>
+                                        <span class="util-desc" data-i18n="ut_export_s">Xuất dữ liệu giải đấu</span>
                                     </span>
                                 </a>
                             </div>
@@ -8575,6 +8597,40 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 lbl_number: 'Số',
                 w_feels: 'Cảm nhận',
                 mc_opening_from: '⏰ Khai mạc từ',
+                dd_about_t: 'Giới thiệu giải đấu',
+                dd_about_s: 'Thể thức, cơ cấu giải thưởng',
+                dd_sched_t: 'Lịch thi đấu & Kết quả',
+                dd_sched_s: '3 Trận đấu Vòng tròn 35\'',
+                dd_stand_t: 'Bảng xếp hạng',
+                dd_stand_s: 'Điểm số, hiệu số & Fair-play',
+                dd_rules_t: 'Điều lệ 5v5',
+                dd_rules_s: 'Luật thi đấu chính thức',
+                dd_teams_t: 'Các Đội Bóng',
+                dd_teams_s: 'Phoenix • Tiger • Xiphias',
+                dd_players_t: 'Cầu Thủ FIFA',
+                dd_players_s: '24 Cầu thủ chỉ số FUT 3D',
+                dd_stats_t: 'Thống kê chi tiết',
+                dd_stats_s: 'Vua phá lưới & Kiến tạo',
+                dd_gallery_t: 'Thư viện Ảnh & Video',
+                dd_gallery_s: 'Bộ sưu tập khoảnh khắc giải',
+                dd_live_s: 'Phát sóng trực tiếp trận đấu',
+                ut_vip_t: 'Tạo Vé VIP',
+                ut_vip_s: 'Tạo vé điện tử cá nhân hóa',
+                ut_cmp_t: 'So Sánh Cầu Thủ',
+                ut_cmp_s: 'Đối chiếu chỉ số 2 cầu thủ',
+                ut_sponsor_s: 'Tài trợ & ủng hộ giải đấu',
+                ut_rules_t: 'Điều Lệ 5v5',
+                ut_rules_s: 'Luật thi đấu chính thức',
+                ut_ref_t: 'Sổ Tay Trọng Tài',
+                ut_ref_s: 'Cẩm nang cho trọng tài',
+                ut_ai_s: 'Tạo nội dung truyền thông AI',
+                ut_audio_s: 'Âm thanh không khí sân đấu',
+                ut_var_s: 'Xem lại tình huống kiểu VAR',
+                ut_export_s: 'Xuất dữ liệu giải đấu',
+                nav_dd_tournament: 'GIẢI ĐẤU',
+                nav_dd_teams: 'ĐỘI & CẦU THỦ',
+                nav_dd_media: 'TRUYỀN THÔNG',
+                nav_dd_utilities: '⚡ TIỆN ÍCH',
                 live_none: 'Chưa có trận đấu nào đang diễn ra',
                 live_none_sub: 'Hãy quay lại đúng giờ để theo dõi trực tiếp!'
             },
@@ -8825,6 +8881,40 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 lbl_number: 'No.',
                 w_feels: 'Feels like',
                 mc_opening_from: '⏰ Opening from',
+                dd_about_t: 'About the tournament',
+                dd_about_s: 'Format and prize structure',
+                dd_sched_t: 'Schedule & results',
+                dd_sched_s: '3 round-robin matches, 35\'',
+                dd_stand_t: 'Standings',
+                dd_stand_s: 'Points, goal difference & fair play',
+                dd_rules_t: '5v5 regulations',
+                dd_rules_s: 'Official playing rules',
+                dd_teams_t: 'The teams',
+                dd_teams_s: 'Phoenix • Tiger • Xiphias',
+                dd_players_t: 'FIFA player cards',
+                dd_players_s: '24 players with 3D FUT ratings',
+                dd_stats_t: 'Detailed statistics',
+                dd_stats_s: 'Top scorers & assists',
+                dd_gallery_t: 'Photo & video gallery',
+                dd_gallery_s: 'Tournament moments collection',
+                dd_live_s: 'Live match broadcast',
+                ut_vip_t: 'Create VIP ticket',
+                ut_vip_s: 'Personalised e-ticket',
+                ut_cmp_t: 'Compare players',
+                ut_cmp_s: 'Match up two players',
+                ut_sponsor_s: 'Sponsor and support the cup',
+                ut_rules_t: '5v5 regulations',
+                ut_rules_s: 'Official playing rules',
+                ut_ref_t: 'Referee handbook',
+                ut_ref_s: 'Guide for match officials',
+                ut_ai_s: 'AI-generated media content',
+                ut_audio_s: 'Matchday atmosphere audio',
+                ut_var_s: 'VAR-style incident replay',
+                ut_export_s: 'Export tournament data',
+                nav_dd_tournament: 'TOURNAMENT',
+                nav_dd_teams: 'TEAMS & PLAYERS',
+                nav_dd_media: 'MEDIA',
+                nav_dd_utilities: '⚡ UTILITIES',
                 live_none: 'No match is currently live',
                 live_none_sub: 'Check back at kick-off to follow it live!'
             }
