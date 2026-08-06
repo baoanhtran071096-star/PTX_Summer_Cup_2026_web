@@ -6192,10 +6192,10 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Cầu thủ</th>
-                            <th>Đội</th>
-                            <th>Bàn thắng</th>
-                            <th>Kiến tạo</th>
+                            <th data-i18n="th_player">Cầu thủ</th>
+                            <th data-i18n="th_team">Đội</th>
+                            <th data-i18n="th_goals">Bàn thắng</th>
+                            <th data-i18n="th_assists">Kiến tạo</th>
                         </tr>
                     </thead>
                     <tbody id="topScorersBody">
@@ -8516,7 +8516,22 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 topscorers_sub: 'Top Scorers',
                 nav_teams_players: '👥 ĐỘI & CẦU THỦ ▾',
                 nav_prediction: '🎯 DỰ ĐOÁN',
-                nav_utilities: '⚡ TIỆN ÍCH ▾'
+                nav_utilities: '⚡ TIỆN ÍCH ▾',
+                fifa_pac: 'TỐC',
+                fifa_sho: 'SÚT',
+                fifa_pas: 'CHUYỀN',
+                fifa_phy: 'LỰC',
+                th_player: 'Cầu thủ',
+                th_team: 'Đội',
+                th_goals: 'Bàn thắng',
+                th_assists: 'Kiến tạo',
+                w_condition: 'Tình trạng',
+                w_pop: 'Xác suất mưa',
+                w_humidity: 'Độ ẩm',
+                w_wind: 'Gió',
+                w_gust: 'Gió giật',
+                live_none: 'Chưa có trận đấu nào đang diễn ra',
+                live_none_sub: 'Hãy quay lại đúng giờ để theo dõi trực tiếp!'
             },
             en: {
                 home_nav: 'Home',
@@ -8706,7 +8721,22 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 filter_team: 'Filter by team:',
                 filter_all: 'All',
                 topscorers_title: 'TOP SCORERS',
-                topscorers_sub: 'Top Scorers'
+                topscorers_sub: 'Top Scorers',
+                fifa_pac: 'PAC',
+                fifa_sho: 'SHO',
+                fifa_pas: 'PAS',
+                fifa_phy: 'PHY',
+                th_player: 'Player',
+                th_team: 'Team',
+                th_goals: 'Goals',
+                th_assists: 'Assists',
+                w_condition: 'Condition',
+                w_pop: 'Chance of rain',
+                w_humidity: 'Humidity',
+                w_wind: 'Wind',
+                w_gust: 'Gusts',
+                live_none: 'No match is currently live',
+                live_none_sub: 'Check back at kick-off to follow it live!'
             }
         };
         const translations = window.translations;
@@ -9389,23 +9419,23 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                         </div>
                         <div class="weather-metrics-grid">
                             <div class="weather-metric-item">
-                                <span class="label">Tình trạng</span>
+                                <span class="label" data-i18n="w_condition">Tình trạng</span>
                                 <span class="val">${weather.condition}</span>
                             </div>
                             <div class="weather-metric-item">
-                                <span class="label">Xác suất mưa</span>
+                                <span class="label" data-i18n="w_pop">Xác suất mưa</span>
                                 <span class="val" style="color:#60a5fa;">${weather.precipitationProbability}%</span>
                             </div>
                             <div class="weather-metric-item">
-                                <span class="label">Độ ẩm</span>
+                                <span class="label" data-i18n="w_humidity">Độ ẩm</span>
                                 <span class="val">${weather.humidity}%</span>
                             </div>
                             <div class="weather-metric-item">
-                                <span class="label">Gió</span>
+                                <span class="label" data-i18n="w_wind">Gió</span>
                                 <span class="val">${weather.windSpeed} km/h</span>
                             </div>
                             <div class="weather-metric-item">
-                                <span class="label">Gió giật</span>
+                                <span class="label" data-i18n="w_gust">Gió giật</span>
                                 <span class="val">${weather.windGust} km/h</span>
                             </div>
                             <div class="weather-metric-item">
@@ -11052,10 +11082,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                         </div>
                         
                         <div class="p-stats-grid">
-                            <div class="p-stat-item"><span class="lbl">TỐC</span><span class="val">${pac}</span></div>
-                            <div class="p-stat-item"><span class="lbl">SÚT</span><span class="val">${sho}</span></div>
-                            <div class="p-stat-item"><span class="lbl">CHUYỀN</span><span class="val">${pas}</span></div>
-                            <div class="p-stat-item"><span class="lbl">LỰC</span><span class="val">${phy}</span></div>
+                            <div class="p-stat-item"><span class="lbl" data-i18n="fifa_pac">TỐC</span><span class="val">${pac}</span></div>
+                            <div class="p-stat-item"><span class="lbl" data-i18n="fifa_sho">SÚT</span><span class="val">${sho}</span></div>
+                            <div class="p-stat-item"><span class="lbl" data-i18n="fifa_pas">CHUYỀN</span><span class="val">${pas}</span></div>
+                            <div class="p-stat-item"><span class="lbl" data-i18n="fifa_phy">LỰC</span><span class="val">${phy}</span></div>
                         </div>
 
                         <div class="p-team-badge" style="color:${team.color};border-color:${team.color};">${renderTeamLogo(team)} ${team.name}</div>
@@ -11319,8 +11349,8 @@ function renderGallery() {
                 container.innerHTML = `
                     <div class="no-live">
                         <span class="big-icon">⏳</span>
-                        <p style="font-size:18px;font-weight:600;color:var(--text-primary);">Chưa có trận đấu nào đang diễn ra</p>
-                        <p style="font-size:14px;color:var(--text-muted);">Hãy quay lại đúng giờ để theo dõi trực tiếp!</p>
+                        <p style="font-size:18px;font-weight:600;color:var(--text-primary);" data-i18n="live_none">Chưa có trận đấu nào đang diễn ra</p>
+                        <p style="font-size:14px;color:var(--text-muted);" data-i18n="live_none_sub">Hãy quay lại đúng giờ để theo dõi trực tiếp!</p>
                         <div style="margin-top:12px;">
                             <a href="#schedule" class="live-cta" style="display:inline-block;padding:10px 32px;font-size:14px;text-decoration:none;" data-i18n="schedule_cta">📅 Xem lịch thi đấu</a>
                         </div>
