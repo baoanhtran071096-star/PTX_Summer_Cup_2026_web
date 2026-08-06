@@ -14053,6 +14053,15 @@ function renderGallery() {
             const teams = window.TEAMS_DATA || (typeof TEAMS_DATA !== 'undefined' ? TEAMS_DATA : {});
             const standings = typeof calculateStandings === 'function' ? calculateStandings() : [];
 
+            // Short terms (jersey names like "M", "De", "ĐQ") must match a whole word,
+            // not just any substring — otherwise e.g. "xem" would false-match jerseyName "M".
+            const qWords = q.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+            function matchesTerm(term) {
+                if (!term) return false;
+                const t = term.toLowerCase();
+                return t.length < 3 ? qWords.includes(t) : q.includes(t);
+            }
+
             // Follow-up context check (e.g. "Mấy giờ?", "Ở đâu?")
             if ((q === 'mấy giờ?' || q.includes('mấy giờ') || q.includes('ở đâu')) && ptxAiState.previousTopic === 'SCHEDULE') {
                 return `📍 <strong>THỜI GIAN & ĐỊA ĐIỂM THI ĐẤU:</strong><br>• Lễ Khai Mạc: <strong>16:00 — Thứ Sáu, 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, Phường Bảy Hiền, TP.HCM</strong>.<br><br>👉 Nguồn dữ liệu: <em>PTX Summer Cup 2026 • Lịch thi đấu chính thức</em>`;
@@ -14155,7 +14164,7 @@ function renderGallery() {
             }
 
             // 4. PLAYER SEARCH / PROFILE / SPECIFIC PLAYER
-            const searchedPlayer = players.find(p => q.includes(p.name.toLowerCase()) || (p.jerseyName && q.includes(p.jerseyName.toLowerCase())) || q.includes('#' + p.number));
+            const searchedPlayer = players.find(p => matchesTerm(p.name) || matchesTerm(p.jerseyName) || q.includes('#' + p.number));
             if (searchedPlayer) {
                 ptxAiState.previousTopic = 'PLAYER_SEARCH';
                 const tName = teams[searchedPlayer.team]?.name || searchedPlayer.team;
@@ -14199,12 +14208,12 @@ function renderGallery() {
         }
 
         // ============================================================
-        // PTX AI — GEMINI FALLBACK (via Cloudflare Worker proxy)
+        // PTX AI — GROQ FALLBACK (via Cloudflare Worker proxy)
         // ============================================================
         // Deployed via cloudflare-worker/ — see cloudflare-worker/README.md.
-        // Left empty until deployed; askPTXAiFallback() throws immediately when empty,
-        // so sendPTXChatMessage() cleanly falls back to ptxAiNoDataMessage().
-        const PTX_AI_PROXY_URL = "";
+        // If this ever becomes empty/unreachable, askPTXAiFallback() throws and
+        // sendPTXChatMessage() cleanly falls back to ptxAiNoDataMessage().
+        const PTX_AI_PROXY_URL = "https://ptx-ai-proxy.baoanhtran071096.workers.dev";
 
         function buildPTXAiGroundingContext() {
             const teams = window.TEAMS_DATA || (typeof TEAMS_DATA !== 'undefined' ? TEAMS_DATA : {});

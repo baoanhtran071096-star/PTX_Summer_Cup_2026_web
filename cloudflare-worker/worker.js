@@ -1,11 +1,16 @@
 // ============================================================
-// PTX AI Assistant — Gemini fallback proxy (Cloudflare Worker)
+// PTX AI Assistant — Groq fallback proxy (Cloudflare Worker)
 // ============================================================
-// Purpose: keeps the Gemini API key server-side. index.html's
+// Purpose: keeps the Groq API key server-side. index.html's
 // askPTXAiFallback() POSTs { message, grounding } here; this worker
-// calls Gemini with that grounding data injected as context and
-// returns { reply }. Deploy with `wrangler deploy` after running
-// `wrangler secret put GEMINI_API_KEY` — see README.md.
+// calls Groq (OpenAI-compatible chat completions) with that grounding
+// data injected as context and returns { reply }. Deploy with
+// `wrangler deploy` after running `wrangler secret put GROQ_API_KEY`
+// — see README.md.
+//
+// (Originally built against Gemini, but Google's Generative Language
+// API rejected all calls with "User location is not supported" for
+// this account/region — Groq's free tier doesn't have that restriction.)
 
 const ALLOWED_ORIGINS = [
     'https://ptxsummercup.vn',
@@ -13,7 +18,7 @@ const ALLOWED_ORIGINS = [
 ];
 
 const MAX_MESSAGE_LENGTH = 300;
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 function isAllowedOrigin(origin) {
     if (!origin) return false;
@@ -34,7 +39,7 @@ function corsHeaders(origin) {
     return headers;
 }
 
-function buildPrompt(message, grounding) {
+function buildSystemPrompt(grounding) {
     return `Bạn là "PTX AI Assistant" — trợ lý ảo của website PTX Summer Cup 2026 (giải bóng đá nội bộ 5v5 của Công đoàn PTX Group Việt Nam).
 
 QUY TẮC BẮT BUỘC:
@@ -45,30 +50,35 @@ QUY TẮC BẮT BUỘC:
 - Giới hạn khoảng 4-6 câu, đi thẳng vào trọng tâm.
 
 DỮ LIỆU GIẢI ĐẤU (JSON):
-${JSON.stringify(grounding)}
-
-CÂU HỎI CỦA NGƯỜI DÙNG: "${message}"`;
+${JSON.stringify(grounding)}`;
 }
 
-async function callGemini(apiKey, message, grounding) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-    const resp = await fetch(url, {
+async function callGroq(apiKey, message, grounding) {
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify({
-            contents: [{ parts: [{ text: buildPrompt(message, grounding) }] }],
-            generationConfig: { temperature: 0.4, maxOutputTokens: 400 }
+            model: GROQ_MODEL,
+            messages: [
+                { role: 'system', content: buildSystemPrompt(grounding) },
+                { role: 'user', content: message }
+            ],
+            temperature: 0.4,
+            max_tokens: 400
         })
     });
 
     if (!resp.ok) {
         const errText = await resp.text().catch(() => '');
-        throw new Error(`Gemini API lỗi ${resp.status}: ${errText.slice(0, 200)}`);
+        throw new Error(`Groq API lỗi ${resp.status}: ${errText.slice(0, 300)}`);
     }
 
     const data = await resp.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Gemini không trả về nội dung');
+    const text = data?.choices?.[0]?.message?.content;
+    if (!text) throw new Error('Groq không trả về nội dung');
     return text.trim();
 }
 
@@ -111,14 +121,14 @@ export default {
                     headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) }
                 });
             }
-            if (!env.GEMINI_API_KEY) {
-                return new Response(JSON.stringify({ error: 'Worker chưa cấu hình GEMINI_API_KEY' }), {
+            if (!env.GROQ_API_KEY) {
+                return new Response(JSON.stringify({ error: 'Worker chưa cấu hình GROQ_API_KEY' }), {
                     status: 500,
                     headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) }
                 });
             }
 
-            const reply = await callGemini(env.GEMINI_API_KEY, message, grounding);
+            const reply = await callGroq(env.GROQ_API_KEY.trim(), message, grounding);
             return new Response(JSON.stringify({ reply }), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) }
