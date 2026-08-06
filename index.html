@@ -5836,7 +5836,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <div>
                             <div style="font-size:11px;font-weight:900;color:#fbbf24;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;" data-i18n="date_label">NGÀY THI ĐẤU CHÍNH THỨC</div>
                             <div id="scheduleDate" style="font-size:15px;font-weight:900;color:#fff;font-family:var(--font-title);">Thứ Sáu, 07/08/2026</div>
-                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 17:00</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 16:00</div>
                         </div>
                     </div>
 
@@ -6363,7 +6363,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <div>
                             <div style="font-size:11px;font-weight:900;color:#fbbf24;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;" data-i18n="date_label">NGÀY THI ĐẤU CHÍNH THỨC</div>
                             <div id="scheduleDate2" style="font-size:15px;font-weight:900;color:#fff;font-family:var(--font-title);">Thứ Sáu, 07/08/2026</div>
-                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 17:00</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 16:00</div>
                         </div>
                     </div>
 
@@ -8658,7 +8658,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         // HERO COUNTDOWN
         // ============================================================
         function updateHeroCountdown() {
-            const target = new Date('2026-08-07T17:00:00+07:00').getTime();
+            const target = new Date('2026-08-07T16:00:00+07:00').getTime();
             const now = Date.now();
             const diff = Math.max(0, Math.floor((target - now) / 1000));
             const days = Math.floor(diff / 86400);
@@ -12122,10 +12122,10 @@ function renderGallery() {
             setTimeout(initReveal, 300);
         });
 
-            // Smart auto-refresh: 5s during match window (07/08 17:00-21:00), 30s otherwise
+            // Smart auto-refresh: 5s during match window (07/08 16:00-21:00), 30s otherwise
             function getRefreshInterval() {
                 const now = new Date();
-                const matchDay = new Date('2026-08-07T17:00:00+07:00');
+                const matchDay = new Date('2026-08-07T16:00:00+07:00');
                 const matchEnd = new Date('2026-08-07T21:00:00+07:00');
                 return (now >= matchDay && now <= matchEnd) ? 5000 : 30000;
             }
@@ -13840,7 +13840,7 @@ function renderGallery() {
 
             // Follow-up context check (e.g. "Mấy giờ?", "Ở đâu?")
             if ((q === 'mấy giờ?' || q.includes('mấy giờ') || q.includes('ở đâu')) && ptxAiState.previousTopic === 'SCHEDULE') {
-                return `📍 <strong>THỜI GIAN & ĐỊA ĐIỂM THI ĐẤU:</strong><br>• Lễ Khai Mạc: <strong>07:30 AM — Thứ Sáu, 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, Phường 12, Quận Tân Bình, TP.HCM</strong>.<br><br>👉 Nguồn dữ liệu: <em>PTX Summer Cup 2026 • Lịch thi đấu chính thức</em>`;
+                return `📍 <strong>THỜI GIAN & ĐỊA ĐIỂM THI ĐẤU:</strong><br>• Lễ Khai Mạc: <strong>16:00 — Thứ Sáu, 07/08/2026</strong><br>• Địa điểm: <strong>Sân bóng đá 152 Hoàng Hoa Thám, Phường 12, Quận Tân Bình, TP.HCM</strong>.<br><br>👉 Nguồn dữ liệu: <em>PTX Summer Cup 2026 • Lịch thi đấu chính thức</em>`;
             }
 
             // 1. STANDINGS / BXH
