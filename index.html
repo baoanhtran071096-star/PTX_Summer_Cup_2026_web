@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<!-- ANTI-FOUC: apply saved theme/language before any content paints.
+     The full theme + i18n engines live at the bottom of <body>, which is ~3700 lines
+     after the markup starts — without this, a light-theme user sees a flash of the dark
+     palette and an English user a flash of Vietnamese on every page load. -->
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('theme');
+                if (!t && window.matchMedia) {
+                    t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+                }
+                document.documentElement.setAttribute('data-theme', t || 'dark');
+                var l = localStorage.getItem('lang');
+                if (l) document.documentElement.setAttribute('lang', l);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 <!-- CACHE BUSTER & SW UNREGISTER SCRIPT -->
     <script>
         (function() {
@@ -8406,14 +8425,6 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 about_nav: 'About',
                 schedule_nav: 'Schedule',
                 standings_nav: 'Standings',
-                teams_nav: '⚽ Teams',
-                players_nav: '🏃 FIFA Players',
-                stats_nav: '📊 Tournament Stats',
-                gallery_nav: 'Gallery',
-                hof_nav: 'Hall of Fame',
-                rules_nav: 'Rules',
-                contact_nav: 'Contact',
-                admin_nav: 'Admin',
                 committee_staff_title: 'LOGISTICS & MEDIA COMMITTEE',
                 standings_hero: 'PRO STANDINGS',
                 standings_hero_sub: 'Rankings & Championship Battle 2026',
@@ -8602,14 +8613,22 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         };
         const translations = window.translations;
 
+        // Translates a single element (or every [data-i18n] inside a subtree).
+        function translateSubtree(root, lang) {
+            const dict = translations[lang];
+            if (!dict) return;
+            const apply = el => {
+                const key = el.getAttribute('data-i18n');
+                if (key && dict[key] !== undefined) el.innerHTML = dict[key];
+            };
+            if (root.nodeType === 1 && root.hasAttribute('data-i18n')) apply(root);
+            if (root.querySelectorAll) root.querySelectorAll('[data-i18n]').forEach(apply);
+        }
+
         function applyLanguage(lang) {
             currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key] !== undefined) {
-                    el.innerHTML = translations[lang][key];
-                }
-            });
+            document.documentElement.setAttribute('lang', lang);
+            translateSubtree(document.body || document, lang);
             localStorage.setItem('lang', lang);
             document.querySelectorAll('.lang-switch button').forEach(btn => {
                 const bLang = btn.getAttribute ? btn.getAttribute('data-lang') : (btn.dataset ? btn.dataset.lang : null);
@@ -8627,11 +8646,19 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         const savedLang = localStorage.getItem('lang') || 'vi';
         applyLanguage(savedLang);
 
-        document.querySelectorAll('.lang-switch button').forEach(btn => {
-            btn.addEventListener('click', function() {
-                applyLanguage(this.dataset.lang);
-            });
-        });
+        // Dynamically rendered markup (match cards, live centre, …) carries the Vietnamese
+        // default inline, so anything re-rendered after a language switch would silently
+        // revert to Vietnamese. Re-translate injected nodes as they appear.
+        if (window.MutationObserver && document.body) {
+            new MutationObserver(mutations => {
+                if (currentLang === 'vi') return; // Vietnamese is the markup default — nothing to do
+                for (const m of mutations) {
+                    for (const node of m.addedNodes) {
+                        if (node.nodeType === 1) translateSubtree(node, currentLang);
+                    }
+                }
+            }).observe(document.body, { childList: true, subtree: true });
+        }
 
         // ============================================================
         // TOAST SYSTEM
