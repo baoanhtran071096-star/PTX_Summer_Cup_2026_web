@@ -14128,20 +14128,26 @@ function renderGallery() {
             // 3. SCHEDULE / MATCHES / VENUE
             if (q.includes('lịch thi đấu') || q.includes('trận tiếp theo') || q.includes('mấy giờ') || q.includes('ngày diễn ra') || q.includes('địa điểm') || q.includes('sân bóng') || q.includes('khai mạc')) {
                 ptxAiState.previousTopic = 'SCHEDULE';
-                return `Trận tiếp theo của PTX VN là:
+                const upcoming = MATCHES_CONFIG.find(m => !getMatchResult(m.id));
+                if (!upcoming) {
+                    return `🏁 <strong>PTX Summer Cup 2026 đã thi đấu xong toàn bộ ${MATCHES_CONFIG.length} trận!</strong><br>👉 <a href="#standings" onclick="navigateToPage('standings')" style="color:#f97316;font-weight:800;text-decoration:none;">Xem bảng xếp hạng chung cuộc →</a>`;
+                }
+                const homeTeam = teams[upcoming.home] || {};
+                const awayTeam = teams[upcoming.away] || {};
+                return `Trận tiếp theo của PTX Summer Cup 2026 là:
                 <div style="background:rgba(24,24,27,0.9);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:14px;margin-top:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                         <div style="display:flex;align-items:center;gap:8px;font-weight:900;font-size:14px;color:#fff;">
-                            <span style="font-size:20px;">🦅</span> <span>PTX VN</span>
+                            ${renderTeamLogo(homeTeam, '20px')} <span>${homeTeam.name || upcoming.home}</span>
                         </div>
                         <div style="font-weight:900;color:#f97316;font-size:13px;letter-spacing:1px;">VS</div>
                         <div style="display:flex;align-items:center;gap:8px;font-weight:900;font-size:14px;color:#fff;">
-                            <span style="font-size:20px;">🐯</span> <span>TEAM TIGER</span>
+                            ${renderTeamLogo(awayTeam, '20px')} <span>${awayTeam.name || upcoming.away}</span>
                         </div>
                     </div>
                     <div style="font-size:11px;color:#cbd5e1;display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;">
                         <div>📅 <strong>Thứ Sáu, 07/08/2026</strong></div>
-                        <div>🕒 <strong>07:30 AM</strong></div>
+                        <div>🕒 <strong>${String(upcoming.startH).padStart(2,'0')}:${String(upcoming.startM).padStart(2,'0')}</strong></div>
                         <div>📍 <strong>Sân bóng Hoàng Hoa Thám (Sân số 1)</strong></div>
                     </div>
                     <button onclick="navigateToPage('matches')" style="width:100%;margin-top:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(249,115,22,0.2)';this.style.borderColor='#f97316';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.15)';">Xem chi tiết trận đấu →</button>
@@ -14156,16 +14162,24 @@ function renderGallery() {
                 return `👤 <strong>HỒ SƠ CẦU THỦ PTX:</strong><br><div style="background:rgba(24,24,27,0.9);border:1px solid rgba(249,115,22,0.3);border-radius:16px;padding:12px;margin-top:6px;display:flex;gap:12px;align-items:center;"><img src="${searchedPlayer.img}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #f97316;"><div><div style="font-weight:900;color:#fff;font-size:14px;">${searchedPlayer.name} (#${searchedPlayer.number})</div><div style="font-size:11px;color:#cbd5e1;">👕 Áo đấu: <strong>${searchedPlayer.jerseyName || searchedPlayer.name}</strong> • ⚽ ${tName}</div><div style="font-size:11px;color:#fbbf24;margin-top:2px;">Bàn thắng: <strong>${searchedPlayer.goals}</strong> | Kiến tạo: <strong>${searchedPlayer.assists}</strong> | OVR: <strong>${searchedPlayer.ovr || 85}</strong></div></div></div><br>👉 <button onclick="openPlayerModal(${searchedPlayer.id})" style="background:#f97316;color:#fff;border:none;padding:6px 14px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">Xem FUT Card Chi Tiết →</button>`;
             }
 
-            // 5. TEAMS / PHOENIX / TIGER / XIPHIAS
+            // 5. AI PREDICTION / CHAMPIONSHIP ODDS (checked before TEAMS — "dự đoán đội vô địch"
+            // style questions contain "đội" too, and would otherwise get swallowed by branch 6)
+            if (q.includes('dự đoán') || q.includes('vô địch') || q.includes('cơ hội') || q.includes('tỷ lệ thắng')) {
+                ptxAiState.previousTopic = 'PREDICTION';
+                const anyPlayed = standings.some(t => t.p > 0);
+                if (!anyPlayed) {
+                    return `🔮 <strong>DỰ ĐOÁN VÔ ĐỊCH:</strong><br>Giải đấu <strong>chưa khởi tranh trận nào</strong> nên chưa đủ dữ liệu để đưa ra tỷ lệ chính xác. Cả 3 đội đều 8 cầu thủ, thực lực khá cân bằng — hỏi lại mình sau khi có kết quả trận đầu tiên nhé!<br><br>👉 <a href="#fan-prediction" onclick="navigateToPage('fan-prediction')" style="color:#34d399;font-weight:800;text-decoration:none;">Vào Góc CĐV Nhập Vé Dự Đoán →</a>`;
+                }
+                const scored = standings.map(t => ({ ...t, _score: Math.max(0.5, t.pts * 2 + t.gd) }));
+                const total = scored.reduce((s, t) => s + t._score, 0);
+                const lines = scored.map(t => `• ${t.icon} <strong>${t.name}: ${Math.round((t._score / total) * 100)}%</strong>`).join('<br>');
+                return `🔮 <strong>MÔ HÌNH AI DỰ ĐOÁN VÔ ĐỊCH (dựa trên điểm số & hiệu số hiện tại):</strong><br>${lines}<br><br>👉 <a href="#fan-prediction" onclick="navigateToPage('fan-prediction')" style="color:#34d399;font-weight:800;text-decoration:none;">Vào Góc CĐV Nhập Vé Dự Đoán →</a>`;
+            }
+
+            // 6. TEAMS / PHOENIX / TIGER / XIPHIAS
             if (q.includes('đội') || q.includes('team') || q.includes('phoenix') || q.includes('tiger') || q.includes('xiphias')) {
                 ptxAiState.previousTopic = 'TEAMS';
                 return `🛡️ <strong>3 ĐỘI BÓNG TRANH TÀI TẠI PTX SUMMER CUP 2026:</strong><br>• 🦅 <strong>TEAM PHOENIX (TEAM P)</strong> — Đội trưởng: Anh Trương (8 cầu thủ)<br>• 🐯 <strong>TEAM TIGER (TEAM T)</strong> — Đội trưởng: Minh Thế (8 cầu thủ)<br>• 🐟 <strong>TEAM XIPHIAS (TEAM X)</strong> — Đội trưởng: Đình Huy (8 cầu thủ)<br><br>👉 <a href="#teams" onclick="navigateToPage('teams')" style="color:#f97316;font-weight:800;text-decoration:none;">Xem danh sách 3 đội hình chi tiết →</a>`;
-            }
-
-            // 6. AI PREDICTION / CHAMPIONSHIP ODDS
-            if (q.includes('dự đoán') || q.includes('vô địch') || q.includes('cơ hội') || q.includes('tỷ lệ thắng')) {
-                ptxAiState.previousTopic = 'PREDICTION';
-                return `🔮 <strong>MÔ HÌNH AI DỰ ĐOÁN VÔ ĐỊCH (REALTIME 4D):</strong><br>• 🦅 <strong>TEAM PHOENIX: 38%</strong> (Sức mạnh tấn công bùng nổ)<br>• 🐯 <strong>TEAM TIGER: 34%</strong> (Lực sút bóng uy hiếp)<br>• 🐟 <strong>TEAM XIPHIAS: 28%</strong> (Phòng thủ phản công vững chắc)<br><br>👉 <a href="#fan-prediction" onclick="navigateToPage('fan-prediction')" style="color:#34d399;font-weight:800;text-decoration:none;">Vào Góc CĐV Nhập Vé Dự Đoán →</a>`;
             }
 
             // 7. RULES / REGULATION / 5V5 FUTSAL
@@ -14174,9 +14188,64 @@ function renderGallery() {
                 return `📋 <strong>ĐIỀU LỆ & LUẬT THI ĐẤU FUTSAL 5v5 CHUẨN PTX:</strong><br>• Thời gian: <strong>02 hiệp x 15 phút</strong> (Nghỉ giữa hiệp 5 phút).<br>• Khống chế <strong>4 giây</strong> cho các quả đá biên / phát bóng / đá phạt.<br>• Phạt đền 10m từ lỗi tổng hợp thứ 6.<br>• 2 Thẻ vàng = 1 Thẻ đỏ (Phạt rời sân 3 phút).`;
             }
 
-            // 8. UNKNOWN / GROUNDING NOTICE
+            // 8. UNKNOWN — no rule matched. Caller (sendPTXChatMessage) will try the
+            // Gemini fallback via PTX_AI_PROXY_URL before falling back to the canned notice.
             ptxAiState.previousTopic = 'UNKNOWN';
+            return null;
+        }
+
+        function ptxAiNoDataMessage(userInput) {
             return `🤖 <strong>PTX AI Assistant:</strong> Dữ liệu về <em>"${userInput}"</em> hiện chưa có trong cơ sở dữ liệu giải đấu PTX Summer Cup 2026.<br><br>💡 Bạn có thể hỏi mình về:<br>• <strong>Bảng xếp hạng</strong> & điểm số hiện tại<br>• <strong>Vua phá lưới</strong> & chỉ số cầu thủ<br>• <strong>Lịch thi đấu</strong> & địa điểm sân đấu 152 Hoàng Hoa Thám<br>• <strong>Dự đoán vô địch</strong> từ mô hình AI`;
+        }
+
+        // ============================================================
+        // PTX AI — GEMINI FALLBACK (via Cloudflare Worker proxy)
+        // ============================================================
+        // Deployed via cloudflare-worker/ — see cloudflare-worker/README.md.
+        // Left empty until deployed; askPTXAiFallback() throws immediately when empty,
+        // so sendPTXChatMessage() cleanly falls back to ptxAiNoDataMessage().
+        const PTX_AI_PROXY_URL = "";
+
+        function buildPTXAiGroundingContext() {
+            const teams = window.TEAMS_DATA || (typeof TEAMS_DATA !== 'undefined' ? TEAMS_DATA : {});
+            const players = window.PLAYERS_DATA || (typeof PLAYERS_DATA !== 'undefined' ? PLAYERS_DATA : []);
+            const standings = typeof calculateStandings === 'function' ? calculateStandings() : [];
+            return {
+                tournament: {
+                    name: 'PTX Summer Cup 2026',
+                    date: '2026-08-07 (Thứ Sáu)',
+                    openingTime: '16:00',
+                    venue: 'Sân bóng 152 Hoàng Hoa Thám, Phường Bảy Hiền, TP.HCM (Sân số 1)'
+                },
+                teams: Object.values(teams).map(t => ({ id: t.id, name: t.name, captain: t.captain })),
+                matches: MATCHES_CONFIG.map(m => ({
+                    id: m.id, home: teams[m.home]?.name || m.home, away: teams[m.away]?.name || m.away,
+                    time: `${String(m.startH).padStart(2,'0')}:${String(m.startM).padStart(2,'0')}`, pitch: m.pitch,
+                    result: getMatchResult(m.id)
+                })),
+                standings: standings.map(t => ({ name: t.name, played: t.p, points: t.pts, goalDiff: t.gd })),
+                players: players.map(p => ({ name: p.name, jerseyName: p.jerseyName, number: p.number, team: teams[p.team]?.name || p.team, goals: p.goals, assists: p.assists }))
+            };
+        }
+
+        async function askPTXAiFallback(userText) {
+            if (!PTX_AI_PROXY_URL) throw new Error('PTX_AI_PROXY_URL chưa được cấu hình');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 12000);
+            try {
+                const resp = await fetch(PTX_AI_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: userText, grounding: buildPTXAiGroundingContext() }),
+                    signal: controller.signal
+                });
+                if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
+                const data = await resp.json();
+                if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
+                return data.reply;
+            } finally {
+                clearTimeout(timeoutId);
+            }
         }
 
         function sendPTXChatMessage() {
@@ -14209,10 +14278,10 @@ function renderGallery() {
             container.appendChild(typingBubble);
             scrollPTXChatToBottom(true);
 
-            // Compute Grounded Response
+            // Compute Grounded Response (null = no rule matched, needs AI fallback)
             const botReplyHtml = groundedPTXQuery(userText);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (currentStreamId !== ptxAiState.activeStreamId) return; // Stale request check
                 if (typingBubble.parentNode) typingBubble.parentNode.removeChild(typingBubble);
 
@@ -14220,19 +14289,26 @@ function renderGallery() {
                 botBubble.className = 'ai-msg-bubble';
                 botBubble.style.cssText = 'background:#1e293b;border:1px solid rgba(148,163,184,0.2);border-radius:16px 16px 16px 4px;padding:12px 14px;align-self:flex-start;max-width:88%;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:13px;';
                 container.appendChild(botBubble);
-
-                // Token/Character Streaming Response
-                let charIdx = 0;
                 ptxAiState.isStreaming = true;
 
-                // Strip HTML tags for character-by-character reveals, but keep final HTML structure
-                botBubble.innerHTML = botReplyHtml;
-                scrollPTXChatToBottom(true);
+                let finalHtml = botReplyHtml;
+                if (finalHtml === null) {
+                    botBubble.innerHTML = '🤖 <em>Đang phân tích câu hỏi bằng AI...</em>';
+                    scrollPTXChatToBottom(true);
+                    try {
+                        finalHtml = await askPTXAiFallback(userText);
+                    } catch (e) {
+                        finalHtml = ptxAiNoDataMessage(userText);
+                    }
+                    if (currentStreamId !== ptxAiState.activeStreamId) return; // Stale after await
+                }
 
+                botBubble.innerHTML = finalHtml;
+                scrollPTXChatToBottom(true);
                 ptxAiState.isStreaming = false;
 
                 if (typeof speakAIVoice === 'function' && !window.isAIVoiceMuted) {
-                    const cleanText = botReplyHtml.replace(/<[^>]*>/g, '').substring(0, 120);
+                    const cleanText = finalHtml.replace(/<[^>]*>/g, '').substring(0, 120);
                     speakAIVoice(cleanText);
                 }
             }, 350);
