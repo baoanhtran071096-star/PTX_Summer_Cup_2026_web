@@ -7436,6 +7436,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     <!-- ============================================================
     SCRIPTS
     ============================================================ -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js">
     </script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js">
@@ -8827,7 +8828,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
                 // Live API Query for 152 Hoàng Hoa Thám Coordinates
                 try {
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${PTX_VENUE_COORDS.lat}&longitude=${PTX_VENUE_COORDS.lng}&current=temperature_2d,relative_humidity_2d,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2d,precipitation_probability,precipitation,weather_code,wind_speed_10m,uv_index&timezone=Asia%2FHo_Chi_Minh`;
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${PTX_VENUE_COORDS.lat}&longitude=${PTX_VENUE_COORDS.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,uv_index&timezone=Asia%2FHo_Chi_Minh`;
                     const resp = await fetch(url);
                     if (resp.ok) {
                         const data = await resp.json();
@@ -8837,7 +8838,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                         const hourlyForecast = [];
                         for (let h = 14; h <= 19; h++) {
                             const timeStr = `${String(h).padStart(2,'0')}:00`;
-                            const tVal = hourly.temperature_2d ? Math.round(hourly.temperature_2d[h] || (31 - (h - 14) * 0.8)) : (31 - (h - 14));
+                            const tVal = hourly.temperature_2m ? Math.round(hourly.temperature_2m[h] || (31 - (h - 14) * 0.8)) : (31 - (h - 14));
                             const pVal = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[h] || 60) : (h === 17 ? 65 : (h === 16 ? 55 : (h === 18 ? 60 : 40)));
                             hourlyForecast.push({
                                 time: timeStr,
@@ -8847,11 +8848,11 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                             });
                         }
 
-                        const temp = Math.round(current.temperature_2d || 29);
+                        const temp = Math.round(current.temperature_2m || 29);
                         const feels = Math.round(current.apparent_temperature || 33);
                         const pop = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[kickoffH] || 65) : 65;
                         const precAmt = current.precipitation || 2.5;
-                        const humidity = Math.round(current.relative_humidity_2d || 78);
+                        const humidity = Math.round(current.relative_humidity_2m || 78);
                         const wind = Math.round(current.wind_speed_10m || 14);
                         const gust = Math.round(current.wind_gusts_10m || 23);
                         const uv = hourly.uv_index ? Math.round(hourly.uv_index[kickoffH] || 4) : 4;
@@ -11156,8 +11157,8 @@ function renderGallery() {
         // ============================================================
         const GALLERY_PAGE_ITEMS = [
             { cat: 'team', label: 'Đội PHOENIX - TEAM P', img: 'https://i.postimg.cc/66yFg2q3/Doi-hinh-doi-P.jpg', tag: 'TEAM P' },
-            { cat: 'team', label: 'Đội TIGER - TEAM T', img: 'https://i.postimg.cc/dQ9drYDF/Doi-hinh-doi-T.jpg', tag: 'TEAM T' },
-            { cat: 'team', label: 'Đội XIPHIAS - TEAM X', img: 'https://i.postimg.cc/2SRz3PzM/Doi-hinh-doi-X.jpg', tag: 'TEAM X' },
+            { cat: 'team', label: 'Đội TIGER - TEAM T', img: 'thư viện/logo biểu tượng 3 đội/Biểu tượng đội T (Tiger).webp', tag: 'TEAM T' },
+            { cat: 'team', label: 'Đội XIPHIAS - TEAM X', img: 'thư viện/logo biểu tượng 3 đội/Biểu tượng đội X (Xiphias Gladius).webp', tag: 'TEAM X' },
             { cat: 'ceremony', label: 'Lễ Khai Mạc PTX Summer Cup 2026', img: 'thư viện/ảnh logo - banner/Logo Công Đoàn.webp', tag: 'Khai mạc' },
             { cat: 'ceremony', label: 'Logo Công Đoàn PTX Group', img: 'thư viện/ảnh logo - banner/Logo Công Đoàn.webp', tag: 'BTC' },
             { cat: 'team', label: 'Anh Trương - Đội trưởng TEAM P', img: 'thư viện/Ảnh cầu thủ/Anh Trương.webp', tag: 'TEAM P' },
