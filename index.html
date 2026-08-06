@@ -6268,41 +6268,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <input type="text" id="predFanName" placeholder="Ví dụ: Superman, Spider-Man, Iron Man, Batman..." style="width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:10px;color:#fff;font-size:13px;font-weight:600;">
                     </div>
 
-                    <!-- Match Predictions -->
-                    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-                        <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-                            <div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:8px;">⚽ Trận 1: TEAM P (Phoenix) vs TEAM T (Tiger)</div>
-                            <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                                <span style="color:#3b82f6;font-weight:800;font-size:13px;">P</span>
-                                <input type="number" id="predScoreP1" min="0" max="20" value="2" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid #3b82f6;border-radius:8px;color:#fff;font-weight:900;">
-                                <span style="color:#94a3b8;">-</span>
-                                <input type="number" id="predScoreT1" min="0" max="20" value="1" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid #ef4444;border-radius:8px;color:#fff;font-weight:900;">
-                                <span style="color:#ef4444;font-weight:800;font-size:13px;">T</span>
-                            </div>
-                        </div>
-
-                        <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-                            <div style="font-size:12px;font-weight:700;color:#fca5a5;margin-bottom:8px;">⚽ Trận 2: TEAM T (Tiger) vs TEAM X (Xiphias)</div>
-                            <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                                <span style="color:#ef4444;font-weight:800;font-size:13px;">T</span>
-                                <input type="number" id="predScoreT2" min="0" max="20" value="3" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid #ef4444;border-radius:8px;color:#fff;font-weight:900;">
-                                <span style="color:#94a3b8;">-</span>
-                                <input type="number" id="predScoreX2" min="0" max="20" value="2" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid #f59e0b;border-radius:8px;color:#fff;font-weight:900;">
-                                <span style="color:#f59e0b;font-weight:800;font-size:13px;">X</span>
-                            </div>
-                        </div>
-
-                        <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
-                            <div style="font-size:12px;font-weight:700;color:#fcd34d;margin-bottom:8px;">⚽ Trận 3: TEAM X (Xiphias) vs TEAM P (Phoenix)</div>
-                            <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                                <span style="color:#f59e0b;font-weight:800;font-size:13px;">X</span>
-                                <input type="number" id="predScoreX3" min="0" max="20" value="1" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid #f59e0b;border-radius:8px;color:#fff;font-weight:900;">
-                                <span style="color:#94a3b8;">-</span>
-                                <input type="number" id="predScoreP3" min="0" max="20" value="2" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid #3b82f6;border-radius:8px;color:#fff;font-weight:900;">
-                                <span style="color:#3b82f6;font-weight:800;font-size:13px;">P</span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Match Predictions — rendered from MATCHES_CONFIG by renderPredictionMatchInputs().
+                         Previously these three blocks were hardcoded and every fixture was wrong
+                         (P–T, T–X, X–P instead of the official P–X, P–T, X–T), so fans were
+                         predicting matches that do not exist. Generating them from the schedule
+                         is what stops the two drifting apart again. -->
+                    <div id="predMatchInputs" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;"></div>
 
                     <!-- MVP Selection -->
                     <div style="margin-bottom:16px;">
@@ -13515,12 +13486,67 @@ function renderGallery() {
         // ============================================================
         // FAN PREDICTION GAME & LEADERBOARD
         // ============================================================
+        // Scores are keyed by the real match id from MATCHES_CONFIG, never by team letters —
+        // that coupling is what let the form drift out of sync with the official schedule.
         const SAMPLE_PREDICTIONS = [
-            { name: 'Anh Tư', p1: 2, t1: 1, t2: 2, x2: 1, x3: 1, p3: 3, mvpId: 2, points: 14, ticket: 'PTX-8821' },
-            { name: 'Nguyễn Sử', p1: 1, t1: 1, t2: 3, x2: 2, x3: 0, p3: 2, mvpId: 17, points: 12, ticket: 'PTX-4192' },
-            { name: 'Hoàng Nam', p1: 3, t1: 2, t2: 1, x2: 1, x3: 2, p3: 2, mvpId: 11, points: 10, ticket: 'PTX-7530' },
-            { name: 'Đình Huy', p1: 0, t1: 2, t2: 2, x2: 2, x3: 1, p3: 1, mvpId: 4, points: 8, ticket: 'PTX-1048' },
+            { name: 'Anh Tư',     scores: { 1: [2, 1], 2: [2, 1], 3: [1, 3] }, mvpId: 2,  goldenBootId: 2,  ticket: 'PTX-8821' },
+            { name: 'Nguyễn Sử',  scores: { 1: [1, 1], 2: [3, 2], 3: [0, 2] }, mvpId: 17, goldenBootId: 19, ticket: 'PTX-4192' },
+            { name: 'Hoàng Nam',  scores: { 1: [3, 2], 2: [1, 1], 3: [2, 2] }, mvpId: 11, goldenBootId: 13, ticket: 'PTX-7530' },
+            { name: 'Đình Huy',   scores: { 1: [0, 2], 2: [2, 2], 3: [1, 1] }, mvpId: 4,  goldenBootId: 6,  ticket: 'PTX-1048' },
         ];
+
+        const PRED_LIST_KEY = 'ptx_user_predictions_list';
+
+        // Builds one score row per fixture, straight from the official schedule.
+        function renderPredictionMatchInputs() {
+            const host = document.getElementById('predMatchInputs');
+            if (!host || typeof MATCHES_CONFIG === 'undefined') return;
+            const teams = window.TEAMS_DATA || TEAMS_DATA || {};
+            host.innerHTML = MATCHES_CONFIG.map(m => {
+                const h = teams[m.home] || {}, a = teams[m.away] || {};
+                const hc = h.color || 'var(--accent-blue)', ac = a.color || 'var(--accent-red)';
+                const time = String(m.startH).padStart(2, '0') + ':' + String(m.startM).padStart(2, '0');
+                return `
+                <div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size:12px;font-weight:700;color:var(--accent-blue);margin-bottom:8px;">
+                        ⚽ <span data-i18n="pred_match_word">Trận</span> ${m.id} • ${time}: ${h.name || m.home} (${h.fullName || ''}) vs ${a.name || m.away} (${a.fullName || ''})
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
+                        <span style="color:${hc};font-weight:800;font-size:13px;">${(h.name || m.home).replace('TEAM ', '')}</span>
+                        <input type="number" id="predScore_${m.id}_home" min="0" max="20" value="0" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid ${hc};border-radius:8px;color:#fff;font-weight:900;">
+                        <span style="color:#94a3b8;">-</span>
+                        <input type="number" id="predScore_${m.id}_away" min="0" max="20" value="0" style="width:50px;text-align:center;padding:6px;background:#0f172a;border:1px solid ${ac};border-radius:8px;color:#fff;font-weight:900;">
+                        <span style="color:${ac};font-weight:800;font-size:13px;">${(a.name || m.away).replace('TEAM ', '')}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // The single place that decides how many points a prediction is worth.
+        // Every comparison is driven by MATCHES_CONFIG + the real recorded result, so a
+        // prediction can only ever be graded against the fixture it was made for.
+        function scorePrediction(item) {
+            let pts = 0, graded = false;
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                const actual = typeof getMatchResult === 'function' ? getMatchResult(m.id) : null;
+                const guess = item.scores && item.scores[m.id];
+                if (!actual || !guess) return;
+                graded = true;
+                const [gh, ga] = guess.map(n => parseInt(n) || 0);
+                const ah = actual.homeScore, aa = actual.awayScore;
+                if (gh === ah && ga === aa) pts += 3;
+                else if (Math.sign(gh - ga) === Math.sign(ah - aa)) pts += 1;
+            });
+
+            const players = window.PLAYERS_DATA || [];
+            // Award the bonuses against the player who actually leads, not a hardcoded id.
+            const topMvp = [...players].sort((a, b) => (b.mvp || 0) - (a.mvp || 0))[0];
+            if (topMvp && (topMvp.mvp || 0) > 0) { graded = true; if (item.mvpId === topMvp.id) pts += 5; }
+            const topScorer = [...players].sort((a, b) => (b.goals || 0) - (a.goals || 0))[0];
+            if (topScorer && (topScorer.goals || 0) > 0) { graded = true; if (item.goldenBootId === topScorer.id) pts += 5; }
+
+            return { points: pts, graded };
+        }
 
         function initFanPredictionForm() {
             const mvpSelect = document.getElementById('predMvpSelect');
@@ -13538,27 +13564,45 @@ function renderGallery() {
                 if (mvpSelect) mvpSelect.innerHTML = optionsHtml;
                 if (gbSelect) gbSelect.innerHTML = optionsHtml;
             }
+            renderPredictionMatchInputs();
+            restorePredictionForm();
+            ptxPredictionCloud.init();
             renderMyPredictionTicket();
             renderPredictionLeaderboard();
         }
 
+        // Re-populate the form from the fan's saved entry so editing starts from what
+        // they previously submitted instead of silently resetting to zeros.
+        function restorePredictionForm() {
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem('ptx_user_prediction')); } catch (e) {}
+            if (!saved) return;
+            const nameEl = document.getElementById('predFanName');
+            if (nameEl && saved.name) nameEl.value = saved.name;
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                const g = saved.scores && saved.scores[m.id];
+                if (!g) return;
+                const h = document.getElementById('predScore_' + m.id + '_home');
+                const a = document.getElementById('predScore_' + m.id + '_away');
+                if (h) h.value = g[0];
+                if (a) a.value = g[1];
+            });
+            const mvp = document.getElementById('predMvpSelect');
+            const gb = document.getElementById('predGoldenBootSelect');
+            if (mvp && saved.mvpId) mvp.value = saved.mvpId;
+            if (gb && saved.goldenBootId) gb.value = saved.goldenBootId;
+        }
+
         function aiAutoSuggestPrediction() {
-            const p1 = document.getElementById('predScoreP1');
-            const t1 = document.getElementById('predScoreT1');
-            const t2 = document.getElementById('predScoreT2');
-            const x2 = document.getElementById('predScoreX2');
-            const x3 = document.getElementById('predScoreX3');
-            const p3 = document.getElementById('predScoreP3');
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                const h = document.getElementById('predScore_' + m.id + '_home');
+                const a = document.getElementById('predScore_' + m.id + '_away');
+                if (h) h.value = 1 + Math.floor(Math.random() * 3);
+                if (a) a.value = Math.floor(Math.random() * 3);
+            });
+
             const mvpSelect = document.getElementById('predMvpSelect');
             const gbSelect = document.getElementById('predGoldenBootSelect');
-
-            if (p1) p1.value = 2;
-            if (t1) t1.value = 1;
-            if (t2) t2.value = 3;
-            if (x2) x2.value = 2;
-            if (x3) x3.value = 1;
-            if (p3) p3.value = 2;
-
             const sortedByGoals = [...PLAYERS_DATA].sort((a, b) => b.goals - a.goals);
             const topScorer = sortedByGoals[0] || PLAYERS_DATA[0];
             const sortedByMVP = [...PLAYERS_DATA].sort((a, b) => b.mvp - a.mvp);
@@ -13577,22 +13621,119 @@ function renderGallery() {
                 showToast('Vui lòng nhập Họ tên / Nickname CĐV!', 'error');
                 return;
             }
-            const p1 = parseInt(document.getElementById('predScoreP1').value) || 0;
-            const t1 = parseInt(document.getElementById('predScoreT1').value) || 0;
-            const t2 = parseInt(document.getElementById('predScoreT2').value) || 0;
-            const x2 = parseInt(document.getElementById('predScoreX2').value) || 0;
-            const x3 = parseInt(document.getElementById('predScoreX3').value) || 0;
-            const p3 = parseInt(document.getElementById('predScoreP3').value) || 0;
-            const mvpId = parseInt(document.getElementById('predMvpSelect').value) || 1;
-            const goldenBootId = parseInt(document.getElementById('predGoldenBootSelect').value) || 1;
-            const ticketCode = 'PTX-' + Math.floor(1000 + Math.random() * 9000);
+            if (name.length > 40) {
+                showToast('Tên quá dài (tối đa 40 ký tự)!', 'error');
+                return;
+            }
 
-            const userPred = { name, p1, t1, t2, x2, x3, p3, mvpId, goldenBootId, ticket: ticketCode, date: new Date().toLocaleDateString('vi-VN') };
+            const scores = {};
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                scores[m.id] = [
+                    parseInt(document.getElementById('predScore_' + m.id + '_home')?.value) || 0,
+                    parseInt(document.getElementById('predScore_' + m.id + '_away')?.value) || 0
+                ];
+            });
+
+            const existing = (() => { try { return JSON.parse(localStorage.getItem('ptx_user_prediction')) || {}; } catch (e) { return {}; } })();
+            const userPred = {
+                name,
+                scores,
+                mvpId: parseInt(document.getElementById('predMvpSelect').value) || 0,
+                goldenBootId: parseInt(document.getElementById('predGoldenBootSelect').value) || 0,
+                // Keep the original ticket when a fan edits their entry, so the code they
+                // were given stays valid instead of silently changing under them.
+                ticket: existing.ticket || ('PTX-' + Math.floor(1000 + Math.random() * 9000)),
+                date: new Date().toLocaleDateString('vi-VN')
+            };
             localStorage.setItem('ptx_user_prediction', JSON.stringify(userPred));
 
-            showToast('🎉 Xác nhận Thẻ Dự Đoán thành công! Mã: ' + ticketCode, 'success');
+            // Local list keeps the entry visible offline and is the fallback when the
+            // shared board is unreachable; the cloud copy is what other devices see.
+            upsertLocalPrediction({ ...userPred, isUser: true });
+            ptxPredictionCloud.submit(userPred);
+
+            showToast('🎉 Xác nhận Thẻ Dự Đoán thành công! Mã: ' + userPred.ticket, 'success');
             renderMyPredictionTicket();
             renderPredictionLeaderboard();
+        }
+
+        // ============================================================
+        // SHARED PREDICTION LEADERBOARD (Firestore)
+        // ============================================================
+        // Fans are not admins, so they sign in anonymously purely to get a uid: the
+        // document id IS that uid, which lets the security rules allow a fan to write
+        // only their own entry — no impersonating, no spamming, no deleting anyone else.
+        // Requires two one-off console steps (Anonymous auth + publishing the rules);
+        // see PHASE2_FIREBASE_SETUP.md. Until then everything falls back to localStorage,
+        // exactly as before, so the page never breaks.
+        const ptxPredictionCloud = (function () {
+            let db = null, uid = null, ready = false, warned = false;
+            const COLLECTION = 'predictions';
+
+            function available() {
+                return typeof firebase !== 'undefined'
+                    && typeof PTX_FIREBASE_CONFIG !== 'undefined'
+                    && PTX_FIREBASE_CONFIG.apiKey
+                    && !String(PTX_FIREBASE_CONFIG.apiKey).startsWith('DÁN_');
+            }
+
+            function note(err) {
+                if (warned) return;
+                warned = true;
+                console.warn('[PTX Prediction] Bảng xếp hạng chung chưa hoạt động — dùng dữ liệu trên máy này. Lý do:', err && err.message ? err.message : err);
+            }
+
+            // Reading the board is public in the rules, so no sign-in is needed here.
+            // Signing in happens lazily in submit(): doing it on load fired an
+            // identitytoolkit 400 on every visit for every reader, which is noise when
+            // most visitors never submit anything.
+            function init() {
+                if (!available() || !firebase.apps.length) return;
+                try {
+                    db = firebase.firestore();
+                    firebase.auth().onAuthStateChanged(u => { uid = u ? u.uid : null; });
+                    db.collection(COLLECTION).onSnapshot(snap => {
+                        const cloud = [];
+                        snap.forEach(d => cloud.push({ ...d.data(), _id: d.id, isUser: d.id === uid }));
+                        window.__ptxCloudPredictions = cloud;
+                        ready = true;
+                        if (typeof renderPredictionLeaderboard === 'function') renderPredictionLeaderboard();
+                    }, note);
+                } catch (e) { note(e); }
+            }
+
+            function write(pred) {
+                return db.collection(COLLECTION).doc(uid).set({
+                    uid,
+                    name: String(pred.name).slice(0, 40),
+                    scores: pred.scores,
+                    mvpId: pred.mvpId,
+                    goldenBootId: pred.goldenBootId,
+                    ticket: pred.ticket,
+                    updatedAt: Date.now()
+                });
+            }
+
+            function submit(pred) {
+                if (!db) { note('Firestore chưa sẵn sàng'); return; }
+                const go = () => write(pred).catch(note);
+                if (uid) { go(); return; }
+                firebase.auth().signInAnonymously()
+                    .then(cred => { uid = cred.user.uid; go(); })
+                    .catch(note);
+            }
+
+            return { init, submit, isLive: () => !!(ready && Array.isArray(window.__ptxCloudPredictions)) };
+        })();
+
+        function readLocalPredictions() {
+            try { return JSON.parse(localStorage.getItem(PRED_LIST_KEY)) || []; } catch (e) { return []; }
+        }
+
+        function upsertLocalPrediction(entry) {
+            const list = readLocalPredictions().filter(x => x.ticket !== entry.ticket);
+            list.push(entry);
+            localStorage.setItem(PRED_LIST_KEY, JSON.stringify(list));
         }
 
         function renderMyPredictionTicket() {
@@ -13621,10 +13762,14 @@ function renderGallery() {
                         <span>CĐV: <strong style="color:#fbbf24;">${p.name}</strong></span>
                         <span style="font-size:11px;color:#94a3b8;">${p.date || '07/08/2026'}</span>
                     </div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;text-align:center;background:rgba(0,0,0,0.4);padding:12px;border-radius:12px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
-                        <div><div style="color:#94a3b8;margin-bottom:2px;">T.1 (P-T)</div><div style="font-size:15px;font-weight:900;color:#60a5fa;">${p.p1} - ${p.t1}</div></div>
-                        <div><div style="color:#94a3b8;margin-bottom:2px;">T.2 (T-X)</div><div style="font-size:15px;font-weight:900;color:#fca5a5;">${p.t2} - ${p.x2}</div></div>
-                        <div><div style="color:#94a3b8;margin-bottom:2px;">T.3 (X-P)</div><div style="font-size:15px;font-weight:900;color:#fcd34d;">${p.x3} - ${p.p3}</div></div>
+                    <div style="display:grid;grid-template-columns:repeat(${(typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG.length : 3)},1fr);gap:10px;font-size:11px;text-align:center;background:rgba(0,0,0,0.4);padding:12px;border-radius:12px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);">
+                        ${(typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).map(m => {
+                            const t = window.TEAMS_DATA || {};
+                            const g = (p.scores && p.scores[m.id]) || ['–', '–'];
+                            const hn = (t[m.home]?.name || m.home).replace('TEAM ', '');
+                            const an = (t[m.away]?.name || m.away).replace('TEAM ', '');
+                            return `<div><div style="color:#94a3b8;margin-bottom:2px;">T.${m.id} (${hn}-${an})</div><div style="font-size:15px;font-weight:900;color:var(--accent-blue);">${g[0]} - ${g[1]}</div></div>`;
+                        }).join('')}
                     </div>
                     <div style="font-size:12px;color:#e2e8f0;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
                         <span>⭐ Dự đoán MVP:</span> <strong style="color:#60a5fa;">${mvp ? mvp.name : '—'}</strong>
@@ -13716,17 +13861,19 @@ function renderGallery() {
                 ctx.fillRect(40, 150, 520, 110);
             }
 
-            // Match 1
-            ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Trận 1: Phoenix vs Tiger', 60, 175);
-            ctx.fillStyle = '#60a5fa'; ctx.font = '900 22px sans-serif'; ctx.fillText(`${p.p1} - ${p.t1}`, 60, 205);
-
-            // Match 2
-            ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Trận 2: Tiger vs Xiphias', 230, 175);
-            ctx.fillStyle = '#fca5a5'; ctx.font = '900 22px sans-serif'; ctx.fillText(`${p.t2} - ${p.x2}`, 230, 205);
-
-            // Match 3
-            ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif'; ctx.fillText('Trận 3: Xiphias vs Phoenix', 400, 175);
-            ctx.fillStyle = '#fcd34d'; ctx.font = '900 22px sans-serif'; ctx.fillText(`${p.x3} - ${p.p3}`, 400, 205);
+            // One column per fixture, labelled from the schedule (canvas needs literal
+            // colours, so the team hex values are read from TEAMS_DATA rather than a var()).
+            const _t = window.TEAMS_DATA || {};
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach((m, i) => {
+                const x = 60 + i * 170;
+                const g = (p.scores && p.scores[m.id]) || ['–', '–'];
+                const hn = (_t[m.home]?.fullName || m.home);
+                const an = (_t[m.away]?.fullName || m.away);
+                ctx.fillStyle = '#94a3b8'; ctx.font = '12px sans-serif';
+                ctx.fillText(`Trận ${m.id}: ${hn} vs ${an}`, x, 175);
+                ctx.fillStyle = _t[m.home]?.color || '#60a5fa'; ctx.font = '900 22px sans-serif';
+                ctx.fillText(`${g[0]} - ${g[1]}`, x, 205);
+            });
 
             // MVP & Golden Boot Picks
             const gb = (window.PLAYERS_DATA || []).find(player => player.id === (p.goldenBootId || p.mvpId));
@@ -13778,17 +13925,10 @@ function renderGallery() {
             if (!container) return;
             container.innerHTML = '';
 
-            const r1 = localStorage.getItem('ptx_result_1') || '';
-            const r2 = localStorage.getItem('ptx_result_2') || '';
-            const r3 = localStorage.getItem('ptx_result_3') || '';
-
-            const isPreMatch = (!r1 && !r2 && !r3);
-
-            let list = [];
-            try {
-                const stored = localStorage.getItem('ptx_user_predictions_list');
-                if (stored) list = JSON.parse(stored);
-            } catch(e){}
+            // Prefer the shared board when it is live; fall back to this device otherwise.
+            const cloud = window.__ptxCloudPredictions;
+            const isShared = Array.isArray(cloud) && ptxPredictionCloud.isLive();
+            let list = isShared ? cloud.slice() : readLocalPredictions();
 
             // If empty, check if sample predictions enabled
             if (list.length === 0 && localStorage.getItem('ptx_show_sample_predictions') === 'true') {
@@ -13810,46 +13950,27 @@ function renderGallery() {
                 return;
             }
 
-            // Dynamically calculate points based on match results
+            // Every entry is graded by the one scoring function, against MATCHES_CONFIG.
+            let anyGraded = false;
             list.forEach(item => {
-                if (!isPreMatch) {
-                    let pts = 0;
-                    if (r1) {
-                        const s = r1.split('|')[0].trim().split('-');
-                        const gP = parseInt(s[0]) || 0, gT = parseInt(s[1]) || 0;
-                        if (item.p1 === gP && item.t1 === gT) pts += 3;
-                        else if ((item.p1 > item.t1 && gP > gT) || (item.p1 < item.t1 && gP < gT) || (item.p1 === item.t1 && gP === gT)) pts += 1;
-                    }
-                    if (r2) {
-                        const s = r2.split('|')[0].trim().split('-');
-                        const gT = parseInt(s[0]) || 0, gX = parseInt(s[1]) || 0;
-                        if (item.t2 === gT && item.x2 === gX) pts += 3;
-                        else if ((item.t2 > item.x2 && gT > gX) || (item.t2 < item.x2 && gT < gX) || (item.t2 === item.x2 && gT === gX)) pts += 1;
-                    }
-                    if (r3) {
-                        const s = r3.split('|')[0].trim().split('-');
-                        const gX = parseInt(s[0]) || 0, gP = parseInt(s[1]) || 0;
-                        if (item.x3 === gX && item.p3 === gP) pts += 3;
-                        else if ((item.x3 > item.p3 && gX > gP) || (item.x3 < item.p3 && gX < gP) || (item.x3 === item.p3 && gX === gP)) pts += 1;
-                    }
-                    if (item.mvpId === 1) pts += 5;
-                    item.points = pts;
-                } else if (item.points === undefined) {
-                    item.points = 0;
-                }
+                const r = scorePrediction(item);
+                item.points = r.points;
+                if (r.graded) anyGraded = true;
             });
+            const isPreMatch = !anyGraded;
 
             list.sort((a, b) => (b.points || 0) - (a.points || 0));
 
-            // Add clear list action header
-            const clearHeader = document.createElement('div');
-            clearHeader.style.cssText = 'display:flex;justify-content:flex-end;margin-bottom:8px;';
-            clearHeader.innerHTML = `
-                <button onclick="clearAllPredictionsList(); return false;" style="background:rgba(239,68,68,0.15);color:var(--accent-red);border:1px solid rgba(239,68,68,0.3);padding:3px 8px;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer;">
-                    🗑️ Xóa sạch danh sách
-                </button>
+            const header = document.createElement('div');
+            header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;';
+            const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+            header.innerHTML = `
+                <span style="font-size:10px;font-weight:700;color:${isShared ? 'var(--accent-green)' : 'var(--accent-slate)'};">
+                    ${isShared ? '🌐 Bảng xếp hạng chung (đồng bộ mọi thiết bị)' : '📱 Chỉ hiển thị trên máy này'}
+                </span>
+                ${isAdmin ? `<button onclick="clearAllPredictionsList(); return false;" style="background:rgba(239,68,68,0.15);color:var(--accent-red);border:1px solid rgba(239,68,68,0.3);padding:3px 8px;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer;">🗑️ Xóa sạch danh sách</button>` : ''}
             `;
-            container.appendChild(clearHeader);
+            container.appendChild(header);
 
             list.forEach((item, idx) => {
                 const hasPoints = (typeof item.points === 'number' && item.points > 0);
@@ -13867,12 +13988,23 @@ function renderGallery() {
                     ? `<span style="font-size:14px;font-weight:900;color:#fbbf24;font-family:var(--font-title);">${item.points || 0} ĐIỂM</span>`
                     : `<span style="font-size:11px;font-weight:800;color:#38bdf8;background:rgba(56,189,248,0.15);padding:4px 10px;border-radius:10px;border:1px solid rgba(56,189,248,0.3);">⏳ Chờ kết quả</span>`;
 
+                // Summary is built from the schedule too, so the labels always name the
+                // fixture the numbers were actually entered against.
+                const teamsRef = window.TEAMS_DATA || {};
+                const summary = (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).map(m => {
+                    const g = item.scores && item.scores[m.id];
+                    if (!g) return null;
+                    const hn = (teamsRef[m.home]?.name || m.home).replace('TEAM ', '');
+                    const an = (teamsRef[m.away]?.name || m.away).replace('TEAM ', '');
+                    return `${hn}-${an}: ${g[0]}-${g[1]}`;
+                }).filter(Boolean).join(' | ');
+
                 row.innerHTML = `
                     <div style="display:flex;align-items:center;gap:12px;">
                         <span style="font-size:16px;font-weight:900;color:#fbbf24;min-width:28px;">${badge}</span>
                         <div>
                             <div style="font-size:13px;font-weight:800;color:${item.isUser ? '#f97316' : '#fff'};">${item.name}</div>
-                            <div style="font-size:10px;color:#94a3b8;">Mã vé: ${item.ticket} • (P-T: ${item.p1}-${item.t1} | T-X: ${item.t2}-${item.x2} | X-P: ${item.x3}-${item.p3})</div>
+                            <div style="font-size:10px;color:#94a3b8;">Mã vé: ${item.ticket}${summary ? ' • (' + summary + ')' : ''}</div>
                         </div>
                     </div>
                     <div style="text-align:right;">

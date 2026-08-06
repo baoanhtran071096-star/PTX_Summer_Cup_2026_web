@@ -28,6 +28,32 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // ============================================================
+    // BẢNG XẾP HẠNG DỰ ĐOÁN CỦA CĐV (predictions)
+    // ============================================================
+    // CĐV đăng nhập ẨN DANH (Anonymous Auth) chỉ để có một uid riêng. Tên tài liệu
+    // CHÍNH LÀ uid đó, nên luật dưới đây cho phép mỗi người ghi đúng 1 phiếu của
+    // mình — không mạo danh người khác, không spam nhiều phiếu, không xoá phiếu
+    // của ai. Chỉ admin (tài khoản email/password, tức có token.email) mới được xoá.
+    //
+    // ⚠️ Cần bật "Anonymous" trong Firebase Console > Authentication > Sign-in method,
+    //    nếu không CĐV sẽ không ghi được và trang tự động lùi về chế độ chỉ-máy-này.
+    match /predictions/{uid} {
+      allow read: if true;
+
+      allow create, update: if request.auth != null
+                            && request.auth.uid == uid
+                            && request.resource.data.uid == uid
+                            && request.resource.data.name is string
+                            && request.resource.data.name.size() > 0
+                            && request.resource.data.name.size() <= 40
+                            && request.resource.data.keys().hasOnly(
+                                 ['uid', 'name', 'scores', 'mvpId', 'goldenBootId', 'ticket', 'updatedAt']
+                               );
+
+      allow delete: if request.auth != null && request.auth.token.email != null;
+    }
+
     // Mặc định: chặn tất cả những gì không khớp rule ở trên (an toàn theo kiểu "deny by default")
     match /{document=**} {
       allow read, write: if false;
