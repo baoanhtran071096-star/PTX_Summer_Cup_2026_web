@@ -13667,7 +13667,7 @@ function renderGallery() {
         // see PHASE2_FIREBASE_SETUP.md. Until then everything falls back to localStorage,
         // exactly as before, so the page never breaks.
         const ptxPredictionCloud = (function () {
-            let db = null, uid = null, ready = false, warned = false;
+            let db = null, uid = null, ready = false, warned = false, writeOk = null;
             const COLLECTION = 'predictions';
 
             function available() {
@@ -13714,16 +13714,35 @@ function renderGallery() {
                 });
             }
 
+            // Reading the board and writing to it can fail independently (reads are
+            // public, writes need anonymous auth). Telling the fan "submitted!" while the
+            // write silently failed would be a lie, so failures surface as a warning and
+            // the board stops claiming to be shared.
+            function failed(err) {
+                writeOk = false;
+                note(err);
+                if (typeof showToast === 'function') {
+                    showToast('⚠️ Đã lưu dự đoán trên máy này, nhưng CHƯA đồng bộ lên bảng xếp hạng chung.', 'warning');
+                }
+                if (typeof renderPredictionLeaderboard === 'function') renderPredictionLeaderboard();
+            }
+
             function submit(pred) {
-                if (!db) { note('Firestore chưa sẵn sàng'); return; }
-                const go = () => write(pred).catch(note);
+                if (!db) { failed('Firestore chưa sẵn sàng'); return; }
+                const go = () => write(pred)
+                    .then(() => { writeOk = true; if (typeof renderPredictionLeaderboard === 'function') renderPredictionLeaderboard(); })
+                    .catch(failed);
                 if (uid) { go(); return; }
                 firebase.auth().signInAnonymously()
                     .then(cred => { uid = cred.user.uid; go(); })
-                    .catch(note);
+                    .catch(failed);
             }
 
-            return { init, submit, isLive: () => !!(ready && Array.isArray(window.__ptxCloudPredictions)) };
+            // "Shared" means reads work AND writing has not been proven broken.
+            return {
+                init, submit,
+                isLive: () => !!(ready && Array.isArray(window.__ptxCloudPredictions) && writeOk !== false)
+            };
         })();
 
         function readLocalPredictions() {
