@@ -9024,6 +9024,40 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 };
             },
 
+            async getMetNorwayReading(kickoffH) {
+                try {
+                    const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${PTX_VENUE_COORDS.lat}&lon=${PTX_VENUE_COORDS.lng}`;
+                    const resp = await fetch(url, { headers: { 'User-Agent': 'PTXSummerCup2026/1.0 (ptxsummercup.vn)' } });
+                    if (!resp.ok) return null;
+                    const data = await resp.json();
+                    const series = (data && data.properties && data.properties.timeseries) || [];
+                    if (!series.length) return null;
+
+                    // Match day is fixed (2026-08-07); convert local kickoff hour (UTC+7) to UTC to find the closest entry.
+                    const targetUtc = Date.UTC(2026, 7, 7, kickoffH - 7, 0, 0);
+                    let closest = null, closestDiff = Infinity;
+                    for (const entry of series) {
+                        const diff = Math.abs(new Date(entry.time).getTime() - targetUtc);
+                        if (diff < closestDiff) { closestDiff = diff; closest = entry; }
+                    }
+                    if (!closest) return null;
+
+                    const details = (closest.data && closest.data.instant && closest.data.instant.details) || {};
+                    const precip = (closest.data && closest.data.next_1_hours && closest.data.next_1_hours.details && closest.data.next_1_hours.details.precipitation_amount)
+                        ?? (closest.data && closest.data.next_6_hours && closest.data.next_6_hours.details && closest.data.next_6_hours.details.precipitation_amount)
+                        ?? null;
+
+                    return {
+                        temp: typeof details.air_temperature === 'number' ? details.air_temperature : null,
+                        humidity: typeof details.relative_humidity === 'number' ? details.relative_humidity : null,
+                        windSpeed: typeof details.wind_speed === 'number' ? details.wind_speed * 3.6 : null, // m/s -> km/h
+                        precipAmount: typeof precip === 'number' ? precip : null
+                    };
+                } catch (e) {
+                    return null;
+                }
+            },
+
             async getMatchWeather(match) {
                 const id = match ? match.id : 2;
                 const cacheKey = 'ptx_weather_match_' + id;
@@ -9063,14 +9097,27 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                             });
                         }
 
-                        const temp = Math.round(current.temperature_2m || 29);
+                        let temp = Math.round(current.temperature_2m || 29);
                         const feels = Math.round(current.apparent_temperature || 33);
                         const pop = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[kickoffH] || 65) : 65;
-                        const precAmt = current.precipitation || 2.5;
-                        const humidity = Math.round(current.relative_humidity_2m || 78);
-                        const wind = Math.round(current.wind_speed_10m || 14);
+                        let precAmt = current.precipitation || 2.5;
+                        let humidity = Math.round(current.relative_humidity_2m || 78);
+                        let wind = Math.round(current.wind_speed_10m || 14);
                         const gust = Math.round(current.wind_gusts_10m || 23);
                         const uv = hourly.uv_index ? Math.round(hourly.uv_index[kickoffH] || 4) : 4;
+
+                        // Cross-check against a second, independent free model (MET Norway) for
+                        // a consensus reading when both sources are available — same idea as
+                        // "model_consensus" forecasting, using only genuinely free/no-key APIs.
+                        let sourceLabel = 'Open-Meteo GPS (152 Hoàng Hoa Thám)';
+                        const metReading = await this.getMetNorwayReading(kickoffH);
+                        if (metReading) {
+                            if (metReading.temp !== null) temp = Math.round((temp + metReading.temp) / 2);
+                            if (metReading.humidity !== null) humidity = Math.round((humidity + metReading.humidity) / 2);
+                            if (metReading.windSpeed !== null) wind = Math.round((wind + metReading.windSpeed) / 2);
+                            if (metReading.precipAmount !== null) precAmt = Math.round(((precAmt + metReading.precipAmount) / 2) * 10) / 10;
+                            sourceLabel = 'Open-Meteo + MET Norway (đồng thuận đa mô hình)';
+                        }
 
                         const risk = this.calculateWeatherRisk(temp, feels, pop, precAmt, wind, uv);
 
@@ -9093,7 +9140,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                             hourlyForecast: hourlyForecast,
                             risk: risk,
                             updatedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-                            source: 'Open-Meteo GPS (152 Hoàng Hoa Thám)',
+                            source: sourceLabel,
                             location: PTX_VENUE_COORDS.shortName
                         };
 
