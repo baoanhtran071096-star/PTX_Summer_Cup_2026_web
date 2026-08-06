@@ -111,6 +111,145 @@
             --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.08);
         }
 
+        /* ===== PTX MODERN GLASS & UI ENHANCEMENTS ===== */
+        .glass-card-v4 {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+            border-radius: var(--radius-card);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .glass-card-v4:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(241, 90, 36, 0.12);
+            border-color: rgba(241, 90, 36, 0.3);
+        }
+
+        /* 3D Tilt FUT Player Card */
+        .fut-card-container {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .fut-card-v4 {
+            position: relative;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(29, 53, 87, 0.05) 0%, rgba(241, 90, 36, 0.08) 100%);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+        }
+
+        .fut-card-v4:hover {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-2deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 0 20px rgba(241, 90, 36, 0.2);
+        }
+
+        .fut-position-badge {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: inline-block;
+        }
+
+        .fut-badge-fw { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; }
+        .fut-badge-mf { background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white; }
+        .fut-badge-df { background: linear-gradient(135deg, #10B981, #047857); color: white; }
+        .fut-badge-gk { background: linear-gradient(135deg, #F59E0B, #D97706); color: white; }
+
+        /* Pulse Glow for Live Matches */
+        @keyframes pulseGlowRed {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .live-badge-pulse {
+            animation: pulseGlowRed 1.8s infinite;
+        }
+
+        /* Floating Mobile Bottom Nav Polish */
+        .bottom-nav-floating {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 480px;
+            height: 64px;
+            background: var(--nav-blur);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border: 1px solid var(--border-color);
+            border-radius: 32px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 8px;
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        }
+
+        .bottom-nav-floating.nav-hidden {
+            transform: translate(-50%, 100px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Podium Rank Styling */
+        .podium-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .podium-card {
+            flex: 1;
+            max-width: 140px;
+            text-align: center;
+            border-radius: 16px;
+            padding: 16px 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .podium-rank-1 {
+            order: 2;
+            transform: scale(1.08);
+            border-color: #D4A13E;
+            box-shadow: 0 8px 24px rgba(212, 161, 62, 0.25);
+            background: linear-gradient(180deg, rgba(212, 161, 62, 0.1) 0%, var(--bg-card) 100%);
+        }
+        .podium-rank-2 { order: 1; border-color: #94A3B8; }
+        .podium-rank-3 { order: 3; border-color: #B45309; }
+
+        /* Page View Transition Fade */
+        .page.active {
+            animation: pageFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Reset & Base */
         * {
             margin: 0;
@@ -588,57 +727,68 @@
             .quick-goal-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        /* ===== BOTTOM NAV ===== */
+        /* ===== BOTTOM NAV (FLOATING GLASS POLISH) ===== */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: var(--bottom-nav-height);
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 24px);
+            max-width: 480px;
+            height: 64px;
+            background: var(--nav-blur);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border: 1px solid var(--border-color);
+            border-radius: 32px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
             display: none;
             z-index: 999;
             justify-content: space-around;
             align-items: center;
             padding: 0 8px;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
         }
         .bottom-nav .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 2px;
-            padding: 4px 12px;
-            border-radius: 12px;
+            padding: 6px 14px;
+            border-radius: 20px;
             border: none;
             background: transparent;
             color: var(--text-muted);
             font-size: 10px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease, background-color 0.2s ease;
             font-family: var(--font-ui);
             text-decoration: none;
-            min-width: 52px;
+            min-width: 56px;
+            position: relative;
         }
         .bottom-nav .nav-item .icon {
-            font-size: 22px;
+            font-size: 20px;
             line-height: 1;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .bottom-nav .nav-item .label {
-            font-size: 9px;
+            font-size: 9.5px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             font-family: var(--font-ui);
         }
         .bottom-nav .nav-item.active {
             color: var(--ptx-orange);
+            background: rgba(241, 90, 36, 0.1);
         }
         .bottom-nav .nav-item.active .icon {
-            transform: scale(1.1);
+            transform: translateY(-2px) scale(1.15);
+        }
+        .bottom-nav .nav-item:active {
+            transform: scale(0.92);
         }
         @media (max-width: 768px) {
             .bottom-nav {

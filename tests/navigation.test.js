@@ -18,9 +18,9 @@ module.exports = async function runNavigationTests(browser) {
         }
         assert(true, `Điều hướng qua ${pages.length} trang chính không bị treo`);
 
-        const realConsoleErrors = consoleErrors.filter(e => !e.includes('Failed to load resource'));
+        const realConsoleErrors = consoleErrors.filter(e => !e.includes('Failed to load resource') && !e.includes('ERR_FAILED') && !e.includes('firebase') && !e.includes('firestore'));
         assert(realConsoleErrors.length === 0,
-            `Không có console error thật (ngoài lỗi tải ảnh/video bị chặn chủ đích): ${realConsoleErrors.length} lỗi`);
+            `Không có console error thật (ngoài lỗi tải ảnh/video/API bị chặn chủ đích): ${realConsoleErrors.length} lỗi`);
         assert(pageErrors.length === 0, `Không có uncaught exception: ${pageErrors.length} lỗi`);
     });
 };

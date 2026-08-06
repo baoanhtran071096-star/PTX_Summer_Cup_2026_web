@@ -28,17 +28,43 @@ function assert(condition, message) {
     }
 }
 
+const http = require('http');
+const fs = require('fs');
+
 async function withServer(fn) {
-    const server = spawn('python3', ['-m', 'http.server', String(PORT)], {
-        cwd: PROJECT_ROOT,
-        stdio: 'ignore',
+    const server = http.createServer((req, res) => {
+        let filePath = path.join(PROJECT_ROOT, decodeURIComponent(req.url.split('?')[0]));
+        if (filePath.endsWith('/') || fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+            filePath = path.join(filePath, 'index.html');
+        }
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                res.writeHead(404);
+                res.end('Not Found');
+                return;
+            }
+            const ext = path.extname(filePath).toLowerCase();
+            const mimeTypes = {
+                '.html': 'text/html',
+                '.js': 'text/javascript',
+                '.css': 'text/css',
+                '.json': 'application/json',
+                '.webp': 'image/webp',
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg',
+                '.svg': 'image/svg+xml',
+                '.mp4': 'video/mp4'
+            };
+            res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
+            res.end(data);
+        });
     });
-    // Đợi server sẵn sàng
-    await new Promise(resolve => setTimeout(resolve, 800));
+
+    await new Promise(resolve => server.listen(PORT, resolve));
     try {
         await fn();
     } finally {
-        server.kill();
+        await new Promise(resolve => server.close(resolve));
     }
 }
 
