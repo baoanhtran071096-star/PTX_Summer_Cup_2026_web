@@ -6112,7 +6112,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <div>
                             <div style="font-size:11px;font-weight:900;color:#fbbf24;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;" data-i18n="date_label">NGÀY THI ĐẤU CHÍNH THỨC</div>
                             <div id="scheduleDate" style="font-size:15px;font-weight:900;color:#fff;font-family:var(--font-title);">Thứ Sáu, 07/08/2026</div>
-                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 16:00</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;"><span data-i18n="mc_opening_from">⏰ Khai mạc từ</span> 16:00</div>
                         </div>
                     </div>
 
@@ -6690,7 +6690,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <div>
                             <div style="font-size:11px;font-weight:900;color:#fbbf24;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;" data-i18n="date_label">NGÀY THI ĐẤU CHÍNH THỨC</div>
                             <div id="scheduleDate2" style="font-size:15px;font-weight:900;color:#fff;font-family:var(--font-title);">Thứ Sáu, 07/08/2026</div>
-                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;">⏰ Khai mạc từ 16:00</div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px;"><span data-i18n="mc_opening_from">⏰ Khai mạc từ</span> 16:00</div>
                         </div>
                     </div>
 
@@ -8572,6 +8572,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 stat_defense: 'Phòng thủ',
                 stat_speed: 'Tốc độ',
                 stat_power: 'Sức mạnh',
+                lbl_number: 'Số',
+                w_feels: 'Cảm nhận',
+                mc_opening_from: '⏰ Khai mạc từ',
                 live_none: 'Chưa có trận đấu nào đang diễn ra',
                 live_none_sub: 'Hãy quay lại đúng giờ để theo dõi trực tiếp!'
             },
@@ -8819,6 +8822,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 stat_defense: 'Defense',
                 stat_speed: 'Speed',
                 stat_power: 'Power',
+                lbl_number: 'No.',
+                w_feels: 'Feels like',
+                mc_opening_from: '⏰ Opening from',
                 live_none: 'No match is currently live',
                 live_none_sub: 'Check back at kick-off to follow it live!'
             }
@@ -9498,7 +9504,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                             <span class="icon">${weather.conditionIcon}</span>
                             <div>
                                 <div class="temp-main">${weather.temperature}°C</div>
-                                <div class="feels-like">Cảm nhận ${weather.feelsLike}°C</div>
+                                <div class="feels-like"><span data-i18n="w_feels">Cảm nhận</span> ${weather.feelsLike}°C</div>
                             </div>
                         </div>
                         <div class="weather-metrics-grid">
@@ -11208,7 +11214,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             if (teamEl) teamEl.textContent = team ? team.fullName : '';
             const num = player.jerseyNumber || player.number || '';
             const jName = player.jerseyName || player.name;
-            if (posEl) posEl.innerHTML = `<span style="color:#f97316;font-weight:700;">👕 Tên áo: "${jName}"</span> • <span style="color:#38bdf8;font-weight:700;">Số #${num}</span> • [${player.position || ''}]`;
+            if (posEl) posEl.innerHTML = `<span style="color:#f97316;font-weight:700;">👕 Tên áo: "${jName}"</span> • <span style="color:#38bdf8;font-weight:700;"><span data-i18n="lbl_number">Số</span> #${num}</span> • [${player.position || ''}]`;
             if (goalsEl) goalsEl.textContent = player.goals || 0;
             if (assistsEl) assistsEl.textContent = player.assists || 0;
             if (mvpEl) mvpEl.textContent = player.mvp || 0;
@@ -11500,7 +11506,7 @@ function renderGallery() {
                                 <div style="font-size:14px;font-weight:800;color:var(--text-primary);line-height:1.2;">${p.name}</div>
                                 <div style="font-size:11px;font-weight:700;color:#94a3b8;line-height:1.2;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                                     <span style="color:var(--accent-orange);background:rgba(249,115,22,0.12);padding:2px 7px;border-radius:6px;border:1px solid rgba(249,115,22,0.25);">👕 ${jName}</span>
-                                    <span style="color:var(--accent-sky);background:rgba(56,189,248,0.12);padding:2px 7px;border-radius:6px;border:1px solid rgba(56,189,248,0.25);">Số #${jNum}</span>
+                                    <span style="color:var(--accent-sky);background:rgba(56,189,248,0.12);padding:2px 7px;border-radius:6px;border:1px solid rgba(56,189,248,0.25);"><span data-i18n="lbl_number">Số</span> #${jNum}</span>
                                 </div>
                             </div>
                         </div>
@@ -12225,7 +12231,7 @@ function renderGallery() {
                 const jName = p.jerseyName || p.name;
                 const opt = document.createElement('option');
                 opt.value = p.id;
-                opt.textContent = `[${team ? team.name : p.team.toUpperCase()}] ${p.name} — 👕 "${jName}" (Số #${num} • ${p.position})`;
+                opt.textContent = `[${team ? team.name : p.team.toUpperCase()}] ${p.name} — 👕 "${jName}" (<span data-i18n="lbl_number">Số</span> #${num} • ${p.position})`;
                 select.appendChild(opt);
             });
             if (PLAYERS_DATA.length > 0) loadAdminPlayerDetail(PLAYERS_DATA[0].id);
@@ -13403,7 +13409,7 @@ function renderGallery() {
                     const team = teams[p.team];
                     const num = p.jerseyNumber || p.number || '—';
                     const jName = p.jerseyName || p.name;
-                    return `<option value="${p.id}">${p.name} — 👕 "${jName}" (Số #${num} • ${team ? team.name : ''} - ${p.position})</option>`;
+                    return `<option value="${p.id}">${p.name} — 👕 "${jName}" (<span data-i18n="lbl_number">Số</span> #${num} • ${team ? team.name : ''} - ${p.position})</option>`;
                 }).join('');
 
                 if (mvpSelect) mvpSelect.innerHTML = optionsHtml;
