@@ -9077,18 +9077,21 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
                 // Live API Query for 152 Hoàng Hoa Thám Coordinates
                 try {
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${PTX_VENUE_COORDS.lat}&longitude=${PTX_VENUE_COORDS.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,uv_index&timezone=Asia%2FHo_Chi_Minh`;
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${PTX_VENUE_COORDS.lat}&longitude=${PTX_VENUE_COORDS.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,uv_index&models=best_match,ecmwf_ifs04,gfs_seamless,icon_seamless&timezone=Asia%2FHo_Chi_Minh`;
                     const resp = await fetch(url);
                     if (resp.ok) {
                         const data = await resp.json();
                         const current = data.current || {};
                         const hourly = data.hourly || {};
+                        const hTemp = hourly.temperature_2m_best_match;
+                        const hPop = hourly.precipitation_probability_best_match;
+                        const hUv = hourly.uv_index_best_match;
 
                         const hourlyForecast = [];
                         for (let h = 14; h <= 19; h++) {
                             const timeStr = `${String(h).padStart(2,'0')}:00`;
-                            const tVal = hourly.temperature_2m ? Math.round(hourly.temperature_2m[h] || (31 - (h - 14) * 0.8)) : (31 - (h - 14));
-                            const pVal = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[h] || 60) : (h === 17 ? 65 : (h === 16 ? 55 : (h === 18 ? 60 : 40)));
+                            const tVal = hTemp ? Math.round(hTemp[h] || (31 - (h - 14) * 0.8)) : (31 - (h - 14));
+                            const pVal = hPop ? Math.round(hPop[h] || 60) : (h === 17 ? 65 : (h === 16 ? 55 : (h === 18 ? 60 : 40)));
                             hourlyForecast.push({
                                 time: timeStr,
                                 temp: Math.round(tVal),
@@ -9099,12 +9102,43 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
                         let temp = Math.round(current.temperature_2m || 29);
                         const feels = Math.round(current.apparent_temperature || 33);
-                        const pop = hourly.precipitation_probability ? Math.round(hourly.precipitation_probability[kickoffH] || 65) : 65;
+                        const pop = hPop ? Math.round(hPop[kickoffH] || 65) : 65;
                         let precAmt = current.precipitation || 2.5;
                         let humidity = Math.round(current.relative_humidity_2m || 78);
                         let wind = Math.round(current.wind_speed_10m || 14);
                         const gust = Math.round(current.wind_gusts_10m || 23);
-                        const uv = hourly.uv_index ? Math.round(hourly.uv_index[kickoffH] || 4) : 4;
+                        const uv = hUv ? Math.round(hUv[kickoffH] || 4) : 4;
+
+                        // Explicit multi-model spread (ECMWF/GFS/ICON) at kickoff hour, to surface
+                        // forecast confidence instead of hiding disagreement behind one blended number.
+                        const modelKeys = ['ecmwf_ifs04', 'gfs_seamless', 'icon_seamless'];
+                        const modelTemps = modelKeys
+                            .map(k => hourly['temperature_2m_' + k] ? hourly['temperature_2m_' + k][kickoffH] : null)
+                            .filter(v => typeof v === 'number');
+                        const modelPops = modelKeys
+                            .map(k => hourly['precipitation_probability_' + k] ? hourly['precipitation_probability_' + k][kickoffH] : null)
+                            .filter(v => typeof v === 'number');
+                        const spread = arr => arr.length >= 2 ? Math.max(...arr) - Math.min(...arr) : 0;
+                        const tempSpread = spread(modelTemps);
+                        const popSpread = spread(modelPops);
+
+                        let modelConfidence = null;
+                        if (modelTemps.length >= 2) {
+                            let level, label;
+                            if (tempSpread <= 2 && popSpread <= 15) {
+                                level = 'HIGH'; label = 'Các mô hình dự báo đồng thuận cao';
+                            } else if (tempSpread <= 4 && popSpread <= 30) {
+                                level = 'MEDIUM'; label = 'Các mô hình dự báo khá đồng thuận';
+                            } else {
+                                level = 'LOW'; label = 'Các mô hình dự báo lệch nhau — theo dõi sát hơn';
+                            }
+                            modelConfidence = {
+                                level, label,
+                                tempSpread: Math.round(tempSpread * 10) / 10,
+                                popSpread: Math.round(popSpread),
+                                modelCount: modelTemps.length
+                            };
+                        }
 
                         // Cross-check against a second, independent free model (MET Norway) for
                         // a consensus reading when both sources are available — same idea as
@@ -9139,6 +9173,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                             dewPoint: 24,
                             hourlyForecast: hourlyForecast,
                             risk: risk,
+                            modelConfidence: modelConfidence,
                             updatedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
                             source: sourceLabel,
                             location: PTX_VENUE_COORDS.shortName
@@ -9177,6 +9212,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                         { time: '19:00', temp: 27, pop: 40, isKickoff: kickoffH === 19 }
                     ],
                     risk: this.calculateWeatherRisk(29, 33, 65, 2.5, 14, 4),
+                    modelConfidence: null,
                     updatedAt: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
                     source: 'PTX Radar (152 Hoàng Hoa Thám)',
                     location: PTX_VENUE_COORDS.shortName
@@ -9260,6 +9296,11 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                         <div class="risk-badge" style="background:${weather.risk.color};">${weather.risk.label}</div>
                         <div class="risk-message">${weather.risk.message}</div>
                     </div>
+                    ${weather.modelConfidence ? `
+                    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:11px;color:#94a3b8;">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${weather.modelConfidence.level === 'HIGH' ? '#10b981' : weather.modelConfidence.level === 'MEDIUM' ? '#fbbf24' : '#ef4444'};"></span>
+                        <span>${weather.modelConfidence.label} <em style="opacity:0.7;">(${weather.modelConfidence.modelCount} mô hình: ECMWF, GFS, ICON — lệch ${weather.modelConfidence.tempSpread}°C / ${weather.modelConfidence.popSpread}% mưa)</em></span>
+                    </div>` : ''}
                 </div>
             `;
         }
