@@ -2086,31 +2086,31 @@
             width: 0%;
         }
         .team-stat-card.team-p .logo-badge {
-            background: linear-gradient(135deg, #1A5BB5, #4A90E2);
+            background: linear-gradient(135deg, var(--team-p-color), #4A90E2);
         }
         .team-stat-card.team-p .t-name {
             color: var(--team-p-color);
         }
         .team-stat-card.team-p .stat-bar .fill {
-            background: linear-gradient(90deg, #1A5BB5, #4A90E2);
+            background: linear-gradient(90deg, var(--team-p-color), #4A90E2);
         }
         .team-stat-card.team-t .logo-badge {
-            background: linear-gradient(135deg, #D32F2F, #F44336);
+            background: linear-gradient(135deg, var(--team-t-color), #F44336);
         }
         .team-stat-card.team-t .t-name {
             color: var(--team-t-color);
         }
         .team-stat-card.team-t .stat-bar .fill {
-            background: linear-gradient(90deg, #D32F2F, #F44336);
+            background: linear-gradient(90deg, var(--team-t-color), #F44336);
         }
         .team-stat-card.team-x .logo-badge {
-            background: linear-gradient(135deg, #F5A623, #FFC107);
+            background: linear-gradient(135deg, var(--team-x-color), #FFC107);
         }
         .team-stat-card.team-x .t-name {
             color: var(--team-x-color);
         }
         .team-stat-card.team-x .stat-bar .fill {
-            background: linear-gradient(90deg, #F5A623, #FFC107);
+            background: linear-gradient(90deg, var(--team-x-color), #FFC107);
         }
 
         /* ===== PLAYER CARD FIFA ===== */
@@ -7772,12 +7772,17 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         // ============================================================
         // DATA
         // ============================================================
+        // NOTE: `color` must stay a literal hex — it is fed to canvas (ctx.fillStyle in the
+        // formation pitch and ticket renderers), which cannot resolve var(). Keep these three
+        // values identical to --team-p/t/x-color in the :root block; they used to drift
+        // (#1A5BB5 / #D32F2F / #F5A623 here vs #3B82F6 / #EF4444 / #F59E0B in CSS), so the
+        // same team rendered in two different shades depending on which layer drew it.
         const TEAMS_DATA = {
-            p: { id: 'p', name: 'TEAM P', fullName: 'PHOENIX', icon: '🦅', color: '#1A5BB5', captain: 'Anh Trương', stats: { attack: 92,
+            p: { id: 'p', name: 'TEAM P', fullName: 'PHOENIX', icon: '🦅', color: '#3B82F6', captain: 'Anh Trương', stats: { attack: 92,
                     defense: 88, speed: 90, power: 85 }, ovr: 89, logo: encodeURI('thư viện/logo biểu tượng 3 đội/Biểu tượng đội P (Phoenix).webp') },
-            t: { id: 't', name: 'TEAM T', fullName: 'TIGER', icon: '🐯', color: '#D32F2F', captain: 'Minh Thế', stats: { attack: 88,
+            t: { id: 't', name: 'TEAM T', fullName: 'TIGER', icon: '🐯', color: '#EF4444', captain: 'Minh Thế', stats: { attack: 88,
                     defense: 85, speed: 80, power: 90 }, ovr: 86, logo: encodeURI('thư viện/logo biểu tượng 3 đội/Biểu tượng đội T (Tiger).webp') },
-            x: { id: 'x', name: 'TEAM X', fullName: 'XIPHIAS', icon: '🐟', color: '#F5A623', captain: 'Đình Huy', stats: { attack: 85,
+            x: { id: 'x', name: 'TEAM X', fullName: 'XIPHIAS', icon: '🐟', color: '#F59E0B', captain: 'Đình Huy', stats: { attack: 85,
                     defense: 90, speed: 95, power: 82 }, ovr: 88, logo: encodeURI('thư viện/logo biểu tượng 3 đội/Biểu tượng đội X (Xiphias Gladius).webp') }
         };
 
@@ -9512,8 +9517,8 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 const awayCorners = LIVE_STATS_DATA.corners[1];
                 const homeFouls = LIVE_STATS_DATA.fouls[0];
                 const awayFouls = LIVE_STATS_DATA.fouls[1];
-                const homeColor = homeTeam.color || '#1A5BB5';
-                const awayColor = awayTeam.color || '#D32F2F';
+                const homeColor = homeTeam.color || '#3B82F6';
+                const awayColor = awayTeam.color || '#EF4444';
 
                 liveStatsHtml = `
                     <div class="live-stats">
