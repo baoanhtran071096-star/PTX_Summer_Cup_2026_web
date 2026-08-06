@@ -134,7 +134,11 @@
             --bg-modal: #0F172A;
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
-            --text-muted: #64748B;
+            /* Was #64748B, which only reached 3.07:1 on --bg-card and accounted for ~74
+               of the dark theme's contrast failures. #8A97AB clears AA on both the card
+               (4.94:1) and the page background (6.03:1) while staying dimmer than
+               --text-secondary, so the muted/secondary hierarchy survives. */
+            --text-muted: #8A97AB;
             --border-color: rgba(255, 255, 255, 0.08);
             --input-bg: #1E293B;
             --nav-blur: rgba(15, 23, 42, 0.90);
@@ -148,6 +152,14 @@
             --accent-amber: #fbbf24;
             --accent-green: #10b981;
             --accent-slate: #94a3b8;
+
+            /* The brand orange serves two roles with opposite contrast needs: as TEXT on a
+               dark card #F15A24 only reaches 4.34:1, while as a button FILL behind white
+               text it reaches 3.37:1 — brightening fixes one and breaks the other. Split
+               the roles so each can be tuned independently; --ptx-orange itself is left
+               untouched so borders, glows and brand accents keep the exact brand hue. */
+            --brand-text: #F97316;  /* 5.22:1 on --bg-card */
+            --brand-fill: #C2410C;  /* white text on it: 5.18:1 */
         }
 
         [data-theme="light"] {
@@ -182,17 +194,12 @@
             --team-p-color: #1D4ED8;  /* was #3B82F6 → 3.68:1 */
             --team-t-color: #B91C1C;  /* was #EF4444 → 3.76:1 */
             --team-x-color: #B45309;  /* was #F59E0B → 2.15:1 */
+            --brand-text: #C2410C;
+            --brand-fill: #C2410C;
         }
 
-        /* Light-theme contrast repairs for rules that hardcode a dark-theme accent.
-           Scoped under [data-theme="light"] so the dark palette is untouched; the
-           !important mirrors the specificity of the base rules being corrected. */
-        [data-theme="light"] .prediction-btn { color: var(--accent-orange) !important; }
-        [data-theme="light"] .vip-btn { color: var(--accent-amber) !important; }
-        [data-theme="light"] .live-btn { color: var(--accent-red) !important; }
-        [data-theme="light"] .lang-switch button { color: #475569; }
-        [data-theme="light"] .match-card-v3 .match-status { color: #334155; }
-        [data-theme="light"] .video-play-btn { background: var(--accent-orange); }
+        /* NOTE: the contrast repairs that need to beat existing rules live in the last
+           <style> block before </head>, so they come after everything they override. */
 
         /* ===== ACCESSIBILITY FOCUS STATES ===== */
         :focus-visible {
@@ -5229,6 +5236,40 @@
             border-radius: 18px !important;
             display: block !important;
         }
+
+        /* ============================================================
+           WCAG CONTRAST REPAIRS
+           Deliberately last in the cascade: every rule here corrects an earlier
+           declaration, and most match at equal specificity, so source order is what
+           makes them win. Moving this block earlier silently disables it.
+           ============================================================ */
+
+        /* Accent hues hardcoded for dark surfaces, unreadable as text on light ones. */
+        [data-theme="light"] .prediction-btn { color: var(--accent-orange) !important; }
+        [data-theme="light"] .vip-btn { color: var(--accent-amber) !important; }
+        [data-theme="light"] .live-btn { color: var(--accent-red) !important; }
+
+        /* These two keep a light surface in BOTH themes (painted #f1f5f9 / #e2e8f0
+           regardless), so they need dark ink either way — a theme-scoped override
+           would only ever fix half the cases. */
+        .lang-switch button { color: #475569; }
+        .lang-switch button.active { color: var(--brand-fill); }
+        .match-card-v3 .match-status { color: #334155; }
+
+        /* White text on a #F15A24 fill is only 3.37:1; --brand-fill is the darkened
+           shade that reaches 5.18:1 while reading as the same brand orange. */
+        .hero-ctas .btn-hero-primary,
+        .live-center .live-cta,
+        .team-stat-card .ovr-badge,
+        .video-play-btn { background: var(--brand-fill); }
+
+        /* The rules-page CTA carries .btn-hero.btn-hero-primary but sits outside
+           .hero-ctas, so the scoped rule never matched it and it fell back to the
+           browser's default link blue (#0000EE on the dark page — 1.90:1). */
+        .btn-hero-primary { background: var(--brand-fill); color: var(--white); }
+
+        /* Brand orange as small text on dark cards (team stat values): 4.34:1. */
+        .team-stat-card .stat-row .stat-label .val { color: var(--brand-text); }
 </style>
 </head>
 <body>
@@ -6342,7 +6383,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                     <div class="video-clip-card active" onclick="loadVideoClip('thư viện/Media/5.mp4',this)">
                         <img src="thư viện/ảnh logo - banner/banner PTX Summer Cup.webp" alt="Highlight" class="video-clip-bg">
-                        <div class="video-play-btn" style="background:var(--accent-orange);">🔥</div>
+                        <div class="video-play-btn">🔥</div>
                         <div class="video-clip-overlay" style="border-top:1px solid #f97316;">
                             <div style="font-size:12px;font-weight:900;color:#fbbf24;">🔥 Highlight PTX Summer Cup 2026</div>
                             <div style="font-size:10px;color:#fdba74;font-weight:800;">Toàn cảnh giải đấu chính thức</div>
@@ -11331,7 +11372,7 @@ function renderGallery() {
             if (!container) return;
             const sorted = [...PLAYERS_DATA].filter(p => p.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists);
             if (sorted.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;color:#475569;font-size:14px;">⏳ Chưa có bàn thắng nào được ghi nhận</div>';
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px;">⏳ Chưa có bàn thắng nào được ghi nhận</div>';
                 return;
             }
             const medals = ['🥇','🥈','🥉'];
