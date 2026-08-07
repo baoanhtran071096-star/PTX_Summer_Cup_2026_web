@@ -6,7 +6,7 @@
 // đổi lần này: mọi khách đã từng mở trang đang giữ bản HTML cũ trong cache
 // 'ptx-cup-2026-v2-r13' và sẽ không bao giờ tự thoát ra được (xem ghi chú ở
 // handler 'fetch' bên dưới).
-const CACHE_NAME = 'ptx-cup-2026-v3-navfix';
+const CACHE_NAME = 'ptx-cup-2026-v4-navfix';
 const STATIC_ASSETS = [
     './index.html',
     './manifest.json',
@@ -61,8 +61,18 @@ self.addEventListener('fetch', (event) => {
     // Dùng `request.mode === 'navigate'` thay cho việc đoán theo đường dẫn: trình duyệt
     // đánh dấu như vậy cho MỌI lần điều hướng tới một trang, bất kể URL nằm ở đâu.
     if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('.js')) {
+        // `cache: 'no-cache'` buộc hỏi lại máy chủ mỗi lần, thay vì tin bộ nhớ đệm HTTP.
+        // Cần thiết vì GitHub Pages trả `Cache-Control: max-age=600`: nếu không có dòng
+        // này thì fetch() bên dưới vẫn lấy bản cũ trong bộ nhớ đệm trình duyệt suốt 10
+        // phút, nên dù service worker đã sửa đúng, người dùng vẫn thấy bản cũ. Đã đo:
+        // mạng trả bản mới, cache service worker có bản mới, mà màn hình vẫn hiện bản cũ.
+        //
+        // Cố ý dùng 'no-cache' chứ KHÔNG dùng 'no-store': 'no-cache' vẫn gửi kèm ETag nên
+        // khi file không đổi máy chủ trả 304 rỗng, không phải tải lại index.html gần 900KB.
+        // 'no-store' sẽ tải lại toàn bộ mỗi lần mở trang — rất tốn băng thông khi nhiều
+        // người liên tục F5 xem tỷ số, và đặc biệt nguy với hạn mức 360MB/ngày của Firebase.
         event.respondWith(
-            fetch(event.request).then((response) => {
+            fetch(event.request, { cache: 'no-cache' }).then((response) => {
                 if (response.ok) {
                     const clone = response.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
