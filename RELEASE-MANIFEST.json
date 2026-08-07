@@ -1,8 +1,10 @@
 {
-  "release": "PTX Summer Cup 2026 Production Candidate R26",
-  "version": "R26-PRODUCTION",
+  "release": "PTX Summer Cup 2026 Production Candidate R27",
+  "version": "R27-PRODUCTION",
   "timestamp": "2026-08-07T00:00:00.000Z",
-  "status": "PRODUCTION-READY (mã nguồn sẵn sàng, 23/23 test PASS) — NHƯNG CHƯA DEPLOY lên hosting thật, xem Phase 5 trong knownRemainingIssues",
+  "status": "ĐANG CHẠY THẬT (LIVE) — trang đã public, 23/23 test PASS, CI tự chạy trên mỗi lần push",
+  "liveUrl": "https://baoanhtran071096-star.github.io/PTX_Summer_Cup_2026_web/",
+  "hostingThucTe": "GitHub Pages (workflow 'pages build and deployment' của GitHub tự deploy mỗi lần push vào main). LƯU Ý: firebase.json và .firebaserc trong repo cấu hình cho Firebase Hosting nhưng THỰC TẾ KHÔNG ĐƯỢC DÙNG để host — Firebase chỉ dùng cho Firestore (đồng bộ tỷ số, bảng dự đoán) và Authentication. Đừng nhầm hai thứ này.",
   "canonicalEntryFile": "index.html",
   "note": "index.html là file HTML DUY NHẤT dùng để deploy. Các bản ghi phiên bản cũ hơn (R2-R6, file 'Update Version 2.4', v.v.) đã được chuyển vào thư mục archive/ để tránh nhầm lẫn — không dùng các file trong archive/ để deploy.",
   "changesInR13": [
@@ -24,8 +26,9 @@
   },
   "checksumNote": "CẢ HAI giá trị của R25 đều đã sai và được thay ở R26. (1) index.html ghi a3c7edc0... nhưng CHƯA BAO GIỜ khớp: ngay tại commit đầu tiên 42e3479 file này đã băm ra 8130d0f9... — nghĩa là khối checksum mà báo cáo R6 gọi là 'Cryptographic Audit Verification' thực tế chưa từng xác minh được điều gì. (2) ptx_migration_data.json ghi 030a6aad... vốn ĐÚNG tại thời điểm R25, nhưng đã cũ kể từ commit 16428e1 (06/08/2026) sửa lại dữ liệu 24 cầu thủ mà không cập nhật manifest.",
   "knownRemainingIssues": [
-    "PHASE 5 (deploy chính thức + domain) CHƯA LÀM — đây là việc còn lại lớn nhất. Firebase Hosting đã cấu hình sẵn (firebase.json + .firebaserc trỏ project ptx-summer-cup-2026), chỉ còn chạy `firebase deploy`. Muốn deploy tự động thì tạo secret FIREBASE_SERVICE_ACCOUNT rồi bỏ comment mẫu job ở cuối .github/workflows/ci.yml",
-    "CẦN TEST THẬT sau khi deploy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5. Bộ test tự động KHÔNG phủ được phần này vì nó chặn toàn bộ request ra ngoài (tests/test-utils.js dòng 98) để chạy độc lập với mạng",
+    "PHẢI DEPLOY LẠI CLOUDFLARE WORKER: đã sửa ALLOWED_ORIGINS trong cloudflare-worker/worker.js nhưng bản đang chạy trên Cloudflare VẪN LÀ BẢN CŨ. Sửa trong repo không tự có hiệu lực. Chủ dự án cần chạy `cd cloudflare-worker && wrangler deploy`, rồi kiểm tra lại bằng lệnh curl trong README (mong đợi HTTP 200 thay vì 403). Chừng nào chưa deploy lại, trợ lý AI trên trang thật vẫn mất phần trả lời ngoài 8 nhánh rule-based",
+    "Phase 5 phần TÊN MIỀN RIÊNG chưa làm: trang đang chạy trên địa chỉ github.io. Tên miền ptxsummercup.vn mới chỉ tồn tại trong ALLOWED_ORIGINS của worker chứ chưa được mua/trỏ. Riêng phần deploy thì ĐÃ XONG từ trước qua GitHub Pages — các bản R25/R26 ghi 'Phase 5 chưa làm' là SAI, xem changesInR27",
+    "CẦN TEST THẬT trên trang đang chạy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5. Bộ test tự động KHÔNG phủ được phần này vì nó chặn toàn bộ request ra ngoài (tests/test-utils.js dòng 98) để chạy độc lập với mạng",
     "1 ảnh đội hình (Team P) vẫn phụ thuộc postimg.cc — index.html dòng 11832. Hai ảnh còn lại (Team T/X) đã đưa về local ở các bản trước; ảnh này chưa có file gốc",
     "index.html nay đã 15.832 dòng (R25 ghi ~12.700) — Phase 3 (tách module) vẫn hoãn. Nên làm SAU khi deploy thành công, vì đây là refactor rủi ro cao nhất trong danh sách",
     "Repo đặt core.autocrlf=true nhưng KHÔNG có .gitattributes, nên byte trên đĩa khác nhau giữa Windows và Linux. Không ảnh hưởng web chạy, nhưng khiến mọi checksum tính trên file ở đĩa mất giá trị (xem checksumMethod). Thêm .gitattributes sẽ sửa dứt điểm nhưng tạo 1 diff rất lớn — cân nhắc làm riêng, không gộp vào commit tính năng",
@@ -133,5 +136,14 @@
     "Thay toàn bộ khối checksums vốn đã sai (chi tiết ở checksumNote) và bổ sung checksumMethod để lần sau tính lại đúng cách, tái lập được trên mọi hệ điều hành",
     "Cập nhật knownRemainingIssues theo đúng hiện trạng: postimg.cc còn 1 ảnh chứ không phải 3, index.html đã 15.832 dòng chứ không phải ~12.700, và bổ sung 2 vấn đề chưa từng được ghi (thiếu .gitattributes, docker-compose trỏ vào thư mục không tồn tại)",
     "QA: chạy lại bộ test sau toàn bộ thay đổi — 23/23 PASS. Lưu ý R17 ghi 16 test, con số thật hiện tại là 23"
+  ],
+  "changesInR27": [
+    "PHÁT HIỆN: trang web ĐÃ CHẠY THẬT từ trước mà không tài liệu nào ghi lại. Sau khi bật CI và xem danh sách workflow trên GitHub mới lộ ra workflow 'pages build and deployment' đã chạy thành công từ các commit trước — tức GitHub Pages vốn đã bật và tự deploy mỗi lần push. Đã kiểm chứng bằng cách tải thật địa chỉ github.io: trang trả về đúng tiêu đề. Mọi bản R25/R26 ghi 'Phase 5 chưa deploy' đều SAI, nay đã sửa cùng với việc bổ sung liveUrl và hostingThucTe",
+    "FIX QUAN TRỌNG (lỗi chỉ tồn tại trên bản production): ALLOWED_ORIGINS trong cloudflare-worker/worker.js chỉ liệt kê ptxsummercup.vn, www.ptxsummercup.vn và localhost — KHÔNG có tên miền github.io mà trang thật đang chạy. Hệ quả: worker trả 403 cho mọi yêu cầu từ trang thật, nên phần fallback Groq của trợ lý PTX AI đã CHẾT HOÀN TOÀN trên bản production, mọi câu hỏi ngoài 8 nhánh rule-based đều không có lời đáp",
+    "Lỗi trên rất khó lộ vì regex trong isAllowedOrigin() luôn cho phép localhost — thử ở máy dev thì lúc nào cũng chạy tốt, chỉ hỏng đúng ở nơi không ai thử. Đã xác minh bằng 2 request curl thật tới worker đang chạy: Origin github.io trả HTTP 403 kèm 'Origin không được phép', Origin localhost trả HTTP 200",
+    "Đã thêm tên miền github.io vào ALLOWED_ORIGINS, kèm ghi chú rằng header Origin chỉ gồm scheme + host (không có đường dẫn) nên dòng này mở cho mọi project page cùng tài khoản — chấp nhận được vì là tài khoản chính chủ, nhưng nên bỏ khi đã có tên miền riêng",
+    "cloudflare-worker/README.md: sửa lệnh curl kiểm tra vốn dùng Origin ptxsummercup.vn (tên miền chưa tồn tại) nên luôn báo 403 dù worker hoàn toàn bình thường — người làm theo hướng dẫn sẽ tưởng proxy hỏng. Thêm hẳn một mục cảnh báo phải giữ ALLOWED_ORIGINS khớp với tên miền thật mỗi khi đổi chỗ host",
+    "LƯU Ý VẬN HÀNH: sửa worker.js trong repo KHÔNG tự động cập nhật worker đang chạy trên Cloudflare. Bắt buộc chạy `wrangler deploy` thủ công thì lỗi 403 mới thật sự hết",
+    "XÁC NHẬN CI ĐÃ CHẠY THẬT: sau khi push, workflow 'PTX Summer Cup 2026 CI/CD Pipeline' chạy lần đầu tiên trong lịch sử dự án trên ubuntu-latest và kết luận success — 23 test qua hết trên Linux, đúng như phần kiểm tra chuẩn hoá Unicode NFC đã dự đoán trước khi chuyển file"
   ]
 }

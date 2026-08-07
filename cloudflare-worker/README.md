@@ -71,11 +71,27 @@ Lưu file — PTX AI Assistant sẽ tự động gọi Groq cho mọi câu hỏi
 ```bash
 curl -X POST https://ptx-ai-proxy.<your-subdomain>.workers.dev \
   -H "Content-Type: application/json" \
-  -H "Origin: https://ptxsummercup.vn" \
+  -H "Origin: https://baoanhtran071096-star.github.io" \
   -d '{"message":"Cho tôi lời khuyên chiến thuật","grounding":{}}'
 ```
 
 Nếu thấy `{"reply": "..."}` là proxy đã hoạt động.
+
+## ⚠️ Phải khớp Origin với tên miền thật đang chạy
+
+`ALLOWED_ORIGINS` trong `worker.js` quyết định trang nào được gọi proxy. Nếu
+tên miền thật của trang KHÔNG có trong danh sách đó, worker trả `403 Origin
+không được phép` và trợ lý AI mất hẳn khả năng trả lời ngoài 8 nhánh
+rule-based.
+
+Lỗi này đã từng xảy ra thật: danh sách chỉ có `ptxsummercup.vn` (tên miền dự
+kiến, chưa mua) trong khi trang chạy trên GitHub Pages, nên fallback Groq chết
+trên bản production. Ở localhost vẫn chạy bình thường vì regex localhost luôn
+được cho phép — nên thử ở máy dev sẽ không bao giờ lộ ra lỗi này.
+
+Vì vậy khi đổi nơi host hoặc trỏ tên miền mới, phải sửa `ALLOWED_ORIGINS` rồi
+`wrangler deploy` lại, và kiểm tra bằng đúng lệnh curl ở trên với `Origin` là
+tên miền thật (mong đợi HTTP 200; nếu ra 403 tức chưa khớp).
 
 ## Giới hạn free tier (tham khảo)
 

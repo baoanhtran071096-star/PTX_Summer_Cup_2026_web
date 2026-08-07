@@ -12,9 +12,21 @@
 // API rejected all calls with "User location is not supported" for
 // this account/region — Groq's free tier doesn't have that restriction.)
 
+// ⚠️ Danh sách này PHẢI chứa tên miền thật đang chạy trang, nếu không worker
+// trả 403 và trợ lý AI mất hẳn phần trả lời ngoài 8 nhánh rule-based. Lỗi này
+// từng xảy ra: danh sách chỉ có ptxsummercup.vn (tên miền dự kiến, chưa mua)
+// trong khi trang thật chạy trên GitHub Pages, nên fallback Groq chết trên bản
+// production suốt thời gian đó mà ở localhost vẫn chạy tốt — rất khó phát hiện
+// khi chỉ thử ở máy dev.
+//
+// Lưu ý: header Origin chỉ gồm scheme + host, KHÔNG có đường dẫn. Vì vậy dòng
+// github.io dưới đây mở cho mọi project page thuộc cùng tài khoản, không riêng
+// repo này. Chấp nhận được vì đó là tài khoản của chính chủ dự án; khi đã trỏ
+// được tên miền riêng thì nên bỏ dòng đó đi.
 const ALLOWED_ORIGINS = [
     'https://ptxsummercup.vn',
-    'https://www.ptxsummercup.vn'
+    'https://www.ptxsummercup.vn',
+    'https://baoanhtran071096-star.github.io'
 ];
 
 const MAX_MESSAGE_LENGTH = 300;
