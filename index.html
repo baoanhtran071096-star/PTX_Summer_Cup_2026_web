@@ -5282,14 +5282,31 @@
            right-hand actions never shrink, so the switcher stays reachable at any width.
            ============================================================ */
         @media (min-width: 769px) {
+            /* ⚠️ TUYỆT ĐỐI KHÔNG đặt overflow (kể cả chỉ overflow-x) lên .nav-links.
+               Bản trước dùng `overflow-x: auto` ở đây để hàng link co lại được thay vì
+               đẩy nút đổi ngôn ngữ ra ngoài màn hình. Nó sửa đúng lỗi đó nhưng làm hỏng
+               nặng hơn nhiều: theo chuẩn CSS, khi MỘT trục overflow khác `visible` thì
+               trục còn lại bị ép thành `auto` — computed overflow-y trở thành `auto` dù
+               không ai khai báo. .nav-links chỉ cao 34px, nên nó CẮT CỤT cả 4 menu xổ
+               xuống nằm bên trong (menu cao 124–375px, tràn ra ngoài khung cha 131–383px).
+               Đo được: bấm vào giữa menu nào cũng trúng phần tử phía sau chứ không trúng
+               menu — tức toàn bộ menu desktop mất tác dụng, chỉ còn thấy một dải mỏng.
+               Dùng `flex-wrap: wrap` đạt đúng mục tiêu ban đầu (hàng link co được, nút đổi
+               ngôn ngữ vẫn trong màn hình) mà không cắt gì cả: chật thì xuống hàng.
+               Đã đo lại sau khi đổi: 4/4 menu bấm được, chiều cao navbar vẫn 99px, nút đổi
+               ngôn ngữ vẫn trong màn hình, tràn ngang vẫn 0. */
             .nav-inner > .nav-links {
                 flex: 1 1 auto;
                 min-width: 0;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                scrollbar-width: none;
+                /* !important là BẮT BUỘC: quy tắc `.nav-links { flex-wrap: nowrap !important }`
+                   ở trên (dòng ~4279) sẽ thắng nếu khai báo thường. Thiếu nó thì hàng link
+                   không xuống hàng mà TRÀN LỘ ra ngoài (đo được 89px ở màn 1280px) rồi đè
+                   lên khối nút bên phải 77px — vì overflow giờ là `visible` nên không còn
+                   gì cắt phần tràn nữa. Đã mắc đúng lỗi này khi sửa và phải quay lại vá. */
+                flex-wrap: wrap !important;
+                overflow: visible;
+                row-gap: 4px;
             }
-            .nav-inner > .nav-links::-webkit-scrollbar { display: none; }
             .nav-inner > .nav-links > li { flex: 0 0 auto; }
 
             /* .nav-inner caps at 1440px, so the link row only ever gets ~1026px however
@@ -5303,13 +5320,35 @@
                !important, so specificity alone cannot win here. */
             .nav-inner > .nav-links > li > a { padding-left: 6px !important; padding-right: 6px !important; }
 
-            /* Only when the row actually overflows (class set from JS): fade the trailing
-               edge so the cut-off pill reads as "there is more, scroll" rather than as a
-               half-drawn button. */
-            .nav-inner > .nav-links.is-scrollable {
-                -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
-                mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
+            /* Menu "TIỆN ÍCH" (dropdown-mega) rộng cố định 640px và neo `right: 0` vào mục
+               cha. Khi cửa sổ hẹp, mục cha dịch sang trái đủ nhiều thì mép trái của menu
+               rơi ra NGOÀI màn hình: đo ở 900px thấy menu trải từ -167px, 5/9 link không
+               với tới được (body có overflow-x:hidden nên phần tràn mất hẳn, không cuộn
+               tới được). Lỗi này CÓ SẴN từ trước chứ không phải mới sinh — trước đây bị
+               lỗi cắt cụt che mất nên không ai thấy, vì menu đã bị xén hết rồi.
+               Dưới 1150px thì neo menu theo VIEWPORT thay vì theo mục cha, để nó luôn nằm
+               trọn trong màn hình bất kể mục cha ở đâu. Ngưỡng 1150px chọn theo phép đo:
+               menu cần mục cha kết thúc ở >=640px mới đủ chỗ mở sang trái. */
+            /* Toàn bộ phải có !important: có một quy tắc `.nav-dropdown-content` khác đặt
+               `position: absolute !important; right: 0 !important`, mà !important thì thắng
+               bất kể độ đặc hiệu. Đây là bẫy lặp lại lần thứ hai trong cùng đợt sửa này —
+               mã của dự án dùng !important rất dày, nên mọi ghi đè đều phải có. */
+            @media (max-width: 1150px) {
+                .nav-dropdown-content.dropdown-mega {
+                    position: fixed !important;
+                    top: 64px !important;
+                    right: 16px !important;
+                    left: auto !important;
+                    max-width: calc(100vw - 32px) !important;
+                }
             }
+
+            /* Hiệu ứng mờ mép phải khi hàng link cuộn ngang — ĐÃ BỎ cùng lúc với việc bỏ
+               overflow ở trên. Hàng link giờ xuống hàng nên không còn cuộn ngang, class
+               is-scrollable không bao giờ được gắn nữa, và mép mờ cũng hết ý nghĩa.
+               Quan trọng hơn: mask-image CẮT phần tử con y hệt overflow, nên nếu để lại
+               thì bất cứ ai bật lại class này đều làm 4 menu xổ xuống bị cắt lần nữa —
+               đúng lỗi vừa sửa. Bỏ hẳn thay vì để nằm chờ. */
         }
 
         /* ============================================================
@@ -7725,7 +7764,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                  nội bộ; để lộ link không phải rủi ro bảo mật, vì Firestore Rules chặn ghi ở
                  tầng máy chủ nên không có token Firebase Auth hợp lệ thì không sửa được gì.
                  Nhãn "Admin" đọc được ở cả hai ngôn ngữ nên không cần thêm khoá i18n mới. -->
-            <span style="opacity:0.45;margin:0 6px;">·</span><a href="#admin" onclick="if(typeof navigateToPage==='function'){navigateToPage('admin');return false;}" style="opacity:0.55;text-decoration:none;font-size:12px;" title="Trang Quản trị / Admin">🔐 Admin</a></div>
+            <div style="margin-top:14px;"><a href="#admin" onclick="if(typeof navigateToPage==='function'){navigateToPage('admin');return false;}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--ptx-orange);border-radius:20px;color:var(--accent-orange);text-decoration:none;font-size:12px;font-weight:700;" title="Trang Quản trị / Admin — chỉ Ban Tổ Chức">🔐 Admin</a></div></div>
     </footer>
 
     <!-- ===== LOGIN MODAL ===== -->
@@ -15991,33 +16030,14 @@ function renderGallery() {
             console.warn('[PTX] Menu mobile không khởi tạo được:', err);
         }
 
-        /* --- LỖI 3: lăn chuột xuống ở thanh nav không có tác dụng ---
-           Ở bề ngang 1280px (rất phổ biến với laptop) hàng nav thừa 85px và mục
-           "TIỆN ÍCH" chỉ hiện 18%. Phần thừa đó nằm theo CHIỀU NGANG
-           (overflow-x:auto), trong khi người dùng lăn chuột theo chiều DỌC —
-           nên không có gì xảy ra và trông như menu bị cắt cụt hỏng. Lần sửa
-           trước chỉ kiểm tra từ 1440px trở lên nên bỏ lọt khoảng 1280–1365px.
-           Ở đây chuyển lăn dọc thành cuộn ngang, giữ nguyên thiết kế cuộn sẵn
-           có thay vì đổi sang xuống hàng. */
-        try {
-            var row = document.querySelector('.nav-inner > .nav-links');
-            if (row) {
-                row.addEventListener('wheel', function (e) {
-                    if (window.innerWidth <= 768) return;             // mobile dùng panel riêng
-                    if (e.deltaX !== 0) return;                        // đã cuộn ngang sẵn thì để yên
-                    var thua = row.scrollWidth - row.clientWidth;
-                    if (thua <= 1) return;                             // không thừa thì đừng nuốt sự kiện
-                    var truoc = row.scrollLeft;
-                    row.scrollLeft = truoc + e.deltaY;
-                    /* Chỉ chặn cuộn trang khi hàng nav THẬT SỰ nhúc nhích. Tới
-                       hai đầu mà vẫn nuốt sự kiện thì người dùng kẹt, không cuộn
-                       trang xuống được khi chuột đang ở trên nav. */
-                    if (row.scrollLeft !== truoc) e.preventDefault();
-                }, { passive: false });
-            }
-        } catch (err) {
-            console.warn('[PTX] Không gắn được cuộn ngang cho nav:', err);
-        }
+        /* --- LỖI 3: "cuộn ở thanh nav không hoạt động" ---
+           Ban đầu tôi hiểu nhầm thành hàng nav bị cắt do cuộn ngang, và thêm
+           đoạn JS chuyển lăn dọc thành cuộn ngang. Đo kỹ lại mới ra nguyên
+           nhân thật: chính `overflow-x: auto` trên .nav-links đã CẮT CỤT cả 4
+           menu xổ xuống (xem ghi chú dài trong <style> ở quy tắc
+           `.nav-inner > .nav-links`). Nay bỏ overflow, cho hàng link xuống
+           hàng, nên không còn cuộn ngang để mà chuyển — đoạn JS đó đã gỡ bỏ
+           thay vì để lại làm mã chết kèm chú thích mô tả lỗi không còn tồn tại. */
     })();
     </script>
 </body>
