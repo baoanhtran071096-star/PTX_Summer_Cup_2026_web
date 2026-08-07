@@ -1,10 +1,15 @@
 {
-  "release": "PTX Summer Cup 2026 Production Candidate R28",
-  "version": "R28-PRODUCTION",
+  "release": "PTX Summer Cup 2026 Production Candidate R29",
+  "version": "R29-PRODUCTION",
   "timestamp": "2026-08-07T00:00:00.000Z",
   "status": "ĐANG CHẠY THẬT (LIVE) — trang đã public, 23/23 test PASS, CI tự chạy trên mỗi lần push",
   "liveUrl": "https://baoanhtran071096-star.github.io/PTX_Summer_Cup_2026_web/",
-  "hostingThucTe": "GitHub Pages (workflow 'pages build and deployment' của GitHub tự deploy mỗi lần push vào main). LƯU Ý: firebase.json và .firebaserc trong repo cấu hình cho Firebase Hosting nhưng THỰC TẾ KHÔNG ĐƯỢC DÙNG để host — Firebase chỉ dùng cho Firestore (đồng bộ tỷ số, bảng dự đoán) và Authentication. Đừng nhầm hai thứ này.",
+  "hostingThucTe": "TRANG CHẠY Ở 2 NƠI CÙNG LÚC, cần biết rõ để khỏi nhầm: (1) GitHub Pages tại baoanhtran071096-star.github.io — TỰ ĐỘNG deploy mỗi lần push vào main, không cần làm gì thêm; (2) Firebase Hosting tại ptx-summer-cup-2026.web.app và .firebaseapp.com — PHẢI deploy THỦ CÔNG bằng `firebase deploy --only hosting`, không tự cập nhật theo git. Chính vì vậy bản Firebase đã từng chạy mã cũ suốt nhiều giờ trong khi github.io đã mới, xem changesInR29.",
+  "cacDiaChiDangChay": {
+    "githubPages": "https://baoanhtran071096-star.github.io/PTX_Summer_Cup_2026_web/",
+    "firebaseHosting": "https://ptx-summer-cup-2026.web.app (và bản thứ hai .firebaseapp.com)",
+    "kenhXemTruoc": "https://ptx-summer-cup-2026--thu-lan-dau-73ubvle7.web.app (tự hết hạn 2026-08-14)"
+  },
   "canonicalEntryFile": "index.html",
   "note": "index.html là file HTML DUY NHẤT dùng để deploy. Các bản ghi phiên bản cũ hơn (R2-R6, file 'Update Version 2.4', v.v.) đã được chuyển vào thư mục archive/ để tránh nhầm lẫn — không dùng các file trong archive/ để deploy.",
   "changesInR13": [
@@ -28,7 +33,9 @@
   "knownRemainingIssues": [
     "LƯU Ý VẬN HÀNH (không phải việc tồn đọng): mỗi lần sửa cloudflare-worker/worker.js đều PHẢI chạy lại `wrangler deploy` từ trong thư mục cloudflare-worker, vì sửa trong repo không tự có hiệu lực lên worker đang chạy. Chạy từ thư mục gốc dự án sẽ báo lỗi 'Could not detect a directory containing static files' — đó là do thiếu wrangler.toml chứ không phải lỗi cấu hình",
     "CHƯA XÁC MINH: github.io có nằm trong Authorized domains của Firebase Authentication hay không. Mặc định Firebase chỉ cho sẵn localhost + <project>.web.app + <project>.firebaseapp.com, KHÔNG có github.io. Nếu thiếu, phần đăng nhập ẩn danh của bảng dự đoán CĐV sẽ hỏng trên trang thật với lỗi auth/unauthorized-domain, dù ở localhost vẫn chạy tốt — cùng một kiểu bẫy với lỗi CORS ở R27. Cách kiểm tra: mở trang thật, gửi thử 1 phiếu dự đoán, xem Console (F12). Nếu lỗi thì vào Firebase Console > Authentication > Settings > Authorized domains thêm baoanhtran071096-star.github.io. Chuyển hẳn sang Firebase Hosting cũng tự hết vì 2 tên miền đó được cho phép sẵn",
-    "Phase 5 phần TÊN MIỀN RIÊNG chưa làm: trang đang chạy trên địa chỉ github.io. Tên miền ptxsummercup.vn mới chỉ tồn tại trong ALLOWED_ORIGINS của worker chứ chưa được mua/trỏ. Riêng phần deploy thì ĐÃ XONG từ trước qua GitHub Pages — các bản R25/R26 ghi 'Phase 5 chưa làm' là SAI, xem changesInR27",
+    "RỦI RO BĂNG THÔNG NGÀY THI ĐẤU (cần quyết định trước khi phát link cho mọi người): thư viện nặng 33,4 MB, trong đó 30,1 MB là 5 file video (riêng 5.mp4 đã 18,4 MB). Firebase Hosting gói miễn phí chỉ cho 360 MB/NGÀY, tức khoảng 19 lượt xem video là hết quota rồi trang ngừng phục vụ tới hôm sau — rơi đúng ngày đông người xem nhất thì rất nguy. GitHub Pages có hạn mức ~100 GB/tháng, rộng hơn khoảng 9 lần và không cắt đột ngột. KHUYẾN NGHỊ: phát cho mọi người link github.io, giữ web.app làm dự phòng; hoặc nâng Firebase lên gói Blaze nếu muốn dùng web.app làm chính",
+    "HAI NƠI HOSTING SONG SONG, DỄ LỆCH NHAU: github.io tự cập nhật theo git còn web.app phải deploy tay. Mỗi lần đẩy thay đổi lên main mà muốn cả hai đồng bộ thì PHẢI chạy thêm `firebase deploy --only hosting`. Quên bước này chính là nguyên nhân bản Firebase từng chạy mã cũ có lỗi khoá API, xem changesInR29",
+    "Phase 5 phần TÊN MIỀN RIÊNG chưa làm: tên miền ptxsummercup.vn mới chỉ tồn tại trong ALLOWED_ORIGINS của worker chứ chưa được mua/trỏ. Riêng phần deploy thì ĐÃ XONG — thậm chí xong ở cả 2 nơi. Các bản R25/R26 ghi 'Phase 5 chưa làm' là SAI, xem changesInR27 và changesInR29",
     "CẦN TEST THẬT trên trang đang chạy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5. Bộ test tự động KHÔNG phủ được phần này vì nó chặn toàn bộ request ra ngoài (tests/test-utils.js dòng 98) để chạy độc lập với mạng",
     "1 ảnh đội hình (Team P) vẫn phụ thuộc postimg.cc — index.html dòng 11832. Hai ảnh còn lại (Team T/X) đã đưa về local ở các bản trước; ảnh này chưa có file gốc",
     "index.html nay đã 15.832 dòng (R25 ghi ~12.700) — Phase 3 (tách module) vẫn hoãn. Nên làm SAU khi deploy thành công, vì đây là refactor rủi ro cao nhất trong danh sách",
@@ -156,5 +163,14 @@
     "GHI CHÚ QUAN TRỌNG khi deploy: firebase.json khai báo CẢ hosting LẪN firestore, nên `firebase deploy` trần sẽ ghi đè luôn Firestore rules đang publish trên Console. Dùng `firebase deploy --only hosting` để chỉ đẩy trang, và `firebase deploy --only firestore:rules` khi thật sự muốn cập nhật rules",
     "ĐÃ DEPLOY WORKER VÀ XÁC MINH TRÊN BẢN THẬT: chủ dự án chạy wrangler deploy thành công. Kiểm chứng lại bằng preflight OPTIONS cho từng origin — github.io, web.app, firebaseapp.com, kênh xem trước và localhost đều được cho phép, các tên miền giả mạo vẫn bị chặn. Thử POST thật từ origin github.io: HTTP 200 kèm câu trả lời đúng từ Groq dựa trên dữ liệu truyền lên. Lỗi 403 làm chết trợ lý AI trên bản production (phát hiện ở R27) nay đã hết hoàn toàn",
     "BÀI HỌC VỀ CÁCH KIỂM CHỨNG: lần chạy kiểm tra đầu tiên báo github.io và web.app bị chặn trong khi firebaseapp.com lại được phép — mâu thuẫn vì cả ba nằm chung một mảng. Nguyên nhân là script test tự viết không phân biệt được 'bị worker chặn' với 'request hỏng do mạng', mà máy này đang có mạng chập chờn (đã gây ECONNRESET khi cài wrangler). Thêm retry và tách riêng mã lỗi curl thì kết quả nhất quán. Rút ra: script kiểm chứng phải phân biệt được lỗi hạ tầng với kết quả thật, nếu không sẽ báo động giả"
+  ],
+  "changesInR29": [
+    "PHÁT HIỆN + ĐÍNH CHÍNH: Firebase Hosting KHÔNG hề bỏ không như R27 từng ghi. Kênh 'live' đã có bản phát hành từ 2026-08-06 22:41, tức trang đã chạy ở 2 nơi song song suốt thời gian qua. Phát hiện khi chạy `firebase hosting:channel:list` để kiểm tra xem lệnh deploy kênh xem trước có lỡ đụng vào production không (không hề — mốc thời gian của live vẫn là hôm trước)",
+    "HỆ QUẢ NGHIÊM TRỌNG của việc trên: bản trên Firebase là bản CŨ, có trước 24 commit ngày 07/08, nên vẫn mang khoá Firebase API sai mà fa4aa2a đã sửa — ai truy cập bằng web.app thì bảng xếp hạng dự đoán KHÔNG đồng bộ được. Xác minh bằng cách tải cả 3 địa chỉ rồi dò chuỗi khoá trong HTML, chứ không suy đoán từ mốc thời gian: github.io và kênh xem trước mang khoá mới, web.app mang khoá cũ",
+    "NGUYÊN NHÂN GỐC: GitHub Pages tự deploy theo mỗi lần push, còn Firebase Hosting phải deploy thủ công. Ai chỉ nhìn git sẽ tưởng mọi nơi đều đã cập nhật. Đã ghi rõ điều này vào trường hostingThucTe để lần sau không mắc lại",
+    "ĐÃ DEPLOY bản mới lên Firebase production bằng `firebase deploy --only hosting` (cố ý KHÔNG dùng lệnh trần để tránh ghi đè Firestore rules). Kiểm chứng sau khi deploy: cả 3 địa chỉ đều đã mang khoá mới",
+    "Kiểm chứng trợ lý AI trên tên miền Firebase: POST thật từ Origin web.app trả HTTP 200 kèm câu trả lời đúng. Đáng chú ý là AI trả lời 'chưa có thông tin về đội dẫn đầu' khi số trận đã đấu bằng 0, thay vì bịa ra một đội — đúng hành vi mà R20/R24 đã sửa",
+    "Kiểm chứng Firestore rules còn nguyên sau khi deploy hosting: đọc công khai trả 200, ghi không xác thực bị chặn 403 'Missing or insufficient permissions'. Xác nhận `--only hosting` không đụng tới rules",
+    "Đã tạo kênh xem trước thu-lan-dau (tự hết hạn 2026-08-14) để kiểm tra trước khi đẩy lên production. Worker đã có sẵn regex cho kênh xem trước từ R28 nên trợ lý AI hoạt động cả trên bản này"
   ]
 }
