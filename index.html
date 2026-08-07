@@ -5311,6 +5311,101 @@
                 mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
             }
         }
+
+        /* ============================================================
+           SỬA LỖI ĐIỀU HƯỚNG — báo cáo trong ngày thi đấu 07/08/2026
+           Cả bốn lỗi đều được ĐO trên trang đang chạy chứ không phỏng đoán.
+           Đặt ở cuối <style> để thắng các quy tắc phía trên khi cùng độ đặc hiệu.
+           ============================================================ */
+
+        /* --- LỖI 1: nút chat chặn thanh điều hướng dưới (mobile) ---
+           Đo được: .ptx-ai-launcher [228,755,129×48] z-index 99998 nằm đè lên
+           #bottomNav [12,752,358×64] z-index 999. Hậu quả KHÔNG chỉ là che
+           khuất — elementFromPoint tại tâm hai mục "Đội" (che 89%) và "Hub"
+           (che 87%) đều trả về chính nút chat, tức bấm vào là mở hộp chat chứ
+           không chuyển trang. 2/5 lối điều hướng trên điện thoại hỏng hẳn.
+           Thanh nav cao 64px và cách đáy 12px, nên đẩy nút chat lên 88px là
+           vừa hết chồng lấn, đồng thời thu còn hình tròn 52px cho gọn. */
+        @media (max-width: 768px) {
+            .ptx-ai-launcher {
+                bottom: 88px !important;
+                right: 14px !important;
+                width: 52px !important;
+                height: 52px !important;
+                padding: 0 !important;
+                gap: 0 !important;
+                border-radius: 50% !important;
+                justify-content: center !important;
+            }
+            .ptx-ai-launcher > div { display: none !important; }
+            .ptx-ai-launcher > span { font-size: 26px !important; }
+        }
+
+        /* --- LỖI 4: điện thoại mất gần hết nội dung ---
+           .nav-links bị display:none trên mobile ở HAI chỗ (≈dòng 896 và 3818),
+           nên cả 4 menu xổ xuống với khoảng 30 mục không có cách nào mở được
+           trên điện thoại; người dùng chỉ còn 5 mục ở thanh dưới, mà 2 trong số
+           đó lại hỏng vì lỗi 1 — thực tế chỉ còn 3 lối đi.
+           Nút .hamburger ĐÃ CÓ SẴN trong HTML (dòng ~5807) kèm CSS tạo hình,
+           nhưng bị ẩn ở cả hai chỗ và chưa bao giờ được gắn hành vi — phần làm
+           dở bị bỏ lại. Nay bật nó lên và dùng lại CHÍNH .nav-links làm nội
+           dung panel, thay vì nhân bản menu: tránh sinh ra hai bản lệch nhau
+           và giữ nguyên toàn bộ khoá i18n đã gắn. */
+        @media (max-width: 768px) {
+            .nav-container .hamburger {
+                display: block !important;
+                margin-left: auto;
+                order: 3;
+            }
+            .nav-container.mobile-open .nav-links {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                flex-wrap: nowrap !important;
+                position: fixed !important;
+                top: 60px;
+                left: 0;
+                right: 0;
+                max-height: calc(100vh - 60px - 96px);
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                background: var(--nav-blur);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-top: 1px solid var(--border-color);
+                box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+                padding: 10px 14px 22px;
+                gap: 2px;
+                z-index: 1002;
+            }
+            .nav-container.mobile-open .nav-links > li { width: 100%; }
+            .nav-container.mobile-open .nav-links > li > a {
+                padding: 11px 10px !important;
+                font-size: 14px !important;
+                justify-content: flex-start;
+            }
+            /* Màn cảm ứng không có :hover, mà menu con vốn chỉ mở bằng hover.
+               Trải phẳng luôn nội dung menu con thay vì bắt bấm mở từng cấp —
+               ít thao tác hơn, không phụ thuộc hover, và không cần thêm JS cho
+               từng menu (càng ít mã chạy trong ngày thi đấu càng an toàn). */
+            .nav-container.mobile-open .nav-dropdown { display: block; width: 100%; }
+            .nav-container.mobile-open .nav-dropdown-content {
+                display: block !important;
+                position: static !important;
+                animation: none !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border: none !important;
+                border-left: 2px solid var(--ptx-orange) !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                padding: 2px 0 6px 10px !important;
+                margin: 0 0 8px 10px !important;
+                min-width: 0 !important;
+                width: auto !important;
+            }
+        }
 </style>
 </head>
 <body>
@@ -7622,7 +7717,15 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <div class="footer-logo-box">
             <img src="thư viện/ảnh logo - banner/logo-cong-doan-ptx-combined.webp" alt="Logo Công đoàn PTX Group Việt Nam">
         </div>
-        <div class="footer-bottom"><div class="org-line"><span data-i18n="footer_org1">Đơn vị chủ trì: <strong>CÔNG ĐOÀN PTX GROUP VIỆT NAM</strong></span><br><span data-i18n="footer_org2">Đơn vị đồng tổ chức: <strong>PTX GROUP VIỆT NAM</strong></span></div>&copy; 2026 PTX Summer Cup 2.0. <span data-i18n="footer_copyright">Bản quyền thuộc về Kylian mBAppé</span></div>
+        <div class="footer-bottom"><div class="org-line"><span data-i18n="footer_org1">Đơn vị chủ trì: <strong>CÔNG ĐOÀN PTX GROUP VIỆT NAM</strong></span><br><span data-i18n="footer_org2">Đơn vị đồng tổ chức: <strong>PTX GROUP VIỆT NAM</strong></span></div>&copy; 2026 PTX Summer Cup 2.0. <span data-i18n="footer_copyright">Bản quyền thuộc về Kylian mBAppé</span>
+            <!-- Lối vào trang Quản trị. Trước đây #page-admin không hề có link nào trỏ tới:
+                 nút đăng nhập nằm BÊN TRONG trang đó, còn nút "CONTROL CENTER" trên nav chỉ
+                 hiện SAU khi đã đăng nhập — thành vòng luẩn quẩn, chỉ ai biết tự gõ #admin
+                 mới vào được. Đặt kín đáo ở footer thay vì trên nav chính vì đây là chức năng
+                 nội bộ; để lộ link không phải rủi ro bảo mật, vì Firestore Rules chặn ghi ở
+                 tầng máy chủ nên không có token Firebase Auth hợp lệ thì không sửa được gì.
+                 Nhãn "Admin" đọc được ở cả hai ngôn ngữ nên không cần thêm khoá i18n mới. -->
+            <span style="opacity:0.45;margin:0 6px;">·</span><a href="#admin" onclick="if(typeof navigateToPage==='function'){navigateToPage('admin');return false;}" style="opacity:0.55;text-decoration:none;font-size:12px;" title="Trang Quản trị / Admin">🔐 Admin</a></div>
     </footer>
 
     <!-- ===== LOGIN MODAL ===== -->
@@ -15828,6 +15931,94 @@ function renderGallery() {
             setInterval(checkFloatBtn, 3000);
             setTimeout(initFanPredictionForm, 500);
         });
+    </script>
+
+    <script>
+    /* ============================================================
+       SỬA LỖI ĐIỀU HƯỚNG (07/08/2026) — phần hành vi
+       Tách riêng thành IIFE và bọc try/catch: nếu khối này có lỗi thì trang
+       vẫn chạy y như trước chứ không kéo theo phần nào khác. Đặt cuối <body>
+       nên mọi phần tử cần thao tác đều đã tồn tại, không phải chờ sự kiện.
+       ============================================================ */
+    (function () {
+        'use strict';
+
+        /* --- LỖI 4: mở/đóng menu mobile ---
+           .hamburger có sẵn trong HTML nhưng chưa từng có onclick. Toàn bộ
+           phần hiển thị nằm ở CSS (.nav-container.mobile-open), ở đây chỉ
+           bật/tắt đúng một class. */
+        try {
+            var navContainer = document.querySelector('.nav-container');
+            var burger = navContainer && navContainer.querySelector('.hamburger');
+            var navLinks = navContainer && navContainer.querySelector('.nav-links');
+
+            if (burger && navContainer && navLinks) {
+                var setOpen = function (open) {
+                    navContainer.classList.toggle('mobile-open', open);
+                    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+                };
+                setOpen(false);
+
+                burger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setOpen(!navContainer.classList.contains('mobile-open'));
+                });
+
+                /* Chọn xong một mục thì đóng menu. Dùng capture để chạy trước
+                   handler điều hướng của chính link, tránh trường hợp link gọi
+                   preventDefault rồi menu vẫn nằm che trang vừa mở. */
+                navLinks.addEventListener('click', function (e) {
+                    if (e.target.closest('a')) setOpen(false);
+                }, true);
+
+                document.addEventListener('click', function (e) {
+                    if (!navContainer.classList.contains('mobile-open')) return;
+                    if (!e.target.closest('.nav-links') && !e.target.closest('.hamburger')) setOpen(false);
+                });
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') setOpen(false);
+                });
+
+                /* Xoay ngang máy hoặc phóng to cửa sổ qua mốc 768px thì panel
+                   mobile không còn nghĩa gì; đóng lại để nav desktop hiện đúng. */
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 768) setOpen(false);
+                });
+            }
+        } catch (err) {
+            console.warn('[PTX] Menu mobile không khởi tạo được:', err);
+        }
+
+        /* --- LỖI 3: lăn chuột xuống ở thanh nav không có tác dụng ---
+           Ở bề ngang 1280px (rất phổ biến với laptop) hàng nav thừa 85px và mục
+           "TIỆN ÍCH" chỉ hiện 18%. Phần thừa đó nằm theo CHIỀU NGANG
+           (overflow-x:auto), trong khi người dùng lăn chuột theo chiều DỌC —
+           nên không có gì xảy ra và trông như menu bị cắt cụt hỏng. Lần sửa
+           trước chỉ kiểm tra từ 1440px trở lên nên bỏ lọt khoảng 1280–1365px.
+           Ở đây chuyển lăn dọc thành cuộn ngang, giữ nguyên thiết kế cuộn sẵn
+           có thay vì đổi sang xuống hàng. */
+        try {
+            var row = document.querySelector('.nav-inner > .nav-links');
+            if (row) {
+                row.addEventListener('wheel', function (e) {
+                    if (window.innerWidth <= 768) return;             // mobile dùng panel riêng
+                    if (e.deltaX !== 0) return;                        // đã cuộn ngang sẵn thì để yên
+                    var thua = row.scrollWidth - row.clientWidth;
+                    if (thua <= 1) return;                             // không thừa thì đừng nuốt sự kiện
+                    var truoc = row.scrollLeft;
+                    row.scrollLeft = truoc + e.deltaY;
+                    /* Chỉ chặn cuộn trang khi hàng nav THẬT SỰ nhúc nhích. Tới
+                       hai đầu mà vẫn nuốt sự kiện thì người dùng kẹt, không cuộn
+                       trang xuống được khi chuột đang ở trên nav. */
+                    if (row.scrollLeft !== truoc) e.preventDefault();
+                }, { passive: false });
+            }
+        } catch (err) {
+            console.warn('[PTX] Không gắn được cuộn ngang cho nav:', err);
+        }
+    })();
     </script>
 </body>
 </html>
