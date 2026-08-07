@@ -1,6 +1,6 @@
 {
-  "release": "PTX Summer Cup 2026 Production Candidate R27",
-  "version": "R27-PRODUCTION",
+  "release": "PTX Summer Cup 2026 Production Candidate R28",
+  "version": "R28-PRODUCTION",
   "timestamp": "2026-08-07T00:00:00.000Z",
   "status": "ĐANG CHẠY THẬT (LIVE) — trang đã public, 23/23 test PASS, CI tự chạy trên mỗi lần push",
   "liveUrl": "https://baoanhtran071096-star.github.io/PTX_Summer_Cup_2026_web/",
@@ -26,7 +26,8 @@
   },
   "checksumNote": "CẢ HAI giá trị của R25 đều đã sai và được thay ở R26. (1) index.html ghi a3c7edc0... nhưng CHƯA BAO GIỜ khớp: ngay tại commit đầu tiên 42e3479 file này đã băm ra 8130d0f9... — nghĩa là khối checksum mà báo cáo R6 gọi là 'Cryptographic Audit Verification' thực tế chưa từng xác minh được điều gì. (2) ptx_migration_data.json ghi 030a6aad... vốn ĐÚNG tại thời điểm R25, nhưng đã cũ kể từ commit 16428e1 (06/08/2026) sửa lại dữ liệu 24 cầu thủ mà không cập nhật manifest.",
   "knownRemainingIssues": [
-    "PHẢI DEPLOY LẠI CLOUDFLARE WORKER: đã sửa ALLOWED_ORIGINS trong cloudflare-worker/worker.js nhưng bản đang chạy trên Cloudflare VẪN LÀ BẢN CŨ. Sửa trong repo không tự có hiệu lực. Chủ dự án cần chạy `cd cloudflare-worker && wrangler deploy`, rồi kiểm tra lại bằng lệnh curl trong README (mong đợi HTTP 200 thay vì 403). Chừng nào chưa deploy lại, trợ lý AI trên trang thật vẫn mất phần trả lời ngoài 8 nhánh rule-based",
+    "PHẢI DEPLOY LẠI CLOUDFLARE WORKER (việc gấp nhất): ALLOWED_ORIGINS trong repo đã đủ cả github.io lẫn 2 tên miền Firebase, nhưng bản đang chạy trên Cloudflare VẪN LÀ BẢN CŨ chỉ có ptxsummercup.vn. Sửa trong repo không tự có hiệu lực. Chạy `cd cloudflare-worker && npx wrangler deploy` (cần đăng nhập Cloudflare), rồi kiểm tra bằng lệnh curl trong README — mong đợi HTTP 200 thay vì 403. Chừng nào chưa deploy lại, trợ lý AI trên trang thật vẫn mất phần trả lời ngoài 8 nhánh rule-based",
+    "CHƯA XÁC MINH: github.io có nằm trong Authorized domains của Firebase Authentication hay không. Mặc định Firebase chỉ cho sẵn localhost + <project>.web.app + <project>.firebaseapp.com, KHÔNG có github.io. Nếu thiếu, phần đăng nhập ẩn danh của bảng dự đoán CĐV sẽ hỏng trên trang thật với lỗi auth/unauthorized-domain, dù ở localhost vẫn chạy tốt — cùng một kiểu bẫy với lỗi CORS ở R27. Cách kiểm tra: mở trang thật, gửi thử 1 phiếu dự đoán, xem Console (F12). Nếu lỗi thì vào Firebase Console > Authentication > Settings > Authorized domains thêm baoanhtran071096-star.github.io. Chuyển hẳn sang Firebase Hosting cũng tự hết vì 2 tên miền đó được cho phép sẵn",
     "Phase 5 phần TÊN MIỀN RIÊNG chưa làm: trang đang chạy trên địa chỉ github.io. Tên miền ptxsummercup.vn mới chỉ tồn tại trong ALLOWED_ORIGINS của worker chứ chưa được mua/trỏ. Riêng phần deploy thì ĐÃ XONG từ trước qua GitHub Pages — các bản R25/R26 ghi 'Phase 5 chưa làm' là SAI, xem changesInR27",
     "CẦN TEST THẬT trên trang đang chạy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5. Bộ test tự động KHÔNG phủ được phần này vì nó chặn toàn bộ request ra ngoài (tests/test-utils.js dòng 98) để chạy độc lập với mạng",
     "1 ảnh đội hình (Team P) vẫn phụ thuộc postimg.cc — index.html dòng 11832. Hai ảnh còn lại (Team T/X) đã đưa về local ở các bản trước; ảnh này chưa có file gốc",
@@ -145,5 +146,13 @@
     "cloudflare-worker/README.md: sửa lệnh curl kiểm tra vốn dùng Origin ptxsummercup.vn (tên miền chưa tồn tại) nên luôn báo 403 dù worker hoàn toàn bình thường — người làm theo hướng dẫn sẽ tưởng proxy hỏng. Thêm hẳn một mục cảnh báo phải giữ ALLOWED_ORIGINS khớp với tên miền thật mỗi khi đổi chỗ host",
     "LƯU Ý VẬN HÀNH: sửa worker.js trong repo KHÔNG tự động cập nhật worker đang chạy trên Cloudflare. Bắt buộc chạy `wrangler deploy` thủ công thì lỗi 403 mới thật sự hết",
     "XÁC NHẬN CI ĐÃ CHẠY THẬT: sau khi push, workflow 'PTX Summer Cup 2026 CI/CD Pipeline' chạy lần đầu tiên trong lịch sử dự án trên ubuntu-latest và kết luận success — 23 test qua hết trên Linux, đúng như phần kiểm tra chuẩn hoá Unicode NFC đã dự đoán trước khi chuyển file"
+  ],
+  "changesInR28": [
+    "CHUẨN BỊ CHO FIREBASE HOSTING: thêm sẵn ptx-summer-cup-2026.web.app và ptx-summer-cup-2026.firebaseapp.com vào ALLOWED_ORIGINS TRƯỚC khi deploy. Mỗi project Firebase luôn có đúng 2 tên miền này theo project-id nên đoán trước được — nhờ vậy lần deploy đầu tiên chạy được ngay, thay vì lặp lại đúng lỗi 403 mà chính danh sách này vừa gây ra ở R27",
+    "FIX (lỗi sẽ xảy ra nếu không xử lý trước): kênh xem trước của Firebase (`firebase hosting:channel:deploy`) có tên miền dạng <project-id>--<kênh>-<hash>.web.app, tức origin KHÁC với tên miền chính và mỗi lần tạo lại một hash khác nên không liệt kê sẵn được. Thêm regex FIREBASE_PREVIEW_ORIGIN khớp đúng tiền tố project này. Thiếu nó thì thử bản xem trước sẽ dính 403 và rất dễ bị hiểu nhầm là bản deploy hỏng",
+    "QA bảo mật cho regex trên: kiểm tra 15 trường hợp bằng cách nạp chính hàm isAllowedOrigin thật trong worker.js (không chép lại logic rồi test bản chép) — 15/15 đúng. Gồm các biến thể giả mạo phải bị chặn: ...web.app.attacker.com, evil-<project>--x.web.app, <project khác>--abc.web.app, github.io.evil.com, localhost.evil.com, và http:// thay vì https://",
+    "cloudflare-worker/README.md: thêm bảng liệt kê rõ hiện đang cho phép những origin nào và mỗi origin dùng cho việc gì, kèm giải thích vì sao kênh xem trước phải dùng regex",
+    "Đã cài firebase-tools (bản 15.26.0) trên máy này. npm có chặn install script của re2/protobufjs nhưng đã xác nhận CLI vẫn chạy bình thường. Bước `firebase login` chưa làm vì phải do chủ dự án tự đăng nhập tài khoản Google",
+    "GHI CHÚ QUAN TRỌNG khi deploy: firebase.json khai báo CẢ hosting LẪN firestore, nên `firebase deploy` trần sẽ ghi đè luôn Firestore rules đang publish trên Console. Dùng `firebase deploy --only hosting` để chỉ đẩy trang, và `firebase deploy --only firestore:rules` khi thật sự muốn cập nhật rules"
   ]
 }

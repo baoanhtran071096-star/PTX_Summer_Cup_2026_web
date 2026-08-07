@@ -93,6 +93,27 @@ Vì vậy khi đổi nơi host hoặc trỏ tên miền mới, phải sửa `ALL
 `wrangler deploy` lại, và kiểm tra bằng đúng lệnh curl ở trên với `Origin` là
 tên miền thật (mong đợi HTTP 200; nếu ra 403 tức chưa khớp).
 
+### Hiện đang cho phép những đâu
+
+| Origin | Dùng cho |
+|---|---|
+| `https://baoanhtran071096-star.github.io` | Trang thật hiện tại (GitHub Pages) |
+| `https://ptx-summer-cup-2026.web.app` | Firebase Hosting (thêm sẵn trước khi deploy) |
+| `https://ptx-summer-cup-2026.firebaseapp.com` | Firebase Hosting (tên miền thứ hai) |
+| `https://ptx-summer-cup-2026--<kênh>-<hash>.web.app` | Kênh xem trước Firebase, khớp bằng regex |
+| `https://ptxsummercup.vn`, `https://www.ptxsummercup.vn` | Tên miền riêng, CHƯA mua/trỏ |
+| `http://localhost:PORT`, `http://127.0.0.1:PORT` | Máy dev |
+
+Hai tên miền Firebase được thêm trước khi deploy là cố ý: mỗi project Firebase
+luôn có đúng `<project-id>.web.app` và `<project-id>.firebaseapp.com` nên đoán
+trước được, không phải chờ deploy xong mới sửa rồi deploy worker lần nữa.
+
+Kênh xem trước (`firebase hosting:channel:deploy`) phải dùng regex vì mỗi lần
+tạo lại sinh một hash khác nhau, không liệt kê sẵn được. Regex neo hai đầu
+`^...$` và bắt buộc đúng tiền tố project, nên không nhận các tên miền giả kiểu
+`...web.app.attacker.com` hay project Firebase khác — đã kiểm tra bằng 15
+trường hợp gồm cả các biến thể giả mạo.
+
 ## Giới hạn free tier (tham khảo)
 
 - **Cloudflare Workers free**: 100.000 request/ngày.

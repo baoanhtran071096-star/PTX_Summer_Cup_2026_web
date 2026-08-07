@@ -23,18 +23,34 @@
 // github.io dưới đây mở cho mọi project page thuộc cùng tài khoản, không riêng
 // repo này. Chấp nhận được vì đó là tài khoản của chính chủ dự án; khi đã trỏ
 // được tên miền riêng thì nên bỏ dòng đó đi.
+//
+// Hai tên miền Firebase Hosting được thêm sẵn TRƯỚC khi deploy, cố ý như vậy:
+// mỗi project Firebase luôn có đúng <project-id>.web.app và
+// <project-id>.firebaseapp.com, biết trước được nên không cần chờ deploy xong
+// mới thêm. Nhờ đó lần deploy đầu tiên chạy được ngay, thay vì lặp lại đúng
+// lỗi 403 mà danh sách này từng gây ra.
 const ALLOWED_ORIGINS = [
     'https://ptxsummercup.vn',
     'https://www.ptxsummercup.vn',
-    'https://baoanhtran071096-star.github.io'
+    'https://baoanhtran071096-star.github.io',
+    'https://ptx-summer-cup-2026.web.app',
+    'https://ptx-summer-cup-2026.firebaseapp.com'
 ];
 
 const MAX_MESSAGE_LENGTH = 300;
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
+// Kênh xem trước của Firebase Hosting (`firebase hosting:channel:deploy`) có
+// tên miền dạng <project-id>--<tên-kênh>-<hash ngẫu nhiên>.web.app, tức mỗi lần
+// tạo lại là một origin khác, không thể liệt kê sẵn. Regex dưới đây chỉ nhận
+// đúng tiền tố project này nên không mở cho project Firebase nào khác. Thiếu nó
+// thì thử bản xem trước sẽ dính 403 và dễ bị hiểu nhầm là bản deploy bị hỏng.
+const FIREBASE_PREVIEW_ORIGIN = /^https:\/\/ptx-summer-cup-2026--[a-z0-9-]+\.web\.app$/;
+
 function isAllowedOrigin(origin) {
     if (!origin) return false;
     if (ALLOWED_ORIGINS.includes(origin)) return true;
+    if (FIREBASE_PREVIEW_ORIGIN.test(origin)) return true;
     // Allow local dev servers (http://localhost:PORT, http://127.0.0.1:PORT)
     return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
 }
