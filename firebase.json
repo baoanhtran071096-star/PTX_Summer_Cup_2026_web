@@ -7,7 +7,7 @@
       "**/node_modules/**",
       "**/tests/**",
       "**/archive/**",
-      "**/workflows/**",
+      "**/.github/**",
       "docker-compose.yml",
       "package.json",
       "package-lock.json",

@@ -1,0 +1,59 @@
+name: PTX Summer Cup 2026 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, dev, 'feature/*' ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install test dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run automated test suite
+        run: npm test
+
+# ============================================================
+# PHASE 5 — DEPLOY THẬT (chưa làm)
+# ============================================================
+# Trước đây ở đây có 2 job "Auto Deploy Staging" / "Auto Deploy Production",
+# nhưng cả hai chỉ chạy lệnh `echo` chứ không deploy gì cả. Khi workflow này
+# còn nằm sai chỗ (thư mục `workflows/`) thì chúng không bao giờ chạy nên vô
+# hại. Nay workflow đã chạy thật trên mỗi lần push vào `main`, giữ chúng lại
+# đồng nghĩa GitHub sẽ hiện dấu tick xanh "Auto Deploy Production" thành công
+# trong khi KHÔNG có gì được deploy — đúng kiểu "báo thành công dù thực tế
+# thất bại" mà dự án đã cố ý loại bỏ ở commit f9cc7dc.
+#
+# Vì vậy đã gỡ bỏ. Khi làm Phase 5 thật (hosting đã chọn: Firebase Hosting —
+# xem firebase.json + .firebaserc), thêm lại job dạng:
+#
+#   deploy-production:
+#     needs: lint-and-test
+#     if: github.ref == 'refs/heads/main'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: FirebaseExtended/action-hosting-deploy@v0
+#         with:
+#           repoToken: ${{ secrets.GITHUB_TOKEN }}
+#           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+#           channelId: live
+#           projectId: ptx-summer-cup-2026
+#
+# Cần tạo trước secret FIREBASE_SERVICE_ACCOUNT trong repo settings.
