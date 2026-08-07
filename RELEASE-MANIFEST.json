@@ -1,8 +1,8 @@
 {
-  "release": "PTX Summer Cup 2026 Production Candidate R25",
-  "version": "R25-PRODUCTION",
-  "timestamp": "2026-08-03T10:30:00.000Z",
-  "status": "PRODUCTION-READY",
+  "release": "PTX Summer Cup 2026 Production Candidate R26",
+  "version": "R26-PRODUCTION",
+  "timestamp": "2026-08-07T00:00:00.000Z",
+  "status": "PRODUCTION-READY (mã nguồn sẵn sàng, 23/23 test PASS) — NHƯNG CHƯA DEPLOY lên hosting thật, xem Phase 5 trong knownRemainingIssues",
   "canonicalEntryFile": "index.html",
   "note": "index.html là file HTML DUY NHẤT dùng để deploy. Các bản ghi phiên bản cũ hơn (R2-R6, file 'Update Version 2.4', v.v.) đã được chuyển vào thư mục archive/ để tránh nhầm lẫn — không dùng các file trong archive/ để deploy.",
   "changesInR13": [
@@ -16,16 +16,20 @@
   "architecture": "PTX Tournament Control Center & Cache-Busted Smooth Scroll UX",
   "predictionSmoothScrollAdded": true,
   "cacheBusterAutoPurgeEnabled": true,
-  "swVersion": "v2-r11",
+  "swVersion": "v2-r13",
+  "checksumMethod": "git show HEAD:<file> | sha256sum — băm nội dung ĐÚNG NHƯ Git lưu, nên tái lập được y hệt trên Windows/Linux/macOS. KHÔNG dùng Get-FileHash hay sha256sum trên file nằm ở đĩa: repo đang đặt core.autocrlf=true và không có .gitattributes, nên ptx_migration_data.json lúc checkout ra Windows bị đổi LF thành CRLF và cho ra hash khác (d48e1f37...).",
   "checksums": {
-    "index.html": "a3c7edc0828d42e972ded1c3567a7cc17dc3a011670c5a503a7cdd8189d2be37",
-    "ptx_migration_data.json": "030a6aad4fbaae3fc29c1db5aa25b71693d78fcf56ec87ace509ac57555642b7"
+    "index.html": "5e22f20cd7975cea073dc852845a7d08d65a8afc5525c07c6e4724add847a3b4",
+    "ptx_migration_data.json": "6ecef6661aa1e676c0d1db1060f479e388845567c742fe4701948b3fbaca4ad2"
   },
+  "checksumNote": "CẢ HAI giá trị của R25 đều đã sai và được thay ở R26. (1) index.html ghi a3c7edc0... nhưng CHƯA BAO GIỜ khớp: ngay tại commit đầu tiên 42e3479 file này đã băm ra 8130d0f9... — nghĩa là khối checksum mà báo cáo R6 gọi là 'Cryptographic Audit Verification' thực tế chưa từng xác minh được điều gì. (2) ptx_migration_data.json ghi 030a6aad... vốn ĐÚNG tại thời điểm R25, nhưng đã cũ kể từ commit 16428e1 (06/08/2026) sửa lại dữ liệu 24 cầu thủ mà không cập nhật manifest.",
   "knownRemainingIssues": [
-    "CẦN TEST THẬT sau khi deploy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5",
-    "3 ảnh đội hình nhóm (Team P/T/X) vẫn phụ thuộc postimg.cc (chưa có file gốc)",
-    "index.html vẫn là 1 file khổng lồ ~12.700 dòng — Phase 3 (tách module) nên làm sau khi xác nhận Phase 2 chạy ổn định thật",
-    "Phase 5 (deploy chính thức + domain) chưa làm"
+    "PHASE 5 (deploy chính thức + domain) CHƯA LÀM — đây là việc còn lại lớn nhất. Firebase Hosting đã cấu hình sẵn (firebase.json + .firebaserc trỏ project ptx-summer-cup-2026), chỉ còn chạy `firebase deploy`. Muốn deploy tự động thì tạo secret FIREBASE_SERVICE_ACCOUNT rồi bỏ comment mẫu job ở cuối .github/workflows/ci.yml",
+    "CẦN TEST THẬT sau khi deploy: mở 2 trình duyệt/thiết bị khác nhau, đăng nhập admin, sửa tỷ số 1 bên, xác nhận bên kia tự cập nhật không cần F5. Bộ test tự động KHÔNG phủ được phần này vì nó chặn toàn bộ request ra ngoài (tests/test-utils.js dòng 98) để chạy độc lập với mạng",
+    "1 ảnh đội hình (Team P) vẫn phụ thuộc postimg.cc — index.html dòng 11832. Hai ảnh còn lại (Team T/X) đã đưa về local ở các bản trước; ảnh này chưa có file gốc",
+    "index.html nay đã 15.832 dòng (R25 ghi ~12.700) — Phase 3 (tách module) vẫn hoãn. Nên làm SAU khi deploy thành công, vì đây là refactor rủi ro cao nhất trong danh sách",
+    "Repo đặt core.autocrlf=true nhưng KHÔNG có .gitattributes, nên byte trên đĩa khác nhau giữa Windows và Linux. Không ảnh hưởng web chạy, nhưng khiến mọi checksum tính trên file ở đĩa mất giá trị (xem checksumMethod). Thêm .gitattributes sẽ sửa dứt điểm nhưng tạo 1 diff rất lớn — cân nhắc làm riêng, không gộp vào commit tính năng",
+    "docker-compose.yml trỏ tới ./backend và ./frontend, nhưng CẢ HAI THƯ MỤC ĐỀU KHÔNG TỒN TẠI. Cùng nhóm với database_schema.sql và server.js — đây là khung sườn kiến trúc client-server cũ chưa bao giờ được dựng, trong khi web thực tế chạy hoàn toàn bằng index.html + Firebase. Nên xoá hoặc dựng thật, để lại dễ gây hiểu nhầm là hệ thống có backend"
   ],
   "changesInR14": [
     "Fix: ci.yml — actions/node@v3 (không tồn tại) -> actions/setup-node@v4; checkout@v3 -> v4",
@@ -100,5 +104,34 @@
   "changesInR25": [
     "UX: thay 2 logo (Công Đoàn + PTX) cạnh nhau ở footer bằng 1 logo kết hợp duy nhất do người dùng cung cấp — đẹp hơn, gọn hơn",
     "Ảnh logo kết hợp đã được cắt gọn viền thừa + nén sang WebP (từ 453KB JPG gốc -> 32KB WebP, giảm ~93%)"
+  ],
+  "noteVeLichSuGit": "Kho Git này bắt đầu bằng commit 42e3479 (03/08/2026) và đã CHỨA SẴN toàn bộ trạng thái R25. Vì vậy mọi thay đổi R1-R25 liệt kê phía trên đều diễn ra TRƯỚC khi có Git, không tra ngược lại được bằng lịch sử commit. Từ R26 trở đi, mỗi mục dưới đây đều đối chiếu được với commit thật.",
+  "changesInR26": [
+    "=== A. KÍCH HOẠT CI (phần việc chính của R26) ===",
+    "FIX QUAN TRỌNG: ci.yml nằm ở thư mục `workflows/` — GitHub CHỈ đọc workflow trong `.github/workflows/`, nên bộ test 23 case tuy viết tốt nhưng CHƯA BAO GIỜ tự chạy lần nào. Đã `git mv` sang đúng chỗ (Git nhận diện là đổi tên, giữ nguyên lịch sử file)",
+    "Trước khi chuyển đã kiểm chứng bộ test có chạy được trên Linux không, vì trước nay nó chỉ từng chạy trên Windows: test media so khớp CHUỖI CHÍNH XÁC giữa tên file đọc từ đĩa và tên trích trong index.html, mà Windows tự chuẩn hoá Unicode còn Linux thì không. Đo thực tế: cả 3 nguồn (Git lưu / đĩa / tham chiếu trong mã) đều nhất quán NFC, 0 xung đột hoa-thường -> an toàn. Nếu lệch NFC/NFD thì CI sẽ báo 53 link gãy + 53 file mồ côi ngay lần chạy đầu",
+    "Node 18 -> 22: Node 18 đã hết hạn hỗ trợ (EOL 04/2025), lại khác xa Node 24 đang dùng ở máy dev — chạy CI trên runtime cũ và lệch phiên bản là nguồn sinh lỗi 'chỉ fail trên CI'",
+    "`npm install` -> `npm ci`: đã xác nhận package-lock.json đồng bộ (npm ci --dry-run chạy sạch) nên cài đặt sẽ tái lập chính xác, không tự nâng phiên bản ngầm",
+    "Gỡ bước 'Install & Test Backend': bước này bọc trong `if [ -d backend ]` mà thư mục backend không tồn tại, nên là lệnh rỗng. Cùng lý do R17 từng gỡ bước build 'if -d frontend' vô nghĩa",
+    "GỠ 2 job deploy giả 'Auto Deploy Staging/Production': cả hai chỉ chạy `echo`. Khi workflow còn nằm sai chỗ thì chúng không chạy nên vô hại, nhưng nay CI chạy thật mỗi lần push vào main, giữ lại đồng nghĩa GitHub hiện tick xanh 'Auto Deploy Production' thành công trong khi không deploy gì — đúng kiểu báo thành công giả mà commit f9cc7dc đã cố ý loại bỏ. Đã thay bằng mẫu job Firebase Hosting dạng comment để dùng khi làm Phase 5",
+    "Đã xác thực ci.yml bằng trình phân tích YAML thật (js-yaml) + kiểm tra cấu trúc: YAML hợp lệ, 1 job, 5 bước, mọi bước đều có `uses` hoặc `run`",
+    "firebase.json: mục ignore `**/workflows/**` thành vô nghĩa sau khi chuyển thư mục, đã đổi thành `**/.github/**`. Ghi rõ là dùng `**/.github/**` chứ không dựa vào `**/.*` có sẵn, vì `*` trong glob không khớp qua dấu `/` nên `**/.*` không chắc loại được file NẰM TRONG thư mục ẩn",
+    "=== B. GHI NHẬN 28 COMMIT TỪ R25 ĐẾN NAY (trước đó chưa bản nào ghi lại) ===",
+    "Dữ liệu & thông tin chính xác: cập nhật số áo/tên chuẩn cho 24/24 cầu thủ, lịch thi đấu chính thức và sân Sân số 1; sửa giờ khai mạc về đúng 16:00; thay tên sân tự đặt 'PTX Arena' bằng tên chính thức; sửa toạ độ GPS về đúng vị trí Hoàng Hoa Thám",
+    "Thẻ thời tiết trận đấu: thêm Canonical Weather Match Card có engine phân loại 4 cấp rủi ro; bổ sung MET Norway làm nguồn thứ hai; hiển thị độ tin cậy dự báo đa mô hình (ECMWF/GFS/ICON)",
+    "PTX AI Assistant: nâng cấp thành lai giữa rule-based và mô hình ngoài; ban đầu định dùng Gemini nhưng Google chặn theo khu vực nên chuyển sang Groq qua Cloudflare Worker (đã deploy, giấu key phía server); sửa lỗi tra cứu cầu thủ khớp nhầm",
+    "Đa ngôn ngữ (i18n): đưa các nhãn do JS sinh vào hệ thống i18n, dịch toàn bộ thanh điều hướng và 30 mục dropdown, tổng từ điển cân bằng 282 khoá mỗi ngôn ngữ. Phát hiện kèm 1 lỗi nghiêm trọng: thanh nav bị tràn khiến nút đổi ngôn ngữ văng khỏi màn hình — người đã chọn English thì KHÔNG CÒN ĐƯỜNG quay lại tiếng Việt",
+    "Khả năng đọc (WCAG): sửa toàn bộ 101 lỗi tương phản ở giao diện sáng và các lỗi còn lại ở giao diện tối; nay cả hai giao diện đo được 0 lỗi",
+    "Nhận diện thương hiệu: gộp 2 mã màu cam đang song song tồn tại về đúng 1 mã #F15A24 (đối chiếu với ảnh banner thật để chọn), gộp bảng màu 3 đội bị trùng lặp về một định nghĩa duy nhất, hiển thị đúng logo từng đội ở bảng xếp hạng",
+    "Trò chơi dự đoán của CĐV — sửa lỗi lớn nhất trong đợt: trước đó hỏng theo 5 cách riêng biệt, trong đó cả 3 cặp đấu trên form đều SAI so với lịch chính thức (hỏi CĐV dự đoán những trận không tồn tại), phần chấm điểm đối chiếu nhầm trận, phiếu gửi lên KHÔNG BAO GIỜ tới bảng xếp hạng, điểm MVP bị gán cứng cho cầu thủ id 1, và Vua phá lưới tuy hứa '+5đ' nhưng chưa từng được tính. Nay sinh form từ MATCHES_CONFIG để form và lịch không thể lệch nhau nữa",
+    "Bảng xếp hạng dự đoán dùng chung: thêm collection Firestore `predictions`, CĐV đăng nhập ẩn danh chỉ để lấy uid, và id tài liệu CHÍNH LÀ uid đó nên security rules đảm bảo mỗi người ghi đúng 1 phiếu của mình, không mạo danh, không spam, chỉ admin xoá được",
+    "Sửa lỗi 'báo đồng bộ thành công dù ghi thất bại': do đọc là công khai còn ghi cần đăng nhập nên hai việc này hỏng độc lập nhau, nay tách ra theo dõi riêng và báo trung thực khi phiếu mới chỉ lưu trên máy",
+    "Sửa sai khoá Firebase Web API: cấu hình mang khoá không thuộc project này nên đăng nhập ẩn danh luôn hỏng API_KEY_INVALID. Khó phát hiện vì Firestore vẫn trả 200 cho khoá sai (rules cho phép đọc công khai), chỉ Identity Toolkit mới thật sự kiểm tra khoá",
+    "Giao diện: thanh điều hướng dưới dạng kính mờ nổi, thẻ nghiêng 3D, bục trao giải và hiệu ứng chuyển trang; thiết kế lại dropdown; sửa lightbox hỏng và ảnh thư viện chết; sửa lỗi mục cuối thanh nav bị cắt đôi",
+    "=== C. ĐÍNH CHÍNH SỐ LIỆU TRONG CHÍNH MANIFEST NÀY ===",
+    "swVersion ghi 'v2-r11' trong khi sw.js thực tế là 'ptx-cup-2026-v2-r13' — đã sửa cho khớp thực tế",
+    "Thay toàn bộ khối checksums vốn đã sai (chi tiết ở checksumNote) và bổ sung checksumMethod để lần sau tính lại đúng cách, tái lập được trên mọi hệ điều hành",
+    "Cập nhật knownRemainingIssues theo đúng hiện trạng: postimg.cc còn 1 ảnh chứ không phải 3, index.html đã 15.832 dòng chứ không phải ~12.700, và bổ sung 2 vấn đề chưa từng được ghi (thiếu .gitattributes, docker-compose trỏ vào thư mục không tồn tại)",
+    "QA: chạy lại bộ test sau toàn bộ thay đổi — 23/23 PASS. Lưu ý R17 ghi 16 test, con số thật hiện tại là 23"
   ]
 }
