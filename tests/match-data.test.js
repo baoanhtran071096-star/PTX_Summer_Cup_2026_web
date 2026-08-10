@@ -262,6 +262,39 @@ module.exports = async function runMatchDataTests(browser) {
             `Trang kết quả tách sự kiện đúng cột cho từng đội ở cả ${columns.length} trận` +
             (badCols.length ? ` — sai ở trận ${badCols.map(c => c.id).join(', ')}` : ''));
 
+        // Thẻ trận đấu ở Trang chủ / Lịch thi đấu là nơi người xem nhìn đầu tiên, và
+        // trước đây vẫn đổ chung hai đội vào một danh sách dù trang kết quả đã tách cột.
+        const cardColumns = await page.evaluate(() => {
+            const out = [];
+            document.querySelectorAll('.match-card-v3').forEach(card => {
+                const timeline = card.querySelector('.goal-timeline');
+                if (!timeline) return;
+                const cols = [...timeline.querySelectorAll('.goal-col')];
+                const minutes = col => [...col.querySelectorAll('.goal-item')]
+                    .map(r => (r.querySelector('.goal-time') || {}).textContent)
+                    .filter(Boolean).map(s => s.replace("'", '')).sort();
+                // Xác định trận từ chính tên đội trên thẻ, không giả định thứ tự thẻ.
+                const label = card.innerText;
+                const m = MATCHES_CONFIG.find(mc =>
+                    label.includes(TEAMS_DATA[mc.home].name) && label.includes(TEAMS_DATA[mc.away].name));
+                if (!m) return;
+                const events = parseMatchEvents(localStorage.getItem('ptx_result_' + m.id), m);
+                const expect = teamId => events.filter(e => e.team === teamId).map(e => String(e.minute)).sort();
+                out.push({
+                    id: m.id,
+                    cols: cols.length,
+                    ok: cols.length >= 2 &&
+                        JSON.stringify(minutes(cols[0])) === JSON.stringify(expect(m.home)) &&
+                        JSON.stringify(minutes(cols[1])) === JSON.stringify(expect(m.away))
+                });
+            });
+            return out;
+        });
+        const badCards = cardColumns.filter(c => !c.ok);
+        assert(cardColumns.length > 0 && badCards.length === 0,
+            `Thẻ trận đấu cũng tách sự kiện theo từng đội (${cardColumns.length} thẻ)` +
+            (badCards.length ? ` — sai ở trận ${badCards.map(c => c.id).join(', ')}` : ''));
+
         // ----------------------------------------------------------
         // 9. Giải đã đá xong thì mọi nơi phải nói "đã kết thúc"
         // ----------------------------------------------------------

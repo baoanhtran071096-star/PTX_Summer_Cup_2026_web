@@ -1709,15 +1709,27 @@
             display: inline-block;
             font-family: var(--font-ui);
         }
+        /* Hai cột: sự kiện của đội nhà bên trái, đội khách bên phải, thẳng dưới tên đội
+           tương ứng ở đầu thẻ. auto-fit + minmax để thẻ hẹp (điện thoại) tự xếp dọc
+           thành hai khối riêng, thay vì bóp hai cột đến mức vỡ chữ. */
         .goal-timeline {
             width: 100%;
             margin-top: 12px;
             padding-top: 12px;
             border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 6px 10px;
+            align-items: start;
+        }
+        .goal-timeline .goal-col {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            align-items: flex-start;
+            min-width: 0;
+        }
+        .goal-timeline .goal-col-rest {
+            grid-column: 1 / -1;
         }
         .goal-timeline .goal-item {
             display: flex;
@@ -1730,13 +1742,21 @@
             border-radius: 6px;
             background: var(--bg-body);
             width: 100%;
+            min-width: 0;
             font-family: var(--font-ui);
         }
         .goal-timeline .goal-item .goal-icon {
             font-size: 14px;
+            flex-shrink: 0;
         }
         .goal-timeline .goal-item .goal-scorer {
             font-weight: 600;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        .goal-timeline .goal-item.goal-empty {
+            color: var(--text-muted);
+            border-left-color: transparent;
         }
         .goal-timeline .goal-item .goal-og {
             font-weight: 600;
@@ -4301,6 +4321,9 @@
             flex-direction: column;
             gap: 4px;
             min-width: 0;
+        }
+        .match-result-summary .mrs-col-rest {
+            grid-column: 1 / -1;
         }
         .match-result-summary .mrs-event {
             display: grid;
@@ -9643,21 +9666,30 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         // Timeline dùng chung cho thẻ trận đấu & trang kết quả — mỗi loại sự kiện một biểu tượng.
         function renderEventTimeline(events, match) {
             if (!events || events.length === 0) return '';
-            const items = events.map(e => {
-                // Dải màu bên trái phải là màu ĐỘI THẬT của sự kiện. CSS đã có sẵn các lớp
-                // goal-p/goal-t/goal-x nhưng trước đây không ai gắn vào, nên mọi sự kiện của
-                // đội nhà đều tô màu TEAM P — trận X vs T hiện ra màu xanh của Phoenix.
-                const teamClass = e.team === match.home ? 'goal-home' : 'goal-away';
+            // Dải màu bên trái là màu ĐỘI THẬT của sự kiện. CSS đã có sẵn các lớp
+            // goal-p/goal-t/goal-x nhưng trước đây không ai gắn vào, nên mọi sự kiện của
+            // đội nhà đều tô màu TEAM P — trận X vs T hiện ra màu xanh của Phoenix.
+            const row = e => {
                 const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
                 const ogTag = e.ownGoal ? ' <span class="goal-og">(phản lưới)</span>' : '';
                 return `
-                            <div class="goal-item ${teamClass} goal-${e.team}">
-                                <span class="goal-icon">${icon}</span>
-                                <span class="goal-scorer">${e.scorer}${ogTag}</span>
-                                <span class="goal-time">${e.minute}'</span>
-                            </div>`;
-            }).join('');
-            return `<div class="goal-timeline">${items}</div>`;
+                                <div class="goal-item goal-${e.team}">
+                                    <span class="goal-icon">${icon}</span>
+                                    <span class="goal-scorer">${e.scorer}${ogTag}</span>
+                                    <span class="goal-time">${e.minute}'</span>
+                                </div>`;
+            };
+            const column = teamId => {
+                const rows = events.filter(e => e.team === teamId);
+                return `<div class="goal-col">${rows.length
+                    ? rows.map(row).join('')
+                    : '<div class="goal-item goal-empty"><span class="goal-scorer">—</span></div>'}</div>`;
+            };
+            // Sự kiện không nhận ra đội (tên cầu thủ gõ sai) vẫn phải hiện ra, chứ không
+            // được biến mất lặng lẽ khỏi cả hai cột — mất dữ liệu mà không ai hay biết.
+            const rest = events.filter(e => e.team !== match.home && e.team !== match.away);
+            const restHtml = rest.length ? `<div class="goal-col goal-col-rest">${rest.map(row).join('')}</div>` : '';
+            return `<div class="goal-timeline">${column(match.home)}${column(match.away)}${restHtml}</div>`;
         }
 
         function getMatchResult(matchId) {
@@ -12408,19 +12440,22 @@ function renderGallery() {
                 // Trước đây bàn thắng và thẻ của cả hai đội đổ chung vào một danh sách,
                 // nên nhìn vào không biết ai ghi cho bên nào — với trận 2-9 gồm 12 sự kiện
                 // thì gần như không đọc nổi.
-                const columnFor = teamId => {
-                    const rows = events.filter(e => e.team === teamId);
-                    if (rows.length === 0) return '<div class="mrs-empty">—</div>';
-                    return rows.map(e => {
-                        const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
-                        const ogTag = e.ownGoal ? ' <span class="mrs-og">(phản lưới)</span>' : '';
-                        return `<div class="mrs-event mrs-event-${e.type}">
+                const eventRow = e => {
+                    const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
+                    const ogTag = e.ownGoal ? ' <span class="mrs-og">(phản lưới)</span>' : '';
+                    return `<div class="mrs-event mrs-event-${e.type}">
                                     <span class="mrs-ev-icon">${icon}</span>
                                     <span class="mrs-ev-min">${e.minute}'</span>
                                     <span class="mrs-ev-name">${e.scorer}${ogTag}</span>
                                 </div>`;
-                    }).join('');
                 };
+                const columnFor = teamId => {
+                    const rows = events.filter(e => e.team === teamId);
+                    if (rows.length === 0) return '<div class="mrs-empty">—</div>';
+                    return rows.map(eventRow).join('');
+                };
+                // Sự kiện không nhận ra đội vẫn phải hiện ra thay vì biến mất khỏi cả hai cột.
+                const orphans = events.filter(e => e.team !== match.home && e.team !== match.away);
 
                 const side = (team, score) => `
                     <div class="mrs-side">
@@ -12438,6 +12473,7 @@ function renderGallery() {
                         ? `<div class="mrs-events">
                                <div class="mrs-col">${columnFor(match.home)}</div>
                                <div class="mrs-col">${columnFor(match.away)}</div>
+                               ${orphans.length ? `<div class="mrs-col mrs-col-rest">${orphans.map(eventRow).join('')}</div>` : ''}
                            </div>`
                         : `<div class="mrs-no-result" data-i18n="st_no_result">⏳ Chưa có kết quả</div>`
                     }
