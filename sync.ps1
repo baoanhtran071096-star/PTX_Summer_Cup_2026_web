@@ -24,7 +24,18 @@ param(
     [switch]$NoTest
 )
 
-$ErrorActionPreference = "Stop"
+# KHÔNG dùng "Stop" ở đây.
+#
+# git, npm, firebase và wrangler đều ghi thông báo BÌNH THƯỜNG ra stderr — ví dụ dòng
+# "From https://github.com/..." của git pull. Với ErrorActionPreference = "Stop",
+# PowerShell bọc mỗi dòng stderr của chương trình ngoài thành NativeCommandError và
+# coi là lỗi nghiêm trọng, nên script chết ngay ở bước 1 dù git chạy hoàn toàn đúng.
+# Lỗi này chỉ lộ ra khi output bị chuyển hướng hoặc ghép ống, tức chạy bình thường thì
+# tưởng ổn còn chạy trong pipeline/CI thì hỏng.
+#
+# Cách đúng với script điều khiển chương trình ngoài: để "Continue" và tự kiểm tra
+# $LASTEXITCODE sau từng lệnh — đó mới là tín hiệu thành công/thất bại thật.
+$ErrorActionPreference = "Continue"
 Set-Location -Path $PSScriptRoot
 
 function Write-Step($n, $text) {

@@ -3,14 +3,20 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+
       "**/.*",
+      "**/.*/**",
+
       "**/node_modules/**",
       "**/tests/**",
       "**/archive/**",
-      "**/.github/**",
+      "tools/**",
+      "sync.ps1",
+      "server.js",
       "docker-compose.yml",
       "package.json",
       "package-lock.json",
+      "RELEASE-MANIFEST.json",
       "*.sql",
       "*.md"
     ]

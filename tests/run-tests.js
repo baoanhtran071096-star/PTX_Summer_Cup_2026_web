@@ -6,6 +6,7 @@ const { chromium, withServer, getSummary } = require('./test-utils');
 
 const runSyntaxTests = require('./syntax-check.test.js');
 const runMediaIntegrityTests = require('./media-integrity.test.js');
+const runDeployConfigTests = require('./deploy-config.test.js');
 const runNavigationTests = require('./navigation.test.js');
 const runMatchDataTests = require('./match-data.test.js');
 const runPlayerFilterTests = require('./player-filter.test.js');
@@ -20,6 +21,7 @@ async function main() {
     // Các test không cần trình duyệt / server
     await runSyntaxTests();
     await runMediaIntegrityTests();
+    await runDeployConfigTests();
 
     // Các test cần server tĩnh + trình duyệt thật
     await withServer(async () => {
