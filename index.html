@@ -5936,32 +5936,66 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             social_caption: 'Viết caption Facebook ngắn gọn, vui, tối đa 5 câu.'
         };
 
+        // ============================================================
+        // PTX AI GATEWAY — cổng DUY NHẤT đi ra mô hình
+        // ============================================================
+        // Trước đây có hai hàm tự gọi fetch tới proxy, mỗi hàm tự viết lấy phần kiểm URL,
+        // AbortController, bắt lỗi và đọc phản hồi. Không ai cố ý làm chúng khác nhau, nhưng
+        // chúng ĐÃ khác: một bên hết giờ sau 20 giây, bên kia 12 giây, và bên chat còn quên
+        // gửi trường `task` nên Worker phải tự đoán. Đó là dấu vết điển hình của việc chép
+        // đôi rồi sửa một bên.
+        //
+        // Cái giá thật nằm ở tương lai: nối thêm Workers AI làm lớp dự phòng sẽ phải sửa hai
+        // chỗ, và tính năng AI thứ ba sẽ đẻ ra bản sao thứ ba.
+        //
+        // Khác biệt timeout thì GIỮ LẠI, vì nó có lý: người dùng đang ngồi nhìn bong bóng chat
+        // thì 20 giây là quá lâu, còn admin bấm dựng một bài dài thì chờ được. Điều đổi là nó
+        // được KHAI BÁO ở một bảng, thay vì nằm rải rác thành hai con số rời nhau.
+        const ptxAI = (function () {
+            const CAPABILITIES = {
+                chat:  { timeoutMs: 12000 },  // người dùng đang chờ trực tiếp
+                media: { timeoutMs: 20000 }   // bài dài hơn, admin chấp nhận chờ
+            };
+
+            async function request(capability, message) {
+                const policy = CAPABILITIES[capability];
+                if (!policy) throw new Error('Việc AI chưa khai báo trong cổng: ' + capability);
+                if (!PTX_AI_PROXY_URL) throw new Error('PTX_AI_PROXY_URL chưa được cấu hình');
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), policy.timeoutMs);
+                try {
+                    const resp = await fetch(PTX_AI_PROXY_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        // Worker đọc `task` để chọn giới hạn độ dài và cách dựng prompt, nên
+                        // luôn gửi tường minh thay vì để nó đoán.
+                        body: JSON.stringify({ message, grounding: buildPTXAiGroundingContext(), task: capability }),
+                        signal: controller.signal
+                    });
+                    if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
+                    const data = await resp.json();
+                    if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
+                    return { text: String(data.reply).trim(), model: data.model || '' };
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+            }
+
+            return { request, capabilities: () => Object.keys(CAPABILITIES) };
+        })();
+        window.ptxAI = ptxAI;
+
         async function askPTXMediaModel(type, draft) {
-            if (!PTX_AI_PROXY_URL) throw new Error('PTX_AI_PROXY_URL chưa được cấu hình');
             const brief = `${PTX_MEDIA_BRIEF[type] || PTX_MEDIA_BRIEF.preview}\n`
                 + 'Chỉ dùng đúng số liệu trong bản nháp dưới đây, không thêm bất kỳ con số hay tên nào khác.\n\n'
                 + 'BẢN NHÁP:\n' + draft;
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 20000);
-            try {
-                const resp = await fetch(PTX_AI_PROXY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: brief, grounding: buildPTXAiGroundingContext(), task: 'media' }),
-                    signal: controller.signal
-                });
-                if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
-                const data = await resp.json();
-                if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
-                return { text: String(data.reply).trim(), model: data.model || '' };
-            } finally {
-                clearTimeout(timeoutId);
-            }
+            return ptxAI.request('media', brief);
         }
         window.buildMediaDraft = buildMediaDraft;
 
         // ============================================================
-        // BẢN TIN TỰ ĐỘNG — sinh & đăng lên trang chủ, không qua duyệt
+        // BẢN TIN — sinh tự động vào hàng chờ, lên trang chủ chỉ khi có người bấm Đăng
         // ============================================================
         // Điểm kích hoạt đặt ngay lúc admin lưu tỷ số, KHÔNG dùng worker chạy theo lịch.
         // Lý do rất cụ thể chứ không phải chọn cho tiện: kết quả trận nằm ở localStorage
@@ -16087,24 +16121,10 @@ function renderGallery() {
             };
         }
 
+        // Đi qua cổng ptxAI như mọi thứ khác. Vẫn trả về chuỗi để chỗ gọi không phải đổi.
         async function askPTXAiFallback(userText) {
-            if (!PTX_AI_PROXY_URL) throw new Error('PTX_AI_PROXY_URL chưa được cấu hình');
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 12000);
-            try {
-                const resp = await fetch(PTX_AI_PROXY_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userText, grounding: buildPTXAiGroundingContext() }),
-                    signal: controller.signal
-                });
-                if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
-                const data = await resp.json();
-                if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
-                return data.reply;
-            } finally {
-                clearTimeout(timeoutId);
-            }
+            const { text } = await ptxAI.request('chat', userText);
+            return text;
         }
 
         function sendPTXChatMessage() {

@@ -320,6 +320,52 @@ module.exports = async function runMediaCenterTests(browser) {
             /Tạo nội dung truyền thông AI/i.test(document.body.innerHTML));
         assert(nhanDung, `AI Media Center — thứ thật sự gọi mô hình — vẫn giữ nhãn AI`);
 
+        // ------------------------------------------------------------
+        // Cổng ptxAI — mọi đường ra mô hình đi qua đúng một chỗ
+        // ------------------------------------------------------------
+        // Trước đây chatbot và Media Center mỗi bên tự fetch tới proxy, và hai bản sao đã
+        // trôi khỏi nhau: timeout 12s vs 20s, và bên chat quên gửi `task` nên Worker phải tự
+        // đoán giới hạn độ dài. Các test dưới đây khoá lại việc chỉ còn một đường ra.
+        const cong = await page.evaluate(async () => {
+            const goi = [];
+            const fetchThat = window.fetch;
+            window.fetch = async (url, opts) => {
+                goi.push({ url, body: JSON.parse(opts.body) });
+                return { ok: true, json: async () => ({ reply: 'nội dung thử', model: 'model-thử' }) };
+            };
+            let loiViecLa = null;
+            try { await ptxAI.request('khong-ton-tai', 'x'); }
+            catch (e) { loiViecLa = e.message; }
+
+            const chat = await askPTXAiFallback('đội nào vô địch?');
+            const media = await askPTXMediaModel('preview', 'BẢN NHÁP THỬ');
+            window.fetch = fetchThat;
+
+            return {
+                dsViec: ptxAI.capabilities().sort(),
+                loiViecLa,
+                soLanGoi: goi.length,
+                cungMotUrl: goi.length === 2 && goi[0].url === goi[1].url,
+                taskChat: goi[0] && goi[0].body.task,
+                taskMedia: goi[1] && goi[1].body.task,
+                chatCoGrounding: !!(goi[0] && goi[0].body.grounding && goi[0].body.grounding.standings),
+                chatTraChuoi: typeof chat === 'string' && chat === 'nội dung thử',
+                mediaTraModel: media && media.model === 'model-thử'
+            };
+        });
+        assert(JSON.stringify(cong.dsViec) === JSON.stringify(['chat', 'media']),
+            `Cổng khai báo đúng hai việc AI: ${cong.dsViec.join(', ')}`);
+        assert(/chưa khai báo/.test(cong.loiViecLa || ''),
+            `Gọi một việc chưa khai báo thì báo lỗi rõ ràng, không im lặng`);
+        assert(cong.soLanGoi === 2 && cong.cungMotUrl,
+            `Cả chatbot lẫn Media Center đều đi qua cùng một đường ra (${cong.soLanGoi} lượt)`);
+        assert(cong.taskChat === 'chat' && cong.taskMedia === 'media',
+            `Mỗi lượt gửi đúng loại việc cho Worker (chat="${cong.taskChat}", media="${cong.taskMedia}")`);
+        assert(cong.chatCoGrounding,
+            `Chatbot vẫn kèm dữ liệu nền của giải khi đi qua cổng`);
+        assert(cong.chatTraChuoi && cong.mediaTraModel,
+            `Hai chỗ gọi giữ nguyên kiểu trả về cũ — chatbot nhận chuỗi, Media Center nhận kèm tên model`);
+
         assert(pageErrors.length === 0, `Không có uncaught exception trong Media Center: ${pageErrors.length} lỗi`);
     });
 };
