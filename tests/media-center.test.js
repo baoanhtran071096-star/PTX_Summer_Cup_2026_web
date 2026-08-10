@@ -166,6 +166,55 @@ module.exports = async function runMediaCenterTests(browser) {
         assert(report.bodies === 1,
             `Biên bản xuất ra có đúng một thẻ </body> (${report.bodies})`);
 
+        // ----------------------------------------------------------
+        // Bản tin tự động — máy kiểm thay cho người duyệt
+        // ----------------------------------------------------------
+        // Bài AI được đăng thẳng lên trang chủ, không ai đọc trước, nên bộ kiểm là lớp
+        // bảo vệ duy nhất. Nó phải chặn được số liệu bịa mà KHÔNG bác nhầm bài đúng —
+        // bác nhầm hết thì bản AI không bao giờ lên trang và tính năng thành vô dụng.
+        const guard = await page.evaluate(() => {
+            const draft = buildMediaDraft('match_report', 3);
+            const run = t => verifyArticleAgainstFacts(t, draft);
+            return {
+                baiThat: run("TEAM X đã có 2 bàn thắng do công của Đình Huy ở phút 25' và 28'. Hoàng Nam ghi 4 bàn ở các phút 2', 5', 14' và 16'.").ok,
+                tySoNguoc: run('TEAM T thắng 9-2 trước TEAM X.').ok,
+                soSuyRa: run('Hoàng Nam ghi 4 bàn, TEAM T bỏ túi 3 điểm.').ok,
+                tySoBia: run('TEAM T thắng 5-1 trước TEAM X.').ok,
+                phutBia: run("Minh Thế ghi bàn ở phút 88'.").ok,
+                nguoiLa: run('Phan Hiền toả sáng trong trận.').ok,
+                soLa: run('Trận đấu thu hút 4500 khán giả.').ok
+            };
+        });
+        assert(guard.baiThat && guard.tySoNguoc && guard.soSuyRa,
+            `Bộ kiểm KHÔNG bác nhầm bài đúng (bài thật, tỷ số nói ngược chiều, số suy ra như "4 bàn")`);
+        assert(!guard.tySoBia && !guard.phutBia && !guard.nguoiLa && !guard.soLa,
+            `Bộ kiểm chặn tỷ số bịa, phút bịa, cầu thủ không đá trận, và số liệu bịa`);
+
+        // Đăng bài & hiển thị
+        const news = await page.evaluate(async () => {
+            localStorage.removeItem('ptx_news');
+            renderNewsFeed();
+            const anTrangTrong = document.getElementById('newsFeedSection').style.display === 'none';
+            const a = await autoPublishMatchNews(3);
+            const b = await autoPublishMatchNews(3); // đăng lại cùng trận
+            return {
+                anTrangTrong,
+                title: a.title,
+                source: a.source,
+                soBai: document.querySelectorAll('#newsFeedList article').length,
+                hienMuc: document.getElementById('newsFeedSection').style.display !== 'none',
+                trungTitle: a.title === b.title
+            };
+        });
+        assert(news.anTrangTrong, `Chưa có bản tin nào thì mục Bản tin ẩn hẳn, không để khung trống`);
+        assert(news.hienMuc && news.soBai === 1 && news.trungTitle,
+            `Đăng bản tin cho một trận hai lần chỉ ra MỘT bài, không nhân đôi (${news.soBai} bài)`);
+        assert(/2 - 9|9 - 2/.test(news.title),
+            `Tiêu đề bản tin lấy đúng tỷ số thật ("${news.title}")`);
+        // Test chặn mọi request ra ngoài nên AI luôn hỏng — phải rơi về bản dữ liệu.
+        assert(news.source === 'data',
+            `Mô hình AI hỏng thì vẫn đăng được bản dựng từ dữ liệu (nguồn: ${news.source})`);
+
         assert(pageErrors.length === 0, `Không có uncaught exception trong Media Center: ${pageErrors.length} lỗi`);
     });
 };

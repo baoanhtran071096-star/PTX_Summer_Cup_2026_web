@@ -5950,6 +5950,176 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         }
         window.buildMediaDraft = buildMediaDraft;
 
+        // ============================================================
+        // BẢN TIN TỰ ĐỘNG — sinh & đăng lên trang chủ, không qua duyệt
+        // ============================================================
+        // Điểm kích hoạt đặt ngay lúc admin lưu tỷ số, KHÔNG dùng worker chạy theo lịch.
+        // Lý do rất cụ thể chứ không phải chọn cho tiện: kết quả trận nằm ở localStorage
+        // của máy admin, chỉ lên Firestore khi admin đăng nhập rồi bấm lưu — worker chạy
+        // theo lịch sẽ đọc được con số không. Và worker cũng không có quyền ghi Firestore
+        // (rules đòi request.auth != null), muốn có thì phải nạp service account làm secret.
+        // Đặt ở đây thì cả hai vấn đề biến mất: dữ liệu vừa có, admin đang đăng nhập.
+        const PTX_NEWS_KEY = 'ptx_news';
+        const PTX_NEWS_MAX = 20;
+
+        function getNewsArticles() {
+            try {
+                const raw = localStorage.getItem(PTX_NEWS_KEY);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch (e) { return []; }
+        }
+
+        function saveNewsArticles(list) {
+            localStorage.setItem(PTX_NEWS_KEY, JSON.stringify(list.slice(0, PTX_NEWS_MAX)));
+            try { ptxCloudSync.push('news'); } catch (e) { /* offline: vẫn lưu máy này */ }
+            if (typeof renderNewsFeed === 'function') renderNewsFeed();
+        }
+
+        // Máy kiểm thay cho người duyệt.
+        //
+        // Bài do AI viết được đăng thẳng, không ai đọc trước, nên phải có thứ chặn ở giữa.
+        // Đã đo được mô hình bịa diễn biến từ dữ liệu đúng: gpt-oss-120b viết "TEAM X mở
+        // tỷ số" cho đội ghi bàn ở phút 25 trong khi đối thủ đã ghi từ phút 2 — số liệu
+        // không sai chữ nào nhưng câu chuyện thì sai.
+        //
+        // Hàm này kiểm ba loại khẳng định dễ sai nhất, thay vì đòi MỌI con số trong bài
+        // phải có nguyên văn trong bản nháp. Cách đòi-tất-cả nghe chặt chẽ nhưng thực tế
+        // bác luôn cả câu đúng: "Hoàng Nam ghi 4 bàn" bị chặn vì số 4 là con số SUY RA
+        // (đếm số lần anh ấy xuất hiện) chứ không nằm sẵn trong bản nháp. Chặt đến mức mọi
+        // bài đều rớt thì bộ kiểm vô dụng — bản AI không bao giờ được đăng.
+        //
+        //   1. Tỷ số   — mọi cặp "a - b" trong bài phải trùng một tỷ số có thật (cho phép
+        //                viết ngược chiều, "9-2" hay "2-9" đều là cách nói hợp lệ).
+        //   2. Phút    — mọi "phút N" / "N'" phải là phút có thật trong nhật ký trận.
+        //   3. Tên     — mọi cầu thủ được nhắc phải có mặt trong bản nháp của trận đó.
+        //   4. Số lớn  — số từ 100 trở lên phải có trong bản nháp; đây là chỗ mô hình hay
+        //                bịa nhất (số khán giả, năm thành lập, số liệu "thống kê").
+        //
+        // Giới hạn phải nói thẳng: nó KHÔNG bắt được suy diễn sai bằng LỜI, ví dụ "TEAM X
+        // mở tỷ số" cho đội ghi bàn sau — câu đó không chứa số lạ, tên lạ hay phút lạ nào.
+        // Chặn được loại đó thì phải có người đọc trước khi đăng.
+        function verifyArticleAgainstFacts(articleText, draft) {
+            const norm = s => s.replace(/\s+/g, '');
+
+            const draftScores = new Set((draft.match(/\d+\s*-\s*\d+/g) || []).map(norm));
+            const strayScore = (articleText.match(/\d+\s*-\s*\d+/g) || []).map(norm).filter(s => {
+                const reversed = s.split('-').reverse().join('-');
+                return !draftScores.has(s) && !draftScores.has(reversed);
+            });
+            if (strayScore.length) {
+                return { ok: false, reason: `tỷ số không khớp dữ liệu: ${strayScore.slice(0, 3).join(', ')}` };
+            }
+
+            const draftMinutes = new Set((draft.match(/(\d{1,3})'/g) || []).map(m => m.replace("'", '')));
+            const articleMinutes = [
+                ...(articleText.match(/(\d{1,3})'/g) || []).map(m => m.replace("'", '')),
+                ...(articleText.match(/ph[uú]t\s+(\d{1,3})/gi) || []).map(m => m.replace(/\D/g, ''))
+            ];
+            const strayMinute = [...new Set(articleMinutes)].filter(m => !draftMinutes.has(m));
+            if (strayMinute.length) {
+                return { ok: false, reason: `phút không có trong nhật ký: ${strayMinute.slice(0, 3).join(', ')}` };
+            }
+
+            const draftLower = draft.toLowerCase();
+            const strayNames = PLAYERS_DATA
+                .map(p => p.name)
+                .filter(name => articleText.toLowerCase().includes(name.toLowerCase())
+                    && !draftLower.includes(name.toLowerCase()));
+            if (strayNames.length) {
+                return { ok: false, reason: `nhắc cầu thủ không có trong dữ liệu: ${strayNames.join(', ')}` };
+            }
+
+            const draftBig = new Set((draft.match(/\d{3,}/g) || []));
+            const strayBig = (articleText.match(/\d{3,}/g) || []).filter(n => !draftBig.has(n));
+            if (strayBig.length) {
+                return { ok: false, reason: `số liệu lạ: ${strayBig.slice(0, 3).join(', ')}` };
+            }
+
+            return { ok: true };
+        }
+        window.verifyArticleAgainstFacts = verifyArticleAgainstFacts;
+
+        async function autoPublishMatchNews(matchId) {
+            const match = MATCHES_CONFIG.find(m => String(m.id) === String(matchId));
+            if (!match || !getMatchResult(match.id)) return null;
+
+            const draft = buildMediaDraft('match_report', match.id);
+            let body = draft, source = 'data', note = '';
+            try {
+                const polished = await askPTXMediaModel('match_report', draft);
+                const check = verifyArticleAgainstFacts(polished.text, draft);
+                if (check.ok) {
+                    body = polished.text;
+                    source = polished.model || 'ai';
+                } else {
+                    note = check.reason;
+                }
+            } catch (e) {
+                note = 'mô hình AI không phản hồi';
+            }
+
+            const home = TEAMS_DATA[match.home], away = TEAMS_DATA[match.away];
+            const result = getMatchResult(match.id);
+            const article = {
+                id: 'match-' + match.id,
+                title: `${home.name} ${result.homeScore} - ${result.awayScore} ${away.name}`,
+                body,
+                source,
+                note,
+                matchId: match.id,
+                publishedAt: new Date().toISOString()
+            };
+            // Cùng một trận thì thay bài cũ, không chồng thêm: admin sửa lại tỷ số là
+            // bản tin phải theo, chứ không để hai bài mâu thuẫn nằm cạnh nhau.
+            const list = getNewsArticles().filter(a => a.id !== article.id);
+            list.unshift(article);
+            saveNewsArticles(list);
+            return article;
+        }
+        window.autoPublishMatchNews = autoPublishMatchNews;
+
+        function renderNewsFeed() {
+            const section = document.getElementById('newsFeedSection');
+            const list = document.getElementById('newsFeedList');
+            if (!section || !list) return;
+            const articles = getNewsArticles();
+            if (articles.length === 0) { section.style.display = 'none'; return; }
+            section.style.display = '';
+
+            const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+            const esc = s => String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            list.innerHTML = articles.map(a => {
+                const d = new Date(a.publishedAt);
+                const when = isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                // Ghi rõ bài do AI viết hay do dữ liệu dựng — người đọc có quyền biết mình
+                // đang đọc văn của máy, và khi bộ kiểm bác bản AI thì lý do cũng hiện ra.
+                const badge = a.source === 'data'
+                    ? `<span style="font-size:10px;font-weight:900;color:#94a3b8;background:rgba(148,163,184,0.15);border:1px solid rgba(148,163,184,0.35);padding:2px 8px;border-radius:10px;">DỰNG TỪ DỮ LIỆU</span>`
+                    : `<span style="font-size:10px;font-weight:900;color:#60a5fa;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);padding:2px 8px;border-radius:10px;">🤖 AI VIẾT</span>`;
+                return `
+                    <article class="card" style="padding:18px 20px;">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                            ${badge}
+                            <span style="font-size:11px;color:var(--text-muted);font-weight:700;">${when}</span>
+                            ${isAdmin ? `<button onclick="deleteNewsArticle('${esc(a.id)}')" style="margin-left:auto;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);padding:3px 10px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">Gỡ bài</button>` : ''}
+                        </div>
+                        <h3 style="font-size:17px;font-weight:900;color:var(--text-primary);font-family:var(--font-title);margin-bottom:8px;">${esc(a.title)}</h3>
+                        <div style="font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;">${esc(a.body)}</div>
+                        ${a.note ? `<div style="font-size:11px;color:var(--text-muted);margin-top:10px;font-style:italic;">Bản AI bị từ chối (${esc(a.note)}) — đang hiển thị bản dựng từ dữ liệu.</div>` : ''}
+                    </article>`;
+            }).join('');
+        }
+        window.renderNewsFeed = renderNewsFeed;
+
+        function deleteNewsArticle(id) {
+            saveNewsArticles(getNewsArticles().filter(a => a.id !== id));
+            if (typeof showToast === 'function') showToast('🗑️ Đã gỡ bản tin khỏi trang chủ', 'success');
+        }
+        window.deleteNewsArticle = deleteNewsArticle;
+
         function copyAiOutput() {
             const output = document.getElementById('aiGeneratedOutput');
             if (output && output.value) {
@@ -6583,6 +6753,16 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <!-- ===== TOURNAMENT HIGHLIGHT HUB ===== -->
         <div class="container section-gap reveal" style="padding-top:10px;padding-bottom:10px;">
             <div id="tournamentHub" class="tournament-hub" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;"></div>
+        </div>
+
+        <!-- ===== BẢN TIN GIẢI ĐẤU (sinh tự động khi admin lưu tỷ số) ===== -->
+        <!-- Rỗng thì JS ẩn cả khối, không để lại khung trống trên trang chủ. -->
+        <div class="container section-gap reveal" id="newsFeedSection" style="display:none;padding-top:10px;padding-bottom:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+                <div style="font-size:18px;font-weight:900;color:var(--text-primary);font-family:var(--font-title);">📰 BẢN TIN GIẢI ĐẤU</div>
+                <div style="font-size:11px;color:var(--text-muted);font-weight:700;">Tự động cập nhật theo kết quả trận đấu</div>
+            </div>
+            <div id="newsFeedList" style="display:grid;gap:14px;"></div>
         </div>
 
         <!-- ===== 3. LIVE CENTER ===== -->
@@ -8669,6 +8849,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 results: ['ptx_result_1', 'ptx_result_2', 'ptx_result_3'],
                 stats: ['ptx_stat_goals', 'ptx_stat_matches', 'ptx_stat_yellow', 'ptx_stat_red'],
                 eventInfo: ['ptx_slogan', 'ptx_msg', 'ptx_date', 'ptx_location'],
+                // Bản tin tự động: đi qua đúng cơ chế đồng bộ sẵn có nên bài admin đăng
+                // hiện trên máy mọi người xem trong vài giây, không cần deploy lại trang.
+                news: ['ptx_news'],
             };
 
             function isConfigured() {
@@ -12879,6 +13062,7 @@ function renderGallery() {
                 renderRoadToChampion();
                 renderTournamentHub();
                 renderLiveCenter();
+                if (typeof renderNewsFeed === 'function') renderNewsFeed();
                 updateDashboard();
                 applyLanguage(currentLang);
                 // Sau applyLanguage: thanh trạng thái chứa con số nên phải ghi lại đè lên
@@ -13322,6 +13506,7 @@ function renderGallery() {
             const r2 = document.getElementById('admin-result2').value;
             const r3 = document.getElementById('admin-result3').value;
             const hadPrev1 = localStorage.getItem('ptx_result_1');
+            const prevResults = { 2: localStorage.getItem('ptx_result_2'), 3: localStorage.getItem('ptx_result_3') };
             if (r1) localStorage.setItem('ptx_result_1', r1); else localStorage.removeItem('ptx_result_1');
             if (r2) localStorage.setItem('ptx_result_2', r2); else localStorage.removeItem('ptx_result_2');
             if (r3) localStorage.setItem('ptx_result_3', r3); else localStorage.removeItem('ptx_result_3');
@@ -13330,6 +13515,26 @@ function renderGallery() {
             refreshAll();
             ptxCloudSync.push('results');
             showToast('Đã cập nhật BXH & kết quả Live! 🎉', 'success');
+
+            // Trận nào tỷ số vừa ĐỔI thì sinh bản tin mới cho trận đó. So với giá trị cũ
+            // chứ không đăng lại tất cả: bấm lưu để sửa mỗi trận 3 thì không có lý do gì
+            // viết lại bài của trận 1 và 2.
+            const changed = [
+                { id: 1, before: hadPrev1, after: r1 },
+                { id: 2, before: prevResults[2], after: r2 },
+                { id: 3, before: prevResults[3], after: r3 }
+            ].filter(x => x.after && x.after !== x.before);
+
+            if (changed.length) {
+                showToast(`📰 Đang tạo bản tin cho ${changed.length} trận…`, 'success');
+                Promise.all(changed.map(x => autoPublishMatchNews(x.id)))
+                    .then(articles => {
+                        const done = articles.filter(Boolean);
+                        const byAi = done.filter(a => a.source !== 'data').length;
+                        showToast(`📰 Đã đăng ${done.length} bản tin lên trang chủ (${byAi} bài do AI viết)`, 'success');
+                    })
+                    .catch(() => showToast('⚠️ Không tạo được bản tin, kết quả vẫn đã lưu', 'error'));
+            }
         }
 
         function saveHallOfFameAdmin() {
