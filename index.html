@@ -1703,6 +1703,10 @@
         .goal-timeline .goal-item .goal-scorer {
             font-weight: 600;
         }
+        .goal-timeline .goal-item .goal-og {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
         .goal-timeline .goal-item .goal-time {
             color: var(--text-muted);
             font-weight: 400;
@@ -7610,12 +7614,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     <div class="admin-grid">
                         <div class="admin-card">
                             <h4 style="color:#60a5fa;margin-bottom:12px;font-size:15px;">⚽ Cập Nhật Tỷ Số 3 Trận Đấu Vòng Bảng</h4>
-                            <label>Trận 1: 🦅 TEAM P vs 🐯 TEAM T (VD: 2-1 | Hiền 12', Huy 23')</label>
+                            <label>Trận 1: 🦅 TEAM P vs 🐟 TEAM X (VD: 2-1 | Hiền 12', Huy 23', 🟨 Nam 30')</label>
                             <input type="text" id="admin-result1" placeholder="Để trống nếu trận chưa diễn ra (Khởi tạo 0-0)">
-                            
-                            <label>Trận 2: 🦅 TEAM P vs 🐟 TEAM X</label>
+
+                            <label>Trận 2: 🦅 TEAM P vs 🐯 TEAM T</label>
                             <input type="text" id="admin-result2" placeholder="Để trống nếu trận chưa diễn ra">
-                            
+
                             <label>Trận 3: 🐟 TEAM X vs 🐯 TEAM T</label>
                             <input type="text" id="admin-result3" placeholder="Để trống nếu trận chưa diễn ra">
                             
@@ -9394,37 +9398,70 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             return p ? p.team : null;
         }
 
-        function parseGoalDataWithTeam(resultStr, match) {
-            if (!resultStr) return [];
-            const goals = [];
-            const parts = resultStr.split('|');
-            if (parts.length > 1) {
-                const goalPart = parts[1].trim();
-                const goalItems = goalPart.split(',').map(s => s.trim());
-                goalItems.forEach(item => {
-                    const match2 = item.match(/(.+?)\s*(\d+)'/);
-                    if (match2) {
-                        const scorerName = match2[1].trim();
-                        const minute = parseInt(match2[2]);
-                        let team = getPlayerTeam(scorerName);
-                        if (!team) {
-                            const homePlayers = PLAYERS_DATA.filter(p => p.team === match.home).map(p => p.name
-                                .toLowerCase());
-                            const awayPlayers = PLAYERS_DATA.filter(p => p.team === match.away).map(p => p.name
-                                .toLowerCase());
-                            if (homePlayers.some(h => scorerName.toLowerCase().includes(h) || h.includes(
-                                    scorerName.toLowerCase()))) {
-                                team = match.home;
-                            } else if (awayPlayers.some(a => scorerName.toLowerCase().includes(a) || a
-                                    .includes(scorerName.toLowerCase()))) {
-                                team = match.away;
-                            }
-                        }
-                        goals.push({ scorer: scorerName, minute: minute, team: team || 'unknown' });
-                    }
+        // Mỗi mục trong chuỗi kết quả có thể là 3 loại sự kiện khác nhau:
+        //   bàn thắng      → "Hoàng Nam 10'"
+        //   bàn phản lưới  → "Bảo Anh (OG) 7'"
+        //   thẻ phạt       → "🟨 Quang Minh 27'" / "🟥 ... "
+        // Trước đây MỌI mục đều bị coi là bàn thắng, nên thẻ vàng hiện ra kèm biểu tượng ⚽
+        // và bàn phản lưới bị tính cho chính đội của cầu thủ đá phản, ngược với tỷ số.
+        const OWN_GOAL_MARKER = /\(\s*(?:og|ph[ảa]n\s*l[ưu][ớo]i[^)]*)\s*\)/i;
+
+        function resolveEventTeam(name, match) {
+            const direct = getPlayerTeam(name);
+            if (direct) return direct;
+            const lower = name.toLowerCase();
+            const belongsTo = teamId => PLAYERS_DATA
+                .filter(p => p.team === teamId)
+                .some(p => {
+                    const n = p.name.toLowerCase();
+                    return lower.includes(n) || n.includes(lower);
                 });
-            }
-            return goals;
+            if (belongsTo(match.home)) return match.home;
+            if (belongsTo(match.away)) return match.away;
+            return null;
+        }
+
+        function parseMatchEvents(resultStr, match) {
+            if (!resultStr) return [];
+            const parts = resultStr.split('|');
+            if (parts.length < 2) return [];
+            return parts[1].split(',')
+                .map(s => s.trim())
+                .filter(Boolean)
+                .map(item => {
+                    const parsed = item.match(/(.+?)\s*(\d+)'/);
+                    if (!parsed) return null;
+                    const label = parsed[1].trim();
+                    const type = label.includes('🟥') ? 'red' : label.includes('🟨') ? 'yellow' : 'goal';
+                    const ownGoal = type === 'goal' && OWN_GOAL_MARKER.test(label);
+                    const name = label.replace(/[⚽🟨🟥]/g, '').replace(OWN_GOAL_MARKER, '').trim();
+                    let team = resolveEventTeam(name, match);
+                    // Bàn phản lưới được tính cho ĐỘI ĐỐI PHƯƠNG, đúng như tỷ số trận đấu.
+                    if (ownGoal && team) team = (team === match.home) ? match.away : match.home;
+                    return { type, scorer: name, minute: parseInt(parsed[2]), ownGoal, team: team || 'unknown' };
+                })
+                .filter(Boolean);
+        }
+
+        function parseGoalDataWithTeam(resultStr, match) {
+            return parseMatchEvents(resultStr, match).filter(e => e.type === 'goal');
+        }
+
+        // Timeline dùng chung cho thẻ trận đấu & trang kết quả — mỗi loại sự kiện một biểu tượng.
+        function renderEventTimeline(events, match) {
+            if (!events || events.length === 0) return '';
+            const items = events.map(e => {
+                const teamClass = e.team === match.home ? 'goal-home' : 'goal-away';
+                const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
+                const ogTag = e.ownGoal ? ' <span class="goal-og">(phản lưới)</span>' : '';
+                return `
+                            <div class="goal-item ${teamClass}">
+                                <span class="goal-icon">${icon}</span>
+                                <span class="goal-scorer">${e.scorer}${ogTag}</span>
+                                <span class="goal-time">${e.minute}'</span>
+                            </div>`;
+            }).join('');
+            return `<div class="goal-timeline">${items}</div>`;
         }
 
         function getMatchResult(matchId) {
@@ -9816,7 +9853,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
             const resultData = localStorage.getItem('ptx_result_' + id);
             const result = resultData ? getMatchResult(id) : null;
-            const goals = resultData ? parseGoalDataWithTeam(resultData, match) : [];
+            const events = resultData ? parseMatchEvents(resultData, match) : [];
 
             const isLive = now >= start && now <= end;
             const isFinished = now > end;
@@ -9853,21 +9890,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     `<div class="match-score"><span>${result.homeScore}</span><span class="colon">:</span><span>${result.awayScore}</span></div>`;
                 const elapsed = Math.floor((now - start) / 60000);
                 minuteHtml = `<div class="match-minute">${Math.min(elapsed, 35)}'</div>`;
-                if (goals.length > 0) {
-                    let goalsHtml = '';
-                    goals.forEach(g => {
-                        const isHome = g.team === match.home;
-                        const teamClass = isHome ? 'goal-home' : 'goal-away';
-                        goalsHtml += `
-                            <div class="goal-item ${teamClass}">
-                                <span class="goal-icon">⚽</span>
-                                <span class="goal-scorer">${g.scorer}</span>
-                                <span class="goal-time">${g.minute}'</span>
-                            </div>
-                        `;
-                    });
-                    goalTimelineHtml = `<div class="goal-timeline">${goalsHtml}</div>`;
-                }
+                goalTimelineHtml = renderEventTimeline(events, match);
                 const homePoss = LIVE_STATS_DATA.possession[0];
                 const awayPoss = LIVE_STATS_DATA.possession[1];
                 const homeShots = LIVE_STATS_DATA.shots[0];
@@ -9909,21 +9932,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             } else if (isFinished && result) {
                 scoreHtml =
                     `<div class="match-score"><span>${result.homeScore}</span><span class="colon">:</span><span>${result.awayScore}</span></div>`;
-                if (goals.length > 0) {
-                    let goalsHtml = '';
-                    goals.forEach(g => {
-                        const isHome = g.team === match.home;
-                        const teamClass = isHome ? 'goal-home' : 'goal-away';
-                        goalsHtml += `
-                            <div class="goal-item ${teamClass}">
-                                <span class="goal-icon">⚽</span>
-                                <span class="goal-scorer">${g.scorer}</span>
-                                <span class="goal-time">${g.minute}'</span>
-                            </div>
-                        `;
-                    });
-                    goalTimelineHtml = `<div class="goal-timeline">${goalsHtml}</div>`;
-                }
+                goalTimelineHtml = renderEventTimeline(events, match);
             } else {
                 const diff = Math.max(0, Math.floor((start - now) / 1000));
                 const d = Math.floor(diff / 86400),
@@ -10139,15 +10148,15 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                     teamB.draws++;
                     teamB.pts++; }
             }
-            const r1 = localStorage.getItem('ptx_result_1');
-            const r2 = localStorage.getItem('ptx_result_2');
-            const r3 = localStorage.getItem('ptx_result_3');
-            const s1 = r1 ? r1.split('|')[0].trim() : null;
-            const s2 = r2 ? r2.split('|')[0].trim() : null;
-            const s3 = r3 ? r3.split('|')[0].trim() : null;
-            process(p, t, s1);
-            process(p, x, s2);
-            process(x, t, s3);
+            // Cặp đấu của từng trận LUÔN lấy từ MATCHES_CONFIG. Trước đây đoạn này ghép cứng
+            // (P-T, P-X, X-T) trong khi lịch thật là (P-X, P-T, X-T), nên tỷ số trận 1 và trận 2
+            // bị gán nhầm đội — toàn bộ điểm, hiệu số và thứ hạng đều sai.
+            const table = { p, t, x };
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                const raw = localStorage.getItem('ptx_result_' + m.id);
+                if (!raw || !table[m.home] || !table[m.away]) return;
+                process(table[m.home], table[m.away], raw.split('|')[0].trim());
+            });
 
             p.gd = p.goalsFor - p.goalsAgainst;
             t.gd = t.goalsFor - t.goalsAgainst;
@@ -10325,15 +10334,14 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             if (!container) return;
 
             const results = { p: [], t: [], x: [] };
-            const r1 = localStorage.getItem('ptx_result_1');
-            const r2 = localStorage.getItem('ptx_result_2');
-            const r3 = localStorage.getItem('ptx_result_3');
 
-            const matches = [
-                { id: 1, home: 'p', away: 't', data: r1 },
-                { id: 2, home: 'p', away: 'x', data: r2 },
-                { id: 3, home: 'x', away: 't', data: r3 }
-            ];
+            // Cùng lý do như calculateStandings: cặp đấu lấy từ MATCHES_CONFIG, không ghép cứng.
+            const matches = (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).map(m => ({
+                id: m.id,
+                home: m.home,
+                away: m.away,
+                data: localStorage.getItem('ptx_result_' + m.id)
+            }));
 
             matches.forEach(m => {
                 if (!m.data) return;
@@ -12156,14 +12164,16 @@ function renderGallery() {
                 const home = TEAMS_DATA[match.home];
                 const away = TEAMS_DATA[match.away];
                 const result = getMatchResult(match.id);
-                const goals = result ? parseGoalDataWithTeam(localStorage.getItem('ptx_result_' + match.id), match) : [];
+                const events = result ? parseMatchEvents(localStorage.getItem('ptx_result_' + match.id), match) : [];
                 const div = document.createElement('div');
                 div.className = 'match-result-summary reveal';
                 div.style.cssText = `border-top: 3px solid ${home.color};`;
 
-                const scorersHtml = goals.length > 0
-                    ? goals.map(g => `<div>⚽ ${g.scorer} <span style="color:var(--accent-orange);">${g.minute}'</span></div>`).join('')
-                    : '';
+                const scorersHtml = events.map(e => {
+                    const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
+                    const ogTag = e.ownGoal ? ' <span style="color:#94a3b8;">(phản lưới)</span>' : '';
+                    return `<div>${icon} ${e.scorer}${ogTag} <span style="color:var(--accent-orange);">${e.minute}'</span></div>`;
+                }).join('');
 
                 div.innerHTML = `
                     <div class="mrs-teams">${renderTeamLogo(home)} ${home.name} vs ${renderTeamLogo(away)} ${away.name}</div>
@@ -12833,38 +12843,66 @@ function renderGallery() {
             savePlayersData();
         }
 
-        // Seed Default Tournament Data if localStorage is empty (Guarantees zero data loss & auto self-healing)
-        
-        function seedDefaultTournamentData() {
-            const hasAnyState = localStorage.getItem('ptx_seeded_flag') || 
-                                localStorage.getItem('ptx_match_control_v1') || 
-                                localStorage.getItem('ptx_result_1') || 
-                                localStorage.getItem('ptx_result_2') || 
-                                localStorage.getItem('ptx_result_3') || 
-                                localStorage.getItem('ptx_stat_goals');
+        // ============================================================
+        // KẾT QUẢ CHÍNH THỨC — PTX SUMMER CUP 2026 (07/08/2026)
+        // ============================================================
+        // Định dạng mỗi chuỗi: "TỶ SỐ | <sự kiện>, <sự kiện>, ..."
+        //   bàn thắng      → "Hoàng Nam 10'"
+        //   bàn phản lưới  → "Bảo Anh (OG) 7'"   (tính cho ĐỘI ĐỐI PHƯƠNG, không tính cho cá nhân)
+        //   thẻ vàng/đỏ    → "🟨 Quang Minh 27'" / "🟥 ..."
+        // Đội chủ nhà / đội khách của từng trận lấy theo MATCHES_CONFIG:
+        //   Trận 1: P vs X · Trận 2: P vs T · Trận 3: X vs T
+        const OFFICIAL_RESULTS = {
+            1: "3-1 | Anh Trương 3', Anh Trương 6', Bảo Anh 14', Anh Trương 22', 🟨 Quang Minh 27'",
+            2: "1-3 | Hoàng Nam 10', Đăng Quân 13', Hoàng Nam 17', Thanh Long 20', 🟨 Hoàng Nam 21'",
+            3: "2-9 | Hoàng Nam 2', Đăng Quân 3', Hoàng Nam 5', Bảo Anh (OG) 7', Hoàng Nam 14', Hoàng Nam 16', 🟨 Quang Toàn 17', Đăng Quân 19', Minh Thế 23', Đình Huy 25', Đình Huy 28', Quang Toàn 30'"
+        };
 
-            if (!hasAnyState) {
-                localStorage.setItem('ptx_stat_goals', '0');
-                localStorage.setItem('ptx_stat_matches', '0');
-                localStorage.setItem('ptx_stat_yellow', '0');
-                localStorage.setItem('ptx_stat_red', '0');
-                localStorage.setItem('ptx_stat_players', '24');
-                localStorage.setItem('ptx_seeded_flag', 'clean_v3');
+        // Đổi giá trị này mỗi khi kết quả chính thức thay đổi: máy đã từng mở trang (localStorage
+        // còn giữ dữ liệu cũ) sẽ tự nạp lại bản mới, thay vì kẹt ở dữ liệu rỗng của lần seed trước.
+        const OFFICIAL_SEED_VERSION = 'official_2026_08_07';
+
+        function applyOfficialResults() {
+            Object.keys(OFFICIAL_RESULTS).forEach(id => {
+                localStorage.setItem('ptx_result_' + id, OFFICIAL_RESULTS[id]);
+            });
+            localStorage.setItem('ptx_stat_players', String(PLAYERS_DATA.length));
+            localStorage.setItem('ptx_stat_red', '0');
+
+            // Tổng bàn / số trận / số thẻ đều suy ra từ chính chuỗi kết quả ở trên — không gõ tay,
+            // để các con số trên dashboard không bao giờ lệch với nhật ký trận đấu.
+            const stats = computeDashboardStats();
+            localStorage.setItem('ptx_stat_goals', String(stats.goals));
+            localStorage.setItem('ptx_stat_matches', String(stats.matches));
+            localStorage.setItem('ptx_stat_yellow', String(stats.yellow));
+
+            // Số bàn từng cầu thủ cũng lấy từ nhật ký ghi bàn; bàn phản lưới không tính cho người đá phản.
+            localStorage.removeItem('ptx_players_data');
+            PLAYERS_DATA.forEach(p => { p.goals = 0; });
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                parseMatchEvents(OFFICIAL_RESULTS[m.id], m).forEach(e => {
+                    if (e.type !== 'goal' || e.ownGoal) return;
+                    const scorer = PLAYERS_DATA.find(p => p.name.toLowerCase() === e.scorer.toLowerCase());
+                    if (scorer) scorer.goals++;
+                });
+            });
+            savePlayersData();
+        }
+
+        // Seed Default Tournament Data if localStorage is empty (Guarantees zero data loss & auto self-healing)
+
+        function seedDefaultTournamentData() {
+            if (localStorage.getItem('ptx_seeded_flag') !== OFFICIAL_SEED_VERSION) {
+                applyOfficialResults();
+                localStorage.setItem('ptx_seeded_flag', OFFICIAL_SEED_VERSION);
             }
             if (typeof loadPlayersData === 'function') loadPlayersData();
         }
 
         // Global System Recovery Function (100% Restores Default Tournament Data)
         function resetSystemDataToOfficialDefaults() {
-            localStorage.removeItem('ptx_players_data');
-            localStorage.setItem('ptx_result_1', "2-1 | Hiền 12', Huy 23'");
-            localStorage.setItem('ptx_result_2', "1-1 | Nam 30', Lân 44'");
-            localStorage.setItem('ptx_result_3', "2-1 | Huy 15', Trúc 38'");
-            localStorage.setItem('ptx_stat_goals', '8');
-            localStorage.setItem('ptx_stat_matches', '3');
-            localStorage.setItem('ptx_stat_yellow', '4');
-            localStorage.setItem('ptx_stat_red', '0');
-            localStorage.setItem('ptx_seeded_flag', 'true');
+            applyOfficialResults();
+            localStorage.setItem('ptx_seeded_flag', OFFICIAL_SEED_VERSION);
 
             // Force re-render of all core modules
             syncPlayerStatsFromMatches();
@@ -13009,7 +13047,12 @@ function renderGallery() {
                 // Populate match dropdown
                 const sel = document.getElementById('floatMatchSel');
                 if (sel && MATCHES_CONFIG) {
-                    sel.innerHTML = MATCHES_CONFIG.map(m => `<option value="${m.id}">${m.homeLabel} vs ${m.awayLabel}</option>`).join('');
+                    // MATCHES_CONFIG chỉ có mã đội (home/away); tên hiển thị nằm ở TEAMS_DATA —
+                    // đọc m.homeLabel/m.awayLabel như trước chỉ ra "undefined vs undefined".
+                    sel.innerHTML = MATCHES_CONFIG.map(m => {
+                        const h = TEAMS_DATA[m.home] || {}, a = TEAMS_DATA[m.away] || {};
+                        return `<option value="${m.id}">Trận ${m.id}: ${h.name || m.home} vs ${a.name || m.away}</option>`;
+                    }).join('');
                 }
                 // Populate player datalist
                 const list = document.getElementById('floatPlayerList');
