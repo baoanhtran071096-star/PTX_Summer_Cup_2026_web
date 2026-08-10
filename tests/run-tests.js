@@ -9,6 +9,7 @@ const runMediaIntegrityTests = require('./media-integrity.test.js');
 const runNavigationTests = require('./navigation.test.js');
 const runMatchDataTests = require('./match-data.test.js');
 const runPlayerFilterTests = require('./player-filter.test.js');
+const runMediaCenterTests = require('./media-center.test.js');
 const runAdminLoginTests = require('./admin-login.test.js');
 const runResetAdminTests = require('./reset-admin.test.js');
 const runWeatherCardTests = require('./weather-card.test.js');
@@ -27,6 +28,7 @@ async function main() {
             await runNavigationTests(browser);
             await runMatchDataTests(browser);
             await runPlayerFilterTests(browser);
+            await runMediaCenterTests(browser);
             await runWeatherCardTests(browser);
             await runAdminLoginTests(browser);
             await runResetAdminTests(browser);

@@ -5665,6 +5665,20 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         function openAiMediaCenterModal() {
             const m = document.getElementById('aiMediaCenterModal');
             if (m) m.style.display = 'flex';
+            // Danh sách trận dựng từ MATCHES_CONFIG, mặc định chọn trận cuối đã có kết quả
+            // — đó là trận mà người làm truyền thông cần viết báo cáo ngay sau khi đá xong.
+            const sel = document.getElementById('aiMediaMatchSelect');
+            if (sel && typeof MATCHES_CONFIG !== 'undefined') {
+                const played = MATCHES_CONFIG.filter(x => getMatchResult(x.id));
+                sel.innerHTML = MATCHES_CONFIG.map(x => {
+                    const h = TEAMS_DATA[x.home] || {}, a = TEAMS_DATA[x.away] || {};
+                    const r = getMatchResult(x.id);
+                    return `<option value="${x.id}">Trận ${x.id}: ${h.name || x.home} ${r ? `${r.homeScore} - ${r.awayScore}` : 'vs'} ${a.name || x.away}${r ? '' : ' (chưa đấu)'}</option>`;
+                }).join('');
+                if (played.length) sel.value = String(played[played.length - 1].id);
+            }
+            const statusEl = document.getElementById('aiMediaStatus');
+            if (statusEl) statusEl.textContent = '';
         }
         function closeAiMediaCenterModal() {
             const m = document.getElementById('aiMediaCenterModal');
@@ -5727,21 +5741,164 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         }
         window.playMatchdaySFX = playMatchdaySFX;
 
-        function generateAiContent(type) {
-            const output = document.getElementById('aiGeneratedOutput');
-            let content = '';
-            if (type === 'preview') {
-                content = "📰 BÁO CÁO AI PREVIEW: PTX SUMMER CUP 2026\nGiải đấu chính thức khởi tranh tại 152 Hoàng Hoa Thám, HCM với sự góp mặt của 3 đội tuyển PHOENIX, TIGER và XIPHIAS! Sẵn sàng bùng nổ!";
-            } else if (type === 'match_report') {
-                content = "⚽ MATCH REPORT AI DRAFT:\nTổng quan trận đấu vừa công bố chính thức từ BTC. Nhấn copy để đăng tin!";
-            } else if (type === 'mvp_post') {
-                content = "🏆 VINH DANH MVP TRẬN ĐẤU:\nChúc mừng Cầu thủ xuất sắc nhất đã có màn trình diễn xuất sắc!";
-            } else {
-                content = "📱 CAPTION SOCIAL PTX SUMMER CUP 2026:\n🔥 Đừng bỏ lỡ những pha bóng đẹp mắt tại giải bóng đá truyền thống Công đoàn PTX Group!";
+        // ============================================================
+        // AI MEDIA CENTER
+        // ============================================================
+        // Trước đây bốn nút ở đây trả về bốn chuỗi ghi cứng, không đọc một byte dữ liệu
+        // nào của giải: bấm "Báo cáo trận đấu" sau khi cả 3 trận đã đá xong vẫn ra đúng
+        // câu "Tổng quan trận đấu vừa công bố chính thức từ BTC" — không tỷ số, không
+        // người ghi bàn. Nhãn "DATA-BOUND AI ENGINE" trên tiêu đề modal là sai cả hai vế.
+        //
+        // Quy trình mới có hai bước, và thứ tự này là cố ý:
+        //   1. Trang tự dựng BẢN NHÁP từ dữ liệu thật — tỷ số, người ghi bàn kèm phút,
+        //      thẻ phạt, bảng xếp hạng, danh hiệu. Bản này luôn đúng số liệu.
+        //   2. Gửi bản nháp cho mô hình AI (qua worker) để viết lại cho mượt, kèm lệnh
+        //      cấm thêm bất kỳ số liệu nào.
+        // Nếu bước 2 hỏng hoặc quá hạn, người dùng vẫn có bản nháp ở bước 1 để đăng.
+        // Không bao giờ để mô hình tự nghĩ ra số liệu: nội dung ở đây được người thật
+        // copy đem đăng, một con số bịa là nó lên trang cộng đồng của công ty.
+
+        function ptxMediaMatchLine(match) {
+            const home = TEAMS_DATA[match.home], away = TEAMS_DATA[match.away];
+            const result = getMatchResult(match.id);
+            const time = `${String(match.startH).padStart(2, '0')}:${String(match.startM).padStart(2, '0')}`;
+            if (!result) return `Trận ${match.id} (${time}): ${home.name} vs ${away.name} — chưa thi đấu`;
+            const events = parseMatchEvents(localStorage.getItem('ptx_result_' + match.id), match);
+            const side = teamId => {
+                const rows = events.filter(e => e.team === teamId && e.type === 'goal');
+                return rows.length
+                    ? rows.map(e => `${e.scorer} ${e.minute}'${e.ownGoal ? ' (phản lưới)' : ''}`).join(', ')
+                    : 'không ghi bàn';
+            };
+            const cards = events.filter(e => e.type === 'yellow' || e.type === 'red');
+            const cardLine = cards.length
+                ? `\n  Thẻ phạt: ${cards.map(e => `${e.type === 'red' ? 'thẻ đỏ' : 'thẻ vàng'} ${e.scorer} ${e.minute}'`).join(', ')}`
+                : '';
+            return `Trận ${match.id} (${time}): ${home.name} ${result.homeScore} - ${result.awayScore} ${away.name}`
+                + `\n  ${home.name}: ${side(match.home)}`
+                + `\n  ${away.name}: ${side(match.away)}`
+                + cardLine;
+        }
+
+        function buildMediaDraft(type, matchId) {
+            const status = getTournamentStatus();
+            const table = calculateStandings();
+            const stats = computeDashboardStats();
+            const boot = getGoldenBoot();
+            const gk = getBestGoalkeeper();
+            const played = MATCHES_CONFIG.filter(m => getMatchResult(m.id));
+            // Trạng thái giải phải nằm ngay trong bản nháp. Thiếu dòng này, mô hình mặc
+            // định viết "giải đang diễn ra" cho một giải đã đá xong từ lâu — đúng lỗi đã
+            // thấy khi thử thật lần đầu.
+            const phaseText = {
+                finished: `đã kết thúc toàn bộ ${status.total} trận`,
+                live: `đang diễn ra (${status.played}/${status.total} trận đã đấu)`,
+                upcoming: 'chưa khởi tranh'
+            }[status.phase];
+            const header = 'PTX SUMMER CUP 2026 — Công đoàn PTX Group Việt Nam\n'
+                + 'Sân bóng 152 Hoàng Hoa Thám (Sân số 1), TP.HCM — 07/08/2026\n'
+                + `Trạng thái giải: ${phaseText}\n`;
+
+            if (type === 'match_report') {
+                const match = MATCHES_CONFIG.find(m => String(m.id) === String(matchId) && getMatchResult(m.id))
+                    || played[played.length - 1];
+                if (!match) return header + '\nChưa có trận nào kết thúc nên chưa thể viết báo cáo trận đấu.';
+                return header + '\nBÁO CÁO TRẬN ĐẤU\n' + ptxMediaMatchLine(match);
             }
-            if (output) output.value = content;
+
+            if (type === 'preview') {
+                const next = MATCHES_CONFIG.find(m => !getMatchResult(m.id));
+                if (next) {
+                    const home = TEAMS_DATA[next.home], away = TEAMS_DATA[next.away];
+                    const row = id => table.find(t => t.id === id);
+                    const form = t => t ? `${t.obj.pts} điểm, hiệu số ${t.obj.gd >= 0 ? '+' : ''}${t.obj.gd} sau ${t.obj.played} trận` : 'chưa thi đấu';
+                    return header + `\nBÀI VIẾT TRƯỚC TRẬN\nTrận ${next.id}: ${home.name} (${home.fullName}) gặp ${away.name} (${away.fullName})`
+                        + `\n  ${home.name}: ${form(row(next.home))}`
+                        + `\n  ${away.name}: ${form(row(next.away))}`;
+                }
+                return header + `\nTỔNG QUAN GIẢI ĐẤU\n`
+                    + table.map((t, i) => `  ${i + 1}. ${t.fullName} (${t.label}) — ${t.obj.pts} điểm, ${t.obj.goalsFor}/${t.obj.goalsAgainst} bàn`).join('\n')
+                    + `\nTổng ${stats.goals} bàn thắng, ${stats.yellow} thẻ vàng, ${stats.red} thẻ đỏ.`;
+            }
+
+            if (type === 'mvp_post') {
+                const mvp = getMostValuablePlayer();
+                const lines = [
+                    mvp ? `MVP: ${mvp.name} (${(TEAMS_DATA[mvp.team] || {}).name || ''})` : 'MVP: chưa công bố',
+                    `Vua phá lưới: ${boot.label}`,
+                    gk ? `Thủ môn xuất sắc: ${gk.player.name} (${(TEAMS_DATA[gk.player.team] || {}).name || ''}) — ${gk.conceded} bàn thua sau ${gk.played} trận` : 'Thủ môn xuất sắc: chưa công bố',
+                    table[0] ? `Vô địch: ${table[0].fullName} (${table[0].label}) — ${table[0].obj.pts} điểm` : ''
+                ].filter(Boolean);
+                return header + '\nBÀI CÔNG BỐ DANH HIỆU\n' + lines.map(l => '  ' + l).join('\n');
+            }
+
+            // social_caption
+            const champ = table[0];
+            return header + '\nCAPTION MẠNG XÃ HỘI (ngắn, 3-5 câu)\n'
+                + (champ ? `  Vô địch: ${champ.fullName} (${champ.label}), ${champ.obj.pts} điểm\n` : '')
+                + `  ${status.played}/${status.total} trận đã đấu, tổng ${stats.goals} bàn thắng\n`
+                + `  Vua phá lưới: ${boot.label}\n`
+                + '  Gợi ý hashtag: #PTXSummerCup2026 #PTXGroup #CongDoanPTX';
+        }
+
+        let ptxMediaBusy = false;
+
+        async function generateAiContent(type) {
+            const output = document.getElementById('aiGeneratedOutput');
+            const statusEl = document.getElementById('aiMediaStatus');
+            if (!output || ptxMediaBusy) return;
+
+            const matchSel = document.getElementById('aiMediaMatchSelect');
+            const draft = buildMediaDraft(type, matchSel ? matchSel.value : null);
+
+            // Hiện bản nháp NGAY, trước khi gọi mạng: dù mô hình có hỏng hay chậm thì
+            // người dùng vẫn có sẵn nội dung đúng số liệu để copy.
+            output.value = draft;
+            ptxMediaBusy = true;
+            if (statusEl) statusEl.textContent = '⏳ Đang nhờ mô hình AI viết lại bản nháp…';
+
+            try {
+                const polished = await askPTXMediaModel(type, draft);
+                output.value = polished;
+                if (statusEl) statusEl.textContent = '✅ Đã viết lại bằng mô hình AI — số liệu giữ nguyên từ dữ liệu giải.';
+            } catch (e) {
+                if (statusEl) statusEl.textContent = '⚠️ Mô hình AI không phản hồi — đang hiển thị bản dựng thẳng từ dữ liệu giải (vẫn đăng được).';
+            } finally {
+                ptxMediaBusy = false;
+            }
         }
         window.generateAiContent = generateAiContent;
+
+        const PTX_MEDIA_BRIEF = {
+            preview: 'Viết bài giới thiệu/tổng quan đăng trang tin nội bộ.',
+            match_report: 'Viết bài tường thuật trận đấu đăng trang tin nội bộ.',
+            mvp_post: 'Viết bài vinh danh các danh hiệu cá nhân, giọng chúc mừng.',
+            social_caption: 'Viết caption Facebook ngắn gọn, vui, tối đa 5 câu.'
+        };
+
+        async function askPTXMediaModel(type, draft) {
+            if (!PTX_AI_PROXY_URL) throw new Error('PTX_AI_PROXY_URL chưa được cấu hình');
+            const brief = `${PTX_MEDIA_BRIEF[type] || PTX_MEDIA_BRIEF.preview}\n`
+                + 'Chỉ dùng đúng số liệu trong bản nháp dưới đây, không thêm bất kỳ con số hay tên nào khác.\n\n'
+                + 'BẢN NHÁP:\n' + draft;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
+            try {
+                const resp = await fetch(PTX_AI_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: brief, grounding: buildPTXAiGroundingContext(), task: 'media' }),
+                    signal: controller.signal
+                });
+                if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
+                const data = await resp.json();
+                if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
+                return String(data.reply).trim();
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+        window.buildMediaDraft = buildMediaDraft;
 
         function copyAiOutput() {
             const output = document.getElementById('aiGeneratedOutput');
@@ -16172,143 +16329,6 @@ function renderGallery() {
                     </div>
                 </div>
             
-    <!-- ===== MODAL 1: AI MEDIA CENTER ===== -->
-    <div id="aiMediaCenterModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:700px;background:var(--bg-card);border:1.5px solid #3b82f6;border-radius:20px;padding:24px;color:#fff;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
-                <div style="font-size:20px;font-weight:900;color:#60a5fa;display:flex;align-items:center;gap:8px;">
-                    🤖 AI MEDIA CENTER <span style="font-size:10px;background:#1D4ED8;color:#fff;padding:2px 8px;border-radius:10px;">DATA-BOUND AI ENGINE</span>
-                </div>
-                <button onclick="closeAiMediaCenterModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
-            </div>
-            
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-                <button onclick="generateAiContent('preview')" style="padding:10px;background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#93c5fd;border-radius:12px;font-weight:700;cursor:pointer;">📰 Bài Viết Trước Trận</button>
-                <button onclick="generateAiContent('match_report')" style="padding:10px;background:rgba(16,185,129,0.15);border:1px solid #10b981;color:#6ee7b7;border-radius:12px;font-weight:700;cursor:pointer;">⚽ Báo Cáo Trận Đấu</button>
-                <button onclick="generateAiContent('mvp_post')" style="padding:10px;background:rgba(245,158,11,0.15);border:1px solid #f59e0b;color:#fde047;border-radius:12px;font-weight:700;cursor:pointer;">🏆 Bài Công Bố MVP</button>
-                <button onclick="generateAiContent('social_caption')" style="padding:10px;background:rgba(236,72,153,0.15);border:1px solid #ec4899;color:#f472b6;border-radius:12px;font-weight:700;cursor:pointer;">📱 Caption Facebook</button>
-            </div>
-
-            <div style="margin-bottom:14px;">
-                <label style="font-size:12px;font-weight:800;color:#94a3b8;display:block;margin-bottom:6px;">KẾT QUẢ AI DRAFT & CONTEXT:</label>
-                <textarea id="aiGeneratedOutput" rows="8" style="width:100%;background:rgba(15,23,42,0.8);border:1px solid var(--border-color);border-radius:12px;padding:12px;color:#f8fafc;font-family:monospace;font-size:13px;resize:vertical;" readonly placeholder="Bấm chọn loại bài viết ở trên để tạo nội dung từ dữ liệu đã công bố..."></textarea>
-            </div>
-
-            <div style="display:flex;justify-content:flex-end;gap:10px;">
-                <button onclick="copyAiOutput()" style="padding:10px 18px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;">📋 Sao Chép Nội Dung</button>
-                <button onclick="closeAiMediaCenterModal()" style="padding:10px 18px;background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Đóng</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL 2: MATCHDAY AUDIO CENTER ===== -->
-    <div id="audioCenterModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:650px;background:var(--bg-card);border:1.5px solid #ec4899;border-radius:20px;padding:24px;color:#fff;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
-                <div style="font-size:20px;font-weight:900;color:#f472b6;display:flex;align-items:center;gap:8px;">
-                    🎧 MATCHDAY AUDIO CENTER <span style="font-size:10px;background:#ec4899;color:#fff;padding:2px 8px;border-radius:10px;">SOUNDBOARD PRO</span>
-                </div>
-                <button onclick="closeAudioCenterModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
-            </div>
-
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-                <button onclick="playMatchdaySFX('goal')" style="padding:14px;background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(5,150,105,0.3));border:1px solid #10b981;color:#6ee7b7;border-radius:14px;font-weight:800;cursor:pointer;">⚽ Goal Horn</button>
-                <button onclick="playMatchdaySFX('whistle')" style="padding:14px;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(37,99,235,0.3));border:1px solid #3b82f6;color:#93c5fd;border-radius:14px;font-weight:800;cursor:pointer;">📣 Còi Trọng Tài</button>
-                <button onclick="playMatchdaySFX('victory')" style="padding:14px;background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(217,119,6,0.3));border:1px solid #f59e0b;color:#fde047;border-radius:14px;font-weight:800;cursor:pointer;">🏆 Victory Anthem</button>
-                <button onclick="playMatchdaySFX('crowd')" style="padding:14px;background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(147,51,234,0.3));border:1px solid #a855f7;color:#c084fc;border-radius:14px;font-weight:800;cursor:pointer;">👏 Khán Giả Reo Hò</button>
-                <button onclick="playMatchdaySFX('hype')" style="padding:14px;background:linear-gradient(135deg,rgba(239,68,68,0.2),rgba(220,38,38,0.3));border:1px solid #ef4444;color:#fca5a5;border-radius:14px;font-weight:800;cursor:pointer;">🔥 Hype Beat</button>
-                <button onclick="playMatchdaySFX('intro')" style="padding:14px;background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(219,39,119,0.3));border:1px solid #ec4899;color:#f472b6;border-radius:14px;font-weight:800;cursor:pointer;">🎵 DJ Intro Track</button>
-            </div>
-
-            <!-- Emergency Stop All Button -->
-            <div style="background:rgba(239,68,68,0.15);border:1.5px dashed #ef4444;border-radius:16px;padding:16px;text-align:center;margin-bottom:16px;">
-                <button onclick="stopAllAudio()" style="width:100%;padding:12px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(239,68,68,0.4);">
-                    🛑 STOP ALL AUDIO (TẮT TOÀN BỘ ÂM THANH KHẨN CẤP)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL 3: EXPORT CENTER ===== -->
-    <div id="exportCenterModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:680px;background:var(--bg-card);border:1.5px solid #10b981;border-radius:20px;padding:24px;color:#fff;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
-                <div style="font-size:20px;font-weight:900;color:#6ee7b7;display:flex;align-items:center;gap:8px;">
-                    📤 EXPORT CENTER <span style="font-size:10px;background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;">MEDIA & DATA EXPORT</span>
-                </div>
-                <button onclick="closeExportCenterModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-                <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;">
-                    <div style="font-size:28px;margin-bottom:8px;">🎨</div>
-                    <div style="font-weight:800;font-size:14px;color:#fbbf24;margin-bottom:8px;">MEDIA</div>
-                    <button onclick="openInfographicModal()" style="width:100%;padding:8px;background:rgba(251,191,36,0.2);border:1px solid #fbbf24;color:#fde047;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">📸 Xuất Poster HD</button>
-                </div>
-
-                <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;">
-                    <div style="font-size:28px;margin-bottom:8px;">📊</div>
-                    <div style="font-weight:800;font-size:14px;color:#38bdf8;margin-bottom:8px;">REPORT</div>
-                    <button onclick="exportOfficialMatchReport()" style="width:100%;padding:8px;background:rgba(56,189,248,0.2);border:1px solid #38bdf8;color:#7dd3fc;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">📄 Báo Cáo BLĐ</button>
-                </div>
-
-                <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;">
-                    <div style="font-size:28px;margin-bottom:8px;">💾</div>
-                    <div style="font-weight:800;font-size:14px;color:var(--accent-orange);margin-bottom:8px;">DATA</div>
-                    <button onclick="exportPtxMigrationData()" style="width:100%;padding:8px;background:rgba(249,115,22,0.2);border:1px solid var(--ptx-orange);color:#fdba74;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">💾 Backup JSON</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL 4: SPONSOR & SUPPORT MODAL ===== -->
-    <div id="sponsorSupportModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:600px;background:var(--bg-card);border:1.5px solid #fbbf24;border-radius:20px;padding:24px;color:#fff;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
-                <div style="font-size:20px;font-weight:900;color:#fde047;display:flex;align-items:center;gap:8px;">
-                    🤝 ĐỒNG HÀNH CÙNG GIẢI ĐẤU
-                </div>
-                <button onclick="closeSponsorSupportModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:12px;">
-                <div style="background:rgba(251,191,36,0.1);border:1px solid #fbbf24;border-radius:14px;padding:16px;">
-                    <div style="font-weight:900;color:#fbbf24;font-size:15px;margin-bottom:4px;">💼 TRỞ THÀNH NHÀ TÀI TRỢ DOANH NGHIỆP</div>
-                    <div style="font-size:13px;color:#cbd5e1;margin-bottom:8px;">Quảng bá thương hiệu cùng giải bóng đá PTX Summer Cup 2026. Contact: <strong>0867871687</strong></div>
-                    <a href="#sponsor" onclick="closeSponsorSupportModal(); navigateToPage('sponsor');" style="display:inline-block;padding:6px 14px;background:#fbbf24;color:#0f172a;border-radius:8px;font-weight:800;font-size:12px;text-decoration:none;">Xem Quyền Lợi Tài Trợ ➔</a>
-                </div>
-
-                <div style="background:rgba(236,72,153,0.1);border:1px solid #ec4899;border-radius:14px;padding:16px;">
-                    <div style="font-weight:900;color:#f472b6;font-size:15px;margin-bottom:4px;">❤️ ỦNG HỘ GIẢI ĐẤU (CÁ NHÂN / CĐV)</div>
-                    <div style="font-size:13px;color:#cbd5e1;">Mọi sự đóng góp của CĐV giúp nâng cao chất lượng giải đấu & giải thưởng cầu thủ. MoMo/STK: <strong>0867871687 (PTX Union)</strong></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== MODAL 5: VAR REPLAY SIMULATOR ===== -->
-    <div id="varSimulatorModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:700px;background:var(--bg-card);border:1.5px solid #f43f5e;border-radius:20px;padding:24px;color:#fff;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
-                <div style="font-size:20px;font-weight:900;color:#fda4af;display:flex;align-items:center;gap:8px;">
-                    🖥️ VAR REPLAY SIMULATOR <span style="font-size:10px;background:#a855f7;color:#fff;padding:2px 8px;border-radius:10px;">SIMULATION / ENTERTAINMENT</span>
-                </div>
-                <button onclick="closeVarSimulatorModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
-            </div>
-
-            <div style="background:#0f172a;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1);">
-                <div style="font-size:48px;margin-bottom:8px;">🖥️</div>
-                <div style="font-size:16px;font-weight:900;color:#f43f5e;margin-bottom:6px;">CHECKING POSSIBLE GOAL / PENALTY...</div>
-                <div style="font-size:12px;color:#94a3b8;">Hệ thống mô phỏng đồ họa 3D VAR phục vụ giải trí và trình diễn Matchday.</div>
-            </div>
-
-            <div style="display:flex;justify-content:center;gap:12px;">
-                <button onclick="triggerVARReview('GOAL')" style="padding:10px 18px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;">⚽ Simulate VAR Goal</button>
-                <button onclick="closeVarSimulatorModal()" style="padding:10px 18px;background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Đóng</button>
-            </div>
-        </div>
-    </div>
-
 </body>
             </html>
             `;
@@ -16518,5 +16538,149 @@ function renderGallery() {
            thay vì để lại làm mã chết kèm chú thích mô tả lỗi không còn tồn tại. */
     })();
     </script>
+
+    <!-- ===== MODAL 1: AI MEDIA CENTER ===== -->
+    <div id="aiMediaCenterModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:700px;background:var(--bg-card);border:1.5px solid #3b82f6;border-radius:20px;padding:24px;color:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
+                <div style="font-size:20px;font-weight:900;color:#60a5fa;display:flex;align-items:center;gap:8px;">
+                    🤖 AI MEDIA CENTER <span style="font-size:10px;background:#1D4ED8;color:#fff;padding:2px 8px;border-radius:10px;">DỰNG TỪ DỮ LIỆU GIẢI + AI VIẾT LẠI</span>
+                </div>
+                <button onclick="closeAiMediaCenterModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+                <button onclick="generateAiContent('preview')" style="padding:10px;background:rgba(59,130,246,0.15);border:1px solid #3b82f6;color:#93c5fd;border-radius:12px;font-weight:700;cursor:pointer;">📰 Bài Viết Trước Trận</button>
+                <button onclick="generateAiContent('match_report')" style="padding:10px;background:rgba(16,185,129,0.15);border:1px solid #10b981;color:#6ee7b7;border-radius:12px;font-weight:700;cursor:pointer;">⚽ Báo Cáo Trận Đấu</button>
+                <button onclick="generateAiContent('mvp_post')" style="padding:10px;background:rgba(245,158,11,0.15);border:1px solid #f59e0b;color:#fde047;border-radius:12px;font-weight:700;cursor:pointer;">🏆 Bài Công Bố MVP</button>
+                <button onclick="generateAiContent('social_caption')" style="padding:10px;background:rgba(236,72,153,0.15);border:1px solid #ec4899;color:#f472b6;border-radius:12px;font-weight:700;cursor:pointer;">📱 Caption Facebook</button>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+                <label for="aiMediaMatchSelect" style="font-size:12px;font-weight:800;color:#94a3b8;">TRẬN ĐẤU:</label>
+                <select id="aiMediaMatchSelect" style="flex:1;min-width:220px;background:rgba(15,23,42,0.8);border:1px solid var(--border-color);border-radius:10px;padding:8px 10px;color:#f8fafc;font-size:13px;"></select>
+            </div>
+
+            <div style="margin-bottom:14px;">
+                <label style="font-size:12px;font-weight:800;color:#94a3b8;display:block;margin-bottom:6px;">KẾT QUẢ AI DRAFT & CONTEXT:</label>
+                <textarea id="aiGeneratedOutput" rows="10" style="width:100%;background:rgba(15,23,42,0.8);border:1px solid var(--border-color);border-radius:12px;padding:12px;color:#f8fafc;font-family:monospace;font-size:13px;resize:vertical;" readonly placeholder="Bấm chọn loại bài viết ở trên để tạo nội dung từ dữ liệu đã công bố..."></textarea>
+                <div id="aiMediaStatus" style="font-size:11px;color:#94a3b8;margin-top:6px;min-height:16px;font-weight:600;"></div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="copyAiOutput()" style="padding:10px 18px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;">📋 Sao Chép Nội Dung</button>
+                <button onclick="closeAiMediaCenterModal()" style="padding:10px 18px;background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL 2: MATCHDAY AUDIO CENTER ===== -->
+    <div id="audioCenterModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:650px;background:var(--bg-card);border:1.5px solid #ec4899;border-radius:20px;padding:24px;color:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
+                <div style="font-size:20px;font-weight:900;color:#f472b6;display:flex;align-items:center;gap:8px;">
+                    🎧 MATCHDAY AUDIO CENTER <span style="font-size:10px;background:#ec4899;color:#fff;padding:2px 8px;border-radius:10px;">SOUNDBOARD PRO</span>
+                </div>
+                <button onclick="closeAudioCenterModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+                <button onclick="playMatchdaySFX('goal')" style="padding:14px;background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(5,150,105,0.3));border:1px solid #10b981;color:#6ee7b7;border-radius:14px;font-weight:800;cursor:pointer;">⚽ Goal Horn</button>
+                <button onclick="playMatchdaySFX('whistle')" style="padding:14px;background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(37,99,235,0.3));border:1px solid #3b82f6;color:#93c5fd;border-radius:14px;font-weight:800;cursor:pointer;">📣 Còi Trọng Tài</button>
+                <button onclick="playMatchdaySFX('victory')" style="padding:14px;background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(217,119,6,0.3));border:1px solid #f59e0b;color:#fde047;border-radius:14px;font-weight:800;cursor:pointer;">🏆 Victory Anthem</button>
+                <button onclick="playMatchdaySFX('crowd')" style="padding:14px;background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(147,51,234,0.3));border:1px solid #a855f7;color:#c084fc;border-radius:14px;font-weight:800;cursor:pointer;">👏 Khán Giả Reo Hò</button>
+                <button onclick="playMatchdaySFX('hype')" style="padding:14px;background:linear-gradient(135deg,rgba(239,68,68,0.2),rgba(220,38,38,0.3));border:1px solid #ef4444;color:#fca5a5;border-radius:14px;font-weight:800;cursor:pointer;">🔥 Hype Beat</button>
+                <button onclick="playMatchdaySFX('intro')" style="padding:14px;background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(219,39,119,0.3));border:1px solid #ec4899;color:#f472b6;border-radius:14px;font-weight:800;cursor:pointer;">🎵 DJ Intro Track</button>
+            </div>
+
+            <!-- Emergency Stop All Button -->
+            <div style="background:rgba(239,68,68,0.15);border:1.5px dashed #ef4444;border-radius:16px;padding:16px;text-align:center;margin-bottom:16px;">
+                <button onclick="stopAllAudio()" style="width:100%;padding:12px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 4px 15px rgba(239,68,68,0.4);">
+                    🛑 STOP ALL AUDIO (TẮT TOÀN BỘ ÂM THANH KHẨN CẤP)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL 3: EXPORT CENTER ===== -->
+    <div id="exportCenterModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:680px;background:var(--bg-card);border:1.5px solid #10b981;border-radius:20px;padding:24px;color:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
+                <div style="font-size:20px;font-weight:900;color:#6ee7b7;display:flex;align-items:center;gap:8px;">
+                    📤 EXPORT CENTER <span style="font-size:10px;background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;">MEDIA & DATA EXPORT</span>
+                </div>
+                <button onclick="closeExportCenterModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+                <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">🎨</div>
+                    <div style="font-weight:800;font-size:14px;color:#fbbf24;margin-bottom:8px;">MEDIA</div>
+                    <button onclick="openInfographicModal()" style="width:100%;padding:8px;background:rgba(251,191,36,0.2);border:1px solid #fbbf24;color:#fde047;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">📸 Xuất Poster HD</button>
+                </div>
+
+                <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">📊</div>
+                    <div style="font-weight:800;font-size:14px;color:#38bdf8;margin-bottom:8px;">REPORT</div>
+                    <button onclick="exportOfficialMatchReport()" style="width:100%;padding:8px;background:rgba(56,189,248,0.2);border:1px solid #38bdf8;color:#7dd3fc;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">📄 Báo Cáo BLĐ</button>
+                </div>
+
+                <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px;text-align:center;">
+                    <div style="font-size:28px;margin-bottom:8px;">💾</div>
+                    <div style="font-weight:800;font-size:14px;color:var(--accent-orange);margin-bottom:8px;">DATA</div>
+                    <button onclick="exportPtxMigrationData()" style="width:100%;padding:8px;background:rgba(249,115,22,0.2);border:1px solid var(--ptx-orange);color:#fdba74;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">💾 Backup JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL 4: SPONSOR & SUPPORT MODAL ===== -->
+    <div id="sponsorSupportModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:600px;background:var(--bg-card);border:1.5px solid #fbbf24;border-radius:20px;padding:24px;color:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
+                <div style="font-size:20px;font-weight:900;color:#fde047;display:flex;align-items:center;gap:8px;">
+                    🤝 ĐỒNG HÀNH CÙNG GIẢI ĐẤU
+                </div>
+                <button onclick="closeSponsorSupportModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="background:rgba(251,191,36,0.1);border:1px solid #fbbf24;border-radius:14px;padding:16px;">
+                    <div style="font-weight:900;color:#fbbf24;font-size:15px;margin-bottom:4px;">💼 TRỞ THÀNH NHÀ TÀI TRỢ DOANH NGHIỆP</div>
+                    <div style="font-size:13px;color:#cbd5e1;margin-bottom:8px;">Quảng bá thương hiệu cùng giải bóng đá PTX Summer Cup 2026. Contact: <strong>0867871687</strong></div>
+                    <a href="#sponsor" onclick="closeSponsorSupportModal(); navigateToPage('sponsor');" style="display:inline-block;padding:6px 14px;background:#fbbf24;color:#0f172a;border-radius:8px;font-weight:800;font-size:12px;text-decoration:none;">Xem Quyền Lợi Tài Trợ ➔</a>
+                </div>
+
+                <div style="background:rgba(236,72,153,0.1);border:1px solid #ec4899;border-radius:14px;padding:16px;">
+                    <div style="font-weight:900;color:#f472b6;font-size:15px;margin-bottom:4px;">❤️ ỦNG HỘ GIẢI ĐẤU (CÁ NHÂN / CĐV)</div>
+                    <div style="font-size:13px;color:#cbd5e1;">Mọi sự đóng góp của CĐV giúp nâng cao chất lượng giải đấu & giải thưởng cầu thủ. MoMo/STK: <strong>0867871687 (PTX Union)</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL 5: VAR REPLAY SIMULATOR ===== -->
+    <div id="varSimulatorModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:700px;background:var(--bg-card);border:1.5px solid #f43f5e;border-radius:20px;padding:24px;color:#fff;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px;">
+                <div style="font-size:20px;font-weight:900;color:#fda4af;display:flex;align-items:center;gap:8px;">
+                    🖥️ VAR REPLAY SIMULATOR <span style="font-size:10px;background:#a855f7;color:#fff;padding:2px 8px;border-radius:10px;">SIMULATION / ENTERTAINMENT</span>
+                </div>
+                <button onclick="closeVarSimulatorModal()" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;">✕</button>
+            </div>
+
+            <div style="background:#0f172a;border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-size:48px;margin-bottom:8px;">🖥️</div>
+                <div style="font-size:16px;font-weight:900;color:#f43f5e;margin-bottom:6px;">CHECKING POSSIBLE GOAL / PENALTY...</div>
+                <div style="font-size:12px;color:#94a3b8;">Hệ thống mô phỏng đồ họa 3D VAR phục vụ giải trí và trình diễn Matchday.</div>
+            </div>
+
+            <div style="display:flex;justify-content:center;gap:12px;">
+                <button onclick="triggerVARReview('GOAL')" style="padding:10px 18px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-weight:800;cursor:pointer;">⚽ Simulate VAR Goal</button>
+                <button onclick="closeVarSimulatorModal()" style="padding:10px 18px;background:rgba(255,255,255,0.1);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Đóng</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
