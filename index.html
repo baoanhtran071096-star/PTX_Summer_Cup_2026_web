@@ -11775,7 +11775,9 @@ function renderGallery() {
                 podium(1),
                 podium(2),
                 getGoldenBoot().label,
-                mvp ? `${mvp.name} (${(TEAMS_DATA[mvp.team] || {}).name || ''})`.trim() : 'Chưa trao danh hiệu'
+                // Chưa có dữ liệu MVP thì để trống, rơi về dấu "—" mà thẻ Vinh danh vẫn
+                // dùng cho ô chưa có giá trị — không tự đặt ra một danh hiệu chưa hề trao.
+                mvp ? `${mvp.name} (${(TEAMS_DATA[mvp.team] || {}).name || ''})`.trim() : ''
             ].join(' | ');
         }
 
