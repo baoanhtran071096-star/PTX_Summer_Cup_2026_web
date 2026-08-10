@@ -1,0 +1,31 @@
+# ============================================================
+# Chốt quy ước xuống dòng cho MỌI máy
+# ============================================================
+# Trước đây repo không có file này, nên cách xử lý xuống dòng phụ thuộc cấu hình
+# core.autocrlf riêng của từng máy. Với dự án mà toàn bộ trang nằm trong MỘT file
+# index.html ~16.700 dòng, chỉ cần hai máy đặt khác nhau là git báo cả file thay
+# đổi — xung đột không thể giải quyết bằng tay, và rất dễ bị xử lý ẩu bằng cách
+# ghi đè, mất luôn công của một bên.
+#
+# File này nằm trong repo nên đi theo git: máy nào clone về cũng dùng chung quy ước,
+# bất kể cấu hình cá nhân của máy đó.
+
+# Tự nhận diện file văn bản, chuẩn hoá về LF khi lưu vào repo.
+* text=auto
+
+# Đánh dấu nhị phân TƯỜNG MINH. Nếu để git đoán nhầm một file media là văn bản,
+# nó sẽ "sửa" byte xuống dòng bên trong và làm hỏng ảnh/video vĩnh viễn.
+*.webp  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.mp4   binary
+*.mp3   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+
+# Script PowerShell cần CRLF để chạy ổn trên Windows.
+*.ps1 text eol=crlf
