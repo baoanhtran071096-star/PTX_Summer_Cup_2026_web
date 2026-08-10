@@ -8256,7 +8256,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                         <div class="admin-card">
                             <h4 style="color:#ef4444;margin-bottom:12px;font-size:15px;">🔐 Đổi Mật Khẩu Đăng Nhập Admin</h4>
                             <label>Mật khẩu mới</label>
-                            <input type="password" id="admin-new-pass" placeholder="Nhập mật khẩu mới">
+                            <input type="password" id="admin-new-pass" placeholder="Ít nhất 6 ký tự">
                             <button onclick="changeAdminPassword()">🔒 Đổi Mật Khẩu Hash</button>
                         </div>
 
@@ -8947,11 +8947,31 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 }
             }
 
+            // Đổi mật khẩu của CHÍNH tài khoản Firebase Auth đang đăng nhập.
+            //
+            // Vì sao phải có hàm này: signInAdmin() ở trên đăng nhập Firebase bằng đúng mật
+            // khẩu admin mà người dùng gõ. Nếu changeAdminPassword() chỉ ghi hash mới vào
+            // localStorage (như trước), thì tài khoản Firebase vẫn giữ mật khẩu CŨ. Lần đăng
+            // nhập sau: kiểm tra cục bộ khớp nên vào được trang Admin, nhưng signInAdmin()
+            // trượt với auth/wrong-password → không có auth.currentUser → push() lặng lẽ bỏ
+            // qua mọi thay đổi. Người dùng sửa tỉ số, thấy giao diện cập nhật, tưởng đã xong,
+            // trong khi KHÔNG có gì lên Firestore và máy kia không bao giờ thấy. Hỏng âm thầm.
+            async function changeAdminCloudPassword(newPassword) {
+                if (!enabled) return { ok: false, reason: 'not-configured' };
+                if (!auth.currentUser) return { ok: false, reason: 'not-signed-in' };
+                try {
+                    await auth.currentUser.updatePassword(newPassword);
+                    return { ok: true };
+                } catch (e) {
+                    return { ok: false, reason: e.code || 'unknown' };
+                }
+            }
+
             function signOutAdmin() {
                 if (enabled && auth) auth.signOut().catch(() => {});
             }
 
-            return { init, push, signInAdmin, signOutAdmin, isEnabled: () => enabled };
+            return { init, push, signInAdmin, signOutAdmin, changeAdminCloudPassword, isEnabled: () => enabled };
         })();
 
         // ============================================================
@@ -9022,15 +9042,54 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             return inputHash === storedHash;
         }
 
+        // Mật khẩu admin được dùng ở HAI nơi: hash trong localStorage (mở trang Admin) và
+        // tài khoản Firebase Auth (được phép GHI lên Firestore). Đổi một nơi mà quên nơi kia
+        // là hỏng âm thầm — xem chú thích ở changeAdminCloudPassword().
+        //
+        // Tối thiểu 6 ký tự chứ không phải 4: Firebase Auth từ chối mật khẩu dưới 6 ký tự
+        // (auth/weak-password). Nếu vẫn cho 4 thì phần cục bộ đổi được còn phần Firebase thì
+        // không — tạo ra đúng tình trạng lệch mà hàm này sinh ra để ngăn.
+        const ADMIN_PASSWORD_MIN_LENGTH = 6;
+
         async function changeAdminPassword() {
-            const newPass = document.getElementById('admin-new-pass').value;
-            if (newPass && newPass.length >= 4) {
-                const newHash = await hashPassword(newPass);
-                localStorage.setItem(ADMIN_HASH_KEY, newHash);
-                showToast('Đã đổi mật khẩu thành công!', 'success');
-                document.getElementById('admin-new-pass').value = '';
+            const input = document.getElementById('admin-new-pass');
+            const newPass = input.value;
+
+            if (!newPass || newPass.length < ADMIN_PASSWORD_MIN_LENGTH) {
+                showToast(`Mật khẩu phải có ít nhất ${ADMIN_PASSWORD_MIN_LENGTH} ký tự!`, 'error');
+                return;
+            }
+
+            // Đổi trên Firebase TRƯỚC, ghi hash cục bộ SAU.
+            // Thứ tự này là cố ý: nếu Firebase từ chối vì lý do sửa được (phiên quá cũ, mật
+            // khẩu yếu), ta chưa đụng gì tới hash cục bộ, nên hai bên vẫn khớp nhau và người
+            // dùng chỉ việc thử lại. Làm ngược lại thì mỗi lần Firebase lỗi là một lần lệch.
+            const cloud = await ptxCloudSync.changeAdminCloudPassword(newPass);
+
+            if (!cloud.ok && cloud.reason !== 'not-configured' && cloud.reason !== 'not-signed-in') {
+                if (cloud.reason === 'auth/requires-recent-login') {
+                    showToast('⚠️ Chưa đổi được: phiên đăng nhập Firebase đã quá cũ. Hãy đăng xuất, đăng nhập lại rồi đổi ngay sau đó. Mật khẩu hiện tại GIỮ NGUYÊN.', 'warning');
+                } else if (cloud.reason === 'auth/weak-password') {
+                    showToast('⚠️ Firebase từ chối vì mật khẩu quá yếu. Hãy đặt mật khẩu dài và khó đoán hơn. Mật khẩu hiện tại GIỮ NGUYÊN.', 'warning');
+                } else {
+                    showToast(`⚠️ Chưa đổi được mật khẩu trên Firebase (${cloud.reason}). Mật khẩu hiện tại GIỮ NGUYÊN để hai bên không lệch nhau.`, 'error');
+                }
+                return;
+            }
+
+            const newHash = await hashPassword(newPass);
+            localStorage.setItem(ADMIN_HASH_KEY, newHash);
+            input.value = '';
+
+            if (cloud.ok) {
+                showToast('✅ Đã đổi mật khẩu ở cả máy này và trên Firebase.', 'success');
+            } else if (cloud.reason === 'not-configured') {
+                // Không có Firebase thì không có gì để lệch — đây là trường hợp bình thường.
+                showToast('✅ Đã đổi mật khẩu (máy này chưa nối Firebase nên không cần đổi trên cloud).', 'success');
             } else {
-                showToast('Mật khẩu phải có ít nhất 4 ký tự!', 'error');
+                // not-signed-in: vẫn đổi cục bộ vì đó là cửa vào trang Admin, nhưng phải nói
+                // thẳng là đồng bộ cloud sẽ TẮT — im lặng ở đây chính là lỗi cũ.
+                showToast('⚠️ Chỉ đổi được trên máy này. Tài khoản Firebase vẫn giữ mật khẩu CŨ, nên đồng bộ cloud sẽ TẮT ở lần đăng nhập tới. Hãy đăng nhập lại bằng mật khẩu CŨ rồi đổi lại.', 'warning');
             }
         }
 

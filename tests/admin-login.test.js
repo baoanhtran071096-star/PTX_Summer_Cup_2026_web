@@ -39,6 +39,88 @@ module.exports = async function runAdminLoginTests(browser) {
         assert(!fnSource.includes("'ptx_admin_pass'"), 'changeAdminPassword() không lưu vào key plaintext cũ');
         assert(fnSource.includes('hashPassword'), 'changeAdminPassword() dùng hashPassword() (băm SHA-256+salt)');
 
+        // ------------------------------------------------------------
+        // Mật khẩu admin phải đổi ĐỒNG THỜI ở hai nơi
+        // ------------------------------------------------------------
+        // Mật khẩu này vừa mở trang Admin (hash trong localStorage) vừa là mật khẩu tài
+        // khoản Firebase Auth mà signInAdmin() dùng để được phép GHI lên Firestore. Bản
+        // trước chỉ ghi localStorage: lần đăng nhập sau vào được trang Admin nhưng Firebase
+        // trượt, auth.currentUser rỗng, push() bỏ qua mọi thay đổi — người dùng sửa tỉ số,
+        // thấy giao diện đổi, tưởng xong, mà không có gì lên cloud và máy kia không thấy.
+        // Các test dưới đây khoá đúng bất biến: KHÔNG bao giờ để hai bên lệch nhau trong
+        // im lặng.
+        const coApiCloud = await page.evaluate(() => typeof ptxCloudSync.changeAdminCloudPassword === 'function');
+        assert(coApiCloud, 'ptxCloudSync có API đổi mật khẩu Firebase (changeAdminCloudPassword)');
+
+        // Thay showToast và lớp cloud bằng bản giả để chạy được mà không cần Firebase thật.
+        const thuDoiMatKhau = (matKhau, ketQuaCloud) => page.evaluate(async ({ pw, kq }) => {
+            window.__toasts = [];
+            window.showToast = (m, t) => window.__toasts.push({ m, t });
+            ptxCloudSync.changeAdminCloudPassword = async () => kq;
+            document.getElementById('admin-new-pass').value = pw;
+            const truoc = localStorage.getItem('ptx_admin_hash');
+            await window.changeAdminPassword();
+            const sau = localStorage.getItem('ptx_admin_hash');
+            return {
+                giuNguyen: truoc === sau,
+                // Chặt hơn "có đổi không": hash phải bằng ĐÚNG hash của mật khẩu mới.
+                khopMatKhauMoi: sau === await window.hashPassword(pw),
+                toasts: window.__toasts,
+                oConTrong: document.getElementById('admin-new-pass').value === ''
+            };
+        }, { pw: matKhau, kq: ketQuaCloud });
+
+        // Mỗi ca dùng một mật khẩu riêng. Dùng chung một chuỗi thì hash mới trùng hash cũ,
+        // và phép kiểm "hash có đổi không" luôn báo sai dù hàm chạy đúng.
+
+        const hashGoc = await page.evaluate(() => localStorage.getItem('ptx_admin_hash'));
+
+        // Firebase Auth từ chối mật khẩu dưới 6 ký tự, nên UI cũng phải chặn từ 6 —
+        // cho qua 4 ký tự là đổi được cục bộ mà Firebase từ chối, tức lệch ngay.
+        const quaNgan = await thuDoiMatKhau('abc12', { ok: true });
+        assert(quaNgan.giuNguyen, 'Mật khẩu dưới 6 ký tự bị từ chối, hash cục bộ không đổi');
+        assert(/6 ký tự/.test((quaNgan.toasts[0] || {}).m || ''),
+            `Báo rõ yêu cầu tối thiểu 6 ký tự ("${((quaNgan.toasts[0] || {}).m || '').slice(0, 45)}")`);
+
+        // Trường hợp cốt lõi: Firebase từ chối vì lý do sửa được → tuyệt đối KHÔNG đổi cục bộ.
+        const phienQuaCu = await thuDoiMatKhau('mat-khau-ca-A-2026', { ok: false, reason: 'auth/requires-recent-login' });
+        assert(phienQuaCu.giuNguyen,
+            'Firebase từ chối (phiên quá cũ) thì hash cục bộ GIỮ NGUYÊN — hai bên không lệch');
+        assert(/đăng nhập lại/i.test((phienQuaCu.toasts[0] || {}).m || ''),
+            'Báo cho người dùng cách xử lý khi phiên quá cũ (đăng nhập lại)');
+        assert(((phienQuaCu.toasts[0] || {}).t) !== 'success',
+            'Firebase lỗi thì KHÔNG báo thành công');
+
+        const loiKhac = await thuDoiMatKhau('mat-khau-ca-B-2026', { ok: false, reason: 'auth/network-request-failed' });
+        assert(loiKhac.giuNguyen, 'Lỗi Firebase khác cũng giữ nguyên hash cục bộ');
+
+        // Chưa nối Firebase thì không có gì để lệch — không được chặn oan.
+        const khongCoFirebase = await thuDoiMatKhau('mat-khau-ca-C-2026', { ok: false, reason: 'not-configured' });
+        assert(khongCoFirebase.khopMatKhauMoi, 'Máy chưa nối Firebase thì vẫn đổi được mật khẩu cục bộ');
+        assert(((khongCoFirebase.toasts[0] || {}).t) === 'success', 'Trường hợp không có Firebase báo thành công');
+
+        // Chưa đăng nhập Firebase: vẫn đổi cục bộ (đó là cửa vào trang Admin) nhưng phải
+        // nói thẳng là đồng bộ cloud sẽ tắt — im lặng ở đây chính là lỗi cũ.
+        const chuaDangNhap = await thuDoiMatKhau('mat-khau-ca-D-2026', { ok: false, reason: 'not-signed-in' });
+        assert(chuaDangNhap.khopMatKhauMoi, 'Chưa đăng nhập Firebase thì vẫn đổi được mật khẩu cục bộ');
+        assert(((chuaDangNhap.toasts[0] || {}).t) === 'warning',
+            'Chưa đăng nhập Firebase thì CẢNH BÁO chứ không báo thành công');
+        assert(/cũ/i.test((chuaDangNhap.toasts[0] || {}).m || ''),
+            'Cảnh báo nói rõ tài khoản Firebase vẫn giữ mật khẩu cũ');
+
+        // Đường thành công: đổi cả hai nơi.
+        const thanhCong = await thuDoiMatKhau('mat-khau-ca-E-2026', { ok: true });
+        assert(thanhCong.khopMatKhauMoi, 'Firebase đổi được thì hash cục bộ cũng đổi theo, đúng mật khẩu mới');
+        assert(((thanhCong.toasts[0] || {}).t) === 'success' && /Firebase/.test((thanhCong.toasts[0] || {}).m || ''),
+            'Báo rõ đã đổi ở CẢ hai nơi');
+        assert(thanhCong.oConTrong, 'Đổi xong thì xoá ô nhập, không để mật khẩu nằm lại trên màn hình');
+
+        // Trả lại hash gốc cho các test bên dưới (chúng đăng nhập bằng MAT_KHAU_TEST).
+        // Cố ý KHÔNG reload trang: các test khóa bên dưới dựa vào trạng thái modal đã mở từ
+        // đầu, reload sẽ đóng nó lại. Bản giả showToast/changeAdminCloudPassword còn sót lại
+        // cũng vô hại — luồng khóa chỉ đọc #loginError chứ không đọc toast.
+        await page.evaluate((h) => localStorage.setItem('ptx_admin_hash', h), hashGoc);
+
         // Khóa sau 5 lần sai
         for (let i = 0; i < 5; i++) {
             await page.evaluate((val) => {
