@@ -442,6 +442,19 @@ module.exports = async function runMatchDataTests(browser) {
         assert(!(/đang diễn ra/i.test(liveHeader.sub) && /Chưa có trận/i.test(liveHeader.body)),
             `Tiêu đề khu LIVE không mâu thuẫn với nội dung bên dưới`);
 
+        // Chân menu "Tiện ích" có cùng cặp thông tin trạng thái, cũng ghi cứng trong HTML.
+        // Nó từng nói "Chưa khởi tranh · 0 / 3 trận đã đấu" ngay trong lúc thanh trạng thái
+        // phía trên nói "ĐÃ KẾT THÚC · 3 / 3" — hai chỗ trên cùng một màn hình.
+        const menuStatus = await page.evaluate(() => ({
+            label: (document.getElementById('statusLabelText') || {}).textContent || '',
+            matches: (document.getElementById('statusMatchesText') || {}).textContent || '',
+            bar: (document.getElementById('statusBarMatchInfo') || {}).textContent || ''
+        }));
+        assert(/kết thúc/i.test(menuStatus.label) && !/Chưa khởi tranh/i.test(menuStatus.label),
+            `Chân menu Tiện ích báo đúng trạng thái giải ("${menuStatus.label}")`);
+        assert(menuStatus.matches.startsWith(`${finished.status.played} / ${finished.status.total}`),
+            `Chân menu Tiện ích báo đúng số trận, khớp thanh trạng thái ("${menuStatus.matches}" vs "${menuStatus.bar}")`);
+
         // MVP phải khớp giữa trang Vinh danh và trang Thống kê — hai nơi đọc hai nguồn
         // khác nhau nên rất dễ nói ngược nhau nếu chỉ sửa một chỗ.
         const mvpConsistency = await page.evaluate(() => ({

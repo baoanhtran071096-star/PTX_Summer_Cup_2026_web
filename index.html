@@ -2441,6 +2441,46 @@
         }
 
         /* ===== PLAYER MODAL ===== */
+        /* Năm modal ở menu Tiện ích (AI Media Center, Audio, Export, Sponsor, VAR) dùng
+           chung lớp .modal — nhưng lớp này chưa từng có một dòng CSS nào. Suốt thời gian
+           markup của chúng còn kẹt trong chuỗi template của hàm xuất báo cáo thì không
+           ai phát hiện được, vì phần tử không tồn tại để mà sai. Tách ra thành HTML thật
+           rồi mới lộ: đặt display:flex lên một phần tử position:static chỉ tạo ra một
+           khối nằm lọt thỏm ở CUỐI trang, không phải lớp phủ giữa màn hình — bấm nút
+           xong màn hình không đổi gì, đúng như báo cáo "không thao tác được". */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal .modal-content {
+            width: 100%;
+            /* Nội dung dài (bài viết AI, danh sách xuất dữ liệu) phải cuộn được bên trong
+               khung, nếu không phần cuối kèm nút Đóng bị đẩy ra ngoài màn hình. */
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+
+            /* Năm modal này viết bằng inline style, và toàn bộ chữ + nút bên trong đặt
+               cứng màu trắng (color:#fff, nền rgba(255,255,255,0.1)) vì lúc dựng chỉ có
+               giao diện Tối. Nhưng thẻ lại dùng var(--bg-card) — biến này lật sang TRẮNG
+               ở giao diện Sáng, khiến chữ trắng nằm trên nền trắng: nút "Đóng" biến mất
+               hoàn toàn, người dùng không có cách nào thoát ngoài dấu ✕.
+               Giữ các modal này tối ở cả hai giao diện là cách sửa gọn nhất; đổi màu từng
+               phần tử inline thì phải sửa hàng chục chỗ và rất dễ sót.
+               Cần !important vì inline style luôn thắng selector thường. */
+            background: #111827 !important;
+            color: #f8fafc !important;
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
         #playerModal {
             position: fixed;
             top: 0;
@@ -5684,6 +5724,14 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             const m = document.getElementById('aiMediaCenterModal');
             if (m) m.style.display = 'none';
         }
+
+        // Bấm ra nền tối để đóng — dùng chung cho cả 5 modal ở menu Tiện ích, thay vì
+        // buộc người dùng phải tìm đúng nút ✕ ở góc.
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList && e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
         function openAudioCenterModal() {
             const m = document.getElementById('audioCenterModal');
             if (m) m.style.display = 'flex';
@@ -9847,6 +9895,18 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             // chữ được dịch, và bỏ data-i18n để applyLanguage không ghi đè lại con số.
             infoEl.removeAttribute('data-i18n');
             infoEl.textContent = `${status.played} / ${status.total} ${dict.sb_matches_suffix || 'TRẬN ĐÃ THI ĐẤU'}`;
+
+            // Chân menu "Tiện ích" có cùng một cặp thông tin, cũng ghi cứng trong HTML và
+            // cũng không ai cập nhật — nên nó nói "Chưa khởi tranh · 0 / 3 trận đã đấu"
+            // ngay cạnh thanh trạng thái đang nói "ĐÃ KẾT THÚC · 3 / 3". Đọc chung một
+            // nguồn để hai chỗ không thể mâu thuẫn nhau nữa.
+            const menuLabel = document.getElementById('statusLabelText');
+            const menuMatches = document.getElementById('statusMatchesText');
+            if (menuLabel) {
+                menuLabel.textContent = { upcoming: 'Chưa khởi tranh', live: 'Đang thi đấu', finished: 'Đã kết thúc' }[status.phase];
+                menuLabel.style.color = meta.color;
+            }
+            if (menuMatches) menuMatches.textContent = `${status.played} / ${status.total} trận đã đấu`;
         }
 
         function getPlayerTeam(playerName) {

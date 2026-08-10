@@ -122,6 +122,32 @@ module.exports = async function runMediaCenterTests(browser) {
         assert(modalState.matchOptions > 0,
             `Ô chọn trận được nạp danh sách trận (${modalState.matchOptions} lựa chọn)`);
 
+        // Tồn tại trong DOM thôi chưa đủ. Lớp .modal từng không có một dòng CSS nào, nên
+        // đặt display:flex chỉ tạo ra một khối position:static nằm lọt ở CUỐI trang: bấm
+        // nút xong màn hình không đổi gì, người dùng báo "không thao tác được".
+        const overlay = await page.evaluate(ids => ids.map(id => {
+            const m = document.getElementById(id);
+            m.style.display = 'flex';
+            const cs = getComputedStyle(m);
+            const r = m.getBoundingClientRect();
+            const card = m.querySelector('.modal-content');
+            const cardCs = card ? getComputedStyle(card) : null;
+            m.style.display = 'none';
+            return {
+                id,
+                fixed: cs.position === 'fixed',
+                z: parseInt(cs.zIndex) || 0,
+                phuKin: r.width >= window.innerWidth - 2 && r.height >= window.innerHeight - 2,
+                // Thẻ phải tối ở CẢ hai giao diện: chữ và nút bên trong đặt cứng màu trắng,
+                // nếu nền thẻ lật sang trắng theo giao diện Sáng thì nút "Đóng" tàng hình.
+                theToi: cardCs ? cardCs.backgroundColor === 'rgb(17, 24, 39)' : false
+            };
+        }), MODALS);
+        const badOverlay = overlay.filter(o => !o.fixed || o.z < 1000 || !o.phuKin || !o.theToi);
+        assert(badOverlay.length === 0,
+            `Cả ${MODALS.length} modal mở ra là lớp phủ cố định, phủ kín màn hình, thẻ tối ở mọi giao diện` +
+            (badOverlay.length ? ` — sai ở ${badOverlay.map(o => o.id).join(', ')}` : ''));
+
         // Biên bản giải đấu xuất ra không được dính markup của các modal đó.
         const report = await page.evaluate(ids => {
             let captured = '';
