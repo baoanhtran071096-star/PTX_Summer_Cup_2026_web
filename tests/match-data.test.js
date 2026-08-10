@@ -333,4 +333,37 @@ module.exports = async function runMatchDataTests(browser) {
 
         assert(pageErrors.length === 0, `Không có uncaught exception trong luồng dữ liệu trận đấu: ${pageErrors.length} lỗi`);
     });
+
+    // ----------------------------------------------------------
+    // 10. Lần mở trang THỨ HAI (localStorage đã có dữ liệu)
+    // ----------------------------------------------------------
+    // Mọi test phía trên chạy trên trình duyệt sạch, nên chỉ phủ được cảnh người xem
+    // lần đầu. Người xem thật hầu hết là quay lại: localStorage đã có sẵn kết quả, và
+    // đường chạy lúc nạp trang khác hẳn — hero vào ngay nhánh "đã kết thúc" trước khi
+    // dữ liệu cầu thủ kịp nạp. Đúng khe hở đó từng làm hero hiện "Vua phá lưới: Chưa
+    // xác định" trên bản production trong khi trình duyệt sạch vẫn hiện đúng tên.
+    await withPage(browser, async (page, { pageErrors }) => {
+        console.log('  — mở trang lần 2 (localStorage đã có dữ liệu)');
+        await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.waitForTimeout(2000);
+        const firstVisit = await page.evaluate(() => getGoldenBoot().label);
+
+        await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.waitForTimeout(2000);
+        const second = await page.evaluate(() => ({
+            boot: getGoldenBoot().label,
+            hero: document.getElementById('heroCountdown').innerText.replace(/\s+/g, ' ').trim(),
+            hof: getSeasonAwards(2026),
+            seeded: !!localStorage.getItem('ptx_result_1')
+        }));
+
+        assert(second.seeded, `Lần mở thứ hai thật sự có sẵn dữ liệu trong localStorage`);
+        assert(second.boot === firstVisit && !/Chưa xác định/i.test(second.boot),
+            `Vua phá lưới giữ nguyên ở lần mở thứ hai ("${second.boot}")`);
+        assert(second.hero.includes(second.boot) && !/Chưa xác định/i.test(second.hero),
+            `Hero hiện đúng vua phá lưới với khách quay lại ("${second.hero}")`);
+        assert(second.hof.includes(second.boot),
+            `Vinh danh hiện đúng vua phá lưới với khách quay lại`);
+        assert(pageErrors.length === 0, `Không có uncaught exception ở lần mở thứ hai: ${pageErrors.length} lỗi`);
+    });
 };

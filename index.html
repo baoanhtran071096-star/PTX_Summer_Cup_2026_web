@@ -9519,21 +9519,27 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         }
 
         // Bảng tổng kết thay chỗ đồng hồ đếm ngược khi giải đã kết thúc.
+        let heroFinishedSignature = '';
         function renderHeroFinished() {
             const box = document.getElementById('heroCountdown');
-            if (!box || box.dataset.finished === '1') return;
+            if (!box) return;
             const status = getTournamentStatus();
             const table = calculateStandings();
             const champ = table[0];
             const boot = getGoldenBoot();
             const stats = computeDashboardStats();
-            box.dataset.finished = '1';
-            box.classList.add('hero-finished');
-            box.innerHTML = `
+            const html = `
                 <div class="hf-label">🏁 GIẢI ĐẤU ĐÃ KẾT THÚC</div>
                 <div class="hf-champ">🏆 ${champ ? champ.fullName : '—'} <span>VÔ ĐỊCH</span></div>
                 <div class="hf-sub">${status.played}/${status.total} trận · ${stats.goals} bàn thắng · Vua phá lưới: ${boot.label}</div>
             `;
+            // So sánh nội dung thay vì chốt cứng "đã vẽ rồi": hàm này chạy mỗi giây, nên nếu
+            // lần vẽ đầu rơi vào lúc dữ liệu chưa sẵn sàng thì lần sau tự sửa lại. Cách cũ
+            // đặt cờ dataset.finished khiến một lần vẽ hụt là kẹt sai vĩnh viễn.
+            if (heroFinishedSignature === html) return;
+            heroFinishedSignature = html;
+            box.classList.add('hero-finished');
+            box.innerHTML = html;
             const heroSection = document.querySelector('.hero-v3');
             if (heroSection) heroSection.style.background = 'linear-gradient(135deg,#0B1A2E 0%,#78350f 55%,#1D3557 100%)';
         }
@@ -9541,8 +9547,19 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         // ============================================================
         // MATCH CENTER
         // ============================================================
-        setInterval(updateHeroCountdown, 1000);
-        updateHeroCountdown();
+        // Hero chỉ khởi động SAU khi toàn bộ script định nghĩa xong (gọi từ
+        // initFullPageRender ở cuối file). Chạy ngay giữa file như trước thì nó chạm vào
+        // những hằng `const` khai báo phía dưới và ném ReferenceError vì vùng chết — đã
+        // dính hai lần, với baseDate rồi OWN_GOAL_MARKER, và cả hai lần đều làm chết toàn
+        // bộ phần script còn lại chứ không hỏng riêng cái hero. Chốt thứ tự khởi động một
+        // lần, thay vì cứ phải kê thêm từng hằng số lên đầu file mỗi lần thêm tính năng.
+        let heroClockStarted = false;
+        function startHeroClock() {
+            if (heroClockStarted) return;
+            heroClockStarted = true;
+            updateHeroCountdown();
+            setInterval(updateHeroCountdown, 1000);
+        }
 
         // ============================================================
         // TRẠNG THÁI GIẢI ĐẤU — nguồn duy nhất
@@ -9571,12 +9588,26 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         }
 
         // Vua phá lưới: trả về cả trường hợp nhiều người cùng dẫn đầu.
+        //
+        // Đếm thẳng từ nhật ký ghi bàn, KHÔNG đọc PLAYERS_DATA[].goals. Chỉ số trong
+        // PLAYERS_DATA chỉ có giá trị sau khi loadPlayersData() chạy trong initFullPageRender(),
+        // mà hero lại vẽ ngay từ lúc nạp script. Với khách quay lại (localStorage đã có sẵn
+        // kết quả) hero vào nhánh "đã kết thúc" ngay lập tức, đọc PLAYERS_DATA khi mọi cầu
+        // thủ còn 0 bàn, và hiện "Vua phá lưới: Chưa xác định". Máy chưa từng mở trang thì
+        // không dính, nên lỗi chỉ xuất hiện với đúng những người xem thật.
         function getGoldenBoot() {
-            const scorers = PLAYERS_DATA.filter(p => p.goals > 0);
-            if (scorers.length === 0) return { players: [], goals: 0, label: 'Chưa xác định' };
-            const top = Math.max(...scorers.map(p => p.goals));
-            const players = scorers.filter(p => p.goals === top);
-            return { players, goals: top, label: `${players.map(p => p.name).join(' · ')} (${top} bàn)` };
+            const tally = {};
+            (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
+                parseMatchEvents(localStorage.getItem('ptx_result_' + m.id), m).forEach(e => {
+                    if (e.type !== 'goal' || e.ownGoal) return;
+                    tally[e.scorer] = (tally[e.scorer] || 0) + 1;
+                });
+            });
+            const names = Object.keys(tally);
+            if (names.length === 0) return { players: [], goals: 0, label: 'Chưa xác định' };
+            const top = Math.max(...names.map(n => tally[n]));
+            const players = names.filter(n => tally[n] === top);
+            return { players, goals: top, label: `${players.join(' · ')} (${top} bàn)` };
         }
 
         function getMostValuablePlayer() {
@@ -13244,6 +13275,7 @@ function renderGallery() {
             try { if (typeof renderHallOfFame === 'function') if (typeof renderHallOfFame === 'function') renderHallOfFame(); } catch(e){ console.warn(e); }
             try { if (typeof initFanPredictionForm === 'function') initFanPredictionForm(); } catch(e){ console.warn(e); }
             try { if (typeof initFifa3DTilt === 'function') initFifa3DTilt(); } catch(e){ console.warn(e); }
+            try { startHeroClock(); } catch(e){ console.warn(e); }
 
             // Re-trigger navigation to active hash page after rendering
             const currentHash = window.location.hash.substring(1) || localStorage.getItem('currentPage') || 'home';
