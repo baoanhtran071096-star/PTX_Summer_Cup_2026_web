@@ -136,9 +136,30 @@ $changedFiles = git diff --name-only "$baseCommit..HEAD"
 $workerChanged = $changedFiles | Where-Object { $_ -like "cloudflare-worker/*" }
 
 Write-Step 5 "Deploy Firebase Hosting..."
-firebase deploy --only hosting
+
+# Phai kiem tra lenh CO TON TAI truoc khi goi.
+#
+# Neu goi thang `firebase` ma may chua cai, PowerShell nem CommandNotFoundException chu
+# KHONG dat $LASTEXITCODE. Bien do van giu nguyen gia tri cu — vua la 0 tu `git push` o
+# buoc 4 — nen `if ($LASTEXITCODE -ne 0)` khong bat duoc gi, script chay tiep va in
+# "=== XONG ===" du production KHONG he duoc cap nhat. Da dinh dung loi nay that:
+# code len GitHub, web thi van la ban cu, ma man hinh bao thanh cong.
+#
+# Tien the dung npx lam phuong an du phong: hai may khong can cai firebase-tools toan cuc
+# giong nhau, credential dang nhap van dung chung o ~/.config/configstore.
+$firebaseCmd = $null
+if (Get-Command firebase -ErrorAction SilentlyContinue) {
+    $firebaseCmd = @('firebase')
+} elseif (Get-Command npx -ErrorAction SilentlyContinue) {
+    Write-Host "    Khong thay 'firebase' trong PATH - dung 'npx firebase-tools'." -ForegroundColor DarkGray
+    $firebaseCmd = @('npx', '--yes', 'firebase-tools')
+} else {
+    Fail "Khong tim thay Firebase CLI lan npx. Cai bang: npm install -g firebase-tools. Code da nam an toan tren GitHub."
+}
+
+& $firebaseCmd[0] @($firebaseCmd[1..($firebaseCmd.Length - 1)] + @('deploy', '--only', 'hosting'))
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "    Chua dang nhap? Chay: firebase login" -ForegroundColor Yellow
+    Write-Host "    Chua dang nhap? Chay: npx firebase-tools login" -ForegroundColor Yellow
     Fail "Deploy Firebase that bai. Code da nam an toan tren GitHub."
 }
 
@@ -146,6 +167,11 @@ if ($LASTEXITCODE -ne 0) {
 # deploy thua thi khong hong gi nhung ton them mot vong va che mat log co ich.
 if ($workerChanged) {
     Write-Step 6 "Phat hien thay doi trong cloudflare-worker/ - deploy Worker..."
+    # Cung ly do nhu o buoc 5: npx khong ton tai thi $LASTEXITCODE giu gia tri cu (0 tu
+    # deploy Firebase vua roi) va script bao thanh cong du Worker chua he duoc deploy.
+    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+        Fail "Khong tim thay npx nen khong deploy duoc Worker. Code da nam an toan tren GitHub."
+    }
     Push-Location cloudflare-worker
     npx wrangler deploy
     $wrangerExit = $LASTEXITCODE
