@@ -6071,10 +6071,15 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             } catch (e) { return []; }
         }
 
+        // Đăng bài là thao tác hướng ra ngoài — nó đưa nội dung tới người xem — nên nó đi
+        // qua cổng ghi như mọi thay đổi khác, và cũng vào nhật ký.
         function saveNewsArticles(list) {
-            localStorage.setItem(PTX_NEWS_KEY, JSON.stringify(list.slice(0, PTX_NEWS_MAX)));
-            try { ptxCloudSync.push('news'); } catch (e) { /* offline: vẫn lưu máy này */ }
-            if (typeof renderNewsFeed === 'function') renderNewsFeed();
+            return ptxCommit.commit({
+                label: 'Bản tin trang chủ',
+                doc: 'news',
+                keys: { [PTX_NEWS_KEY]: JSON.stringify(list.slice(0, PTX_NEWS_MAX)) },
+                afterLocalWrite: () => { if (typeof renderNewsFeed === 'function') renderNewsFeed(); }
+            });
         }
 
         // Máy kiểm chạy TRƯỚC người duyệt, không thay người duyệt.
@@ -6190,7 +6195,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
         // Duyệt: chuyển một bản nháp từ hàng chờ sang kho bài đã đăng. Đây là chỗ DUY NHẤT
         // nội dung do AI viết được phép ra trang chủ, và nó luôn cần một cú bấm của con người.
-        function approveNewsArticle(id) {
+        async function approveNewsArticle(id) {
             const pending = getPendingNews();
             const article = pending.find(a => a.id === id);
             if (!article) return null;
@@ -6200,9 +6205,15 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
             const list = getNewsArticles().filter(a => a.id !== article.id);
             list.unshift(article);
-            saveNewsArticles(list);                                   // đẩy cloud nằm trong đây
+            const result = await saveNewsArticles(list);
             savePendingNews(pending.filter(a => a.id !== id));
-            if (typeof showToast === 'function') showToast('✅ Đã đăng bản tin lên trang chủ', 'success');
+
+            // Nói đúng bài đã tới đâu. "Đã đăng lên trang chủ" trong khi nó mới nằm ở máy
+            // này là câu dễ khiến người ta yên tâm nhầm rồi đi báo với cả công ty.
+            const msg = ptxCommit.describe(result, 'bản tin');
+            if (typeof showToast === 'function') {
+                showToast(result.synced ? '✅ Đã đăng bản tin lên trang chủ' : msg.text, msg.type);
+            }
             return article;
         }
         window.approveNewsArticle = approveNewsArticle;
@@ -9073,11 +9084,20 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 }, err => console.error('[PTX Cloud Sync] Lỗi lắng nghe "players":', err));
             }
 
+            // Trả về Promise<{ok, reason}> thay vì bắn đi rồi quên.
+            //
+            // Bản cũ nuốt mọi lỗi vào console.error, nên chỗ gọi không có cách nào biết việc
+            // đẩy có thành công hay không — và vì thế mọi nút Lưu đều báo "đã lưu" ngay cả
+            // khi dữ liệu chưa hề rời khỏi máy. Đó là gốc của lớp lỗi "báo thành công cho
+            // việc chưa làm" mà ptxCommit() bên dưới sinh ra để chấm dứt.
+            //
+            // Các chỗ gọi cũ dùng kiểu `push('results')` không await vẫn chạy y như trước —
+            // thêm giá trị trả về không phá vỡ ai cả.
             function push(docName) {
-                if (!enabled) return; // Chế độ offline: bỏ qua, dữ liệu vẫn lưu localStorage như bình thường
+                if (!enabled) return Promise.resolve({ ok: false, reason: 'not-configured' });
                 if (!auth.currentUser) {
                     console.warn('[PTX Cloud Sync] Chưa đăng nhập Firebase Auth — thay đổi CHỈ lưu local, KHÔNG đồng bộ lên cloud. Đăng nhập lại admin để kích hoạt đồng bộ.');
-                    return;
+                    return Promise.resolve({ ok: false, reason: 'not-signed-in' });
                 }
                 let payload = { updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: auth.currentUser.email };
                 if (docName === 'players') {
@@ -9085,8 +9105,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 } else {
                     (DOC_MAP[docName] || []).forEach(k => { payload[k] = localStorage.getItem(k); });
                 }
-                db.collection('tournamentState').doc(docName).set(payload, { merge: true })
-                    .catch(e => console.error('[PTX Cloud Sync] Lỗi đẩy dữ liệu "' + docName + '":', e));
+                return db.collection('tournamentState').doc(docName).set(payload, { merge: true })
+                    .then(() => ({ ok: true, reason: '' }))
+                    .catch(e => {
+                        console.error('[PTX Cloud Sync] Lỗi đẩy dữ liệu "' + docName + '":', e);
+                        return { ok: false, reason: (e && e.code) || 'unknown' };
+                    });
             }
 
             function pseudoEmailFor(username) {
@@ -9129,6 +9153,144 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
             return { init, push, signInAdmin, signOutAdmin, changeAdminCloudPassword, isEnabled: () => enabled };
         })();
+
+        // ============================================================
+        // PTX COMMIT — cổng DUY NHẤT để ghi dữ liệu giải
+        // ============================================================
+        // Vì sao có tầng này, thay vì cứ vá từng nút Lưu:
+        //
+        // Sáu nút Lưu trước đây mỗi nút tự viết lấy cách lưu của mình. Kết quả là mỗi nút
+        // hỏng theo một kiểu riêng — nút quên ghi đĩa (chỉ số cầu thủ mất trắng khi tải
+        // lại), nút quên đồng bộ (Vinh danh không bao giờ rời khỏi một máy), nút vỡ giữa
+        // chừng (Hall of Fame ném lỗi ở năm 2028). Vá từng cái là chữa triệu chứng: chỗ
+        // thứ bảy được thêm vào sau sẽ lại hỏng theo một kiểu mới.
+        //
+        // Điều quan trọng nhất ở đây KHÔNG phải gom code cho gọn, mà là: thông báo thành
+        // công được phát ra SAU KHI biết kết quả thật, và mang đúng kết quả đó. Trước kia
+        // showToast('Đã lưu') chạy độc lập với việc ghi có xong hay không, nên mọi lỗi đều
+        // hiện ra dưới dạng thành công — kiểu hỏng nguy hiểm nhất, vì không ai đi tìm.
+        //
+        // CỐ Ý KHÔNG đảo nguồn sự thật sang cloud-first. Nghe thì "chuẩn" hơn, nhưng máy
+        // chưa cấu hình Firebase hoặc admin chưa đăng nhập sẽ thành KHÔNG lưu được gì —
+        // đổi một lớp lỗi lấy một lớp lỗi nặng hơn. Ở đây ghi cục bộ luôn thành công, còn
+        // trạng thái đồng bộ được BÁO RA TRUNG THỰC thay vì giấu đi.
+        const ptxCommit = (function () {
+            const AUDIT_KEY = 'ptx_audit_log';
+            const AUDIT_MAX = 100;
+            // Ảnh chụp lớn hơn ngưỡng này thì không lưu để hoàn tác: dữ liệu cầu thủ là
+            // một khối JSON vài KB, nhân 100 mục là đủ làm tràn localStorage. Mục đó vẫn
+            // được ghi nhật ký, chỉ không hoàn tác được — và nói rõ như vậy.
+            const SNAPSHOT_MAX = 4000;
+
+            function readAudit() {
+                try {
+                    const raw = localStorage.getItem(AUDIT_KEY);
+                    const arr = raw ? JSON.parse(raw) : [];
+                    return Array.isArray(arr) ? arr : [];
+                } catch (e) { return []; }
+            }
+
+            // Nhật ký CỐ Ý chỉ nằm ở máy này, không vào DOC_MAP.
+            //
+            // Không phải bỏ quên: cơ chế đồng bộ hiện tại ghi đè trọn giá trị (last write
+            // wins). Đẩy một mảng nhật ký lên đó thì máy nào lưu sau sẽ XOÁ các mục của máy
+            // kia — một nhật ký mất mục còn tệ hơn không có nhật ký, vì nó trông như đầy đủ.
+            // Nhật ký dùng chung thật cần ghi kiểu chỉ-thêm, thứ mô hình đồng bộ này chưa
+            // diễn tả được.
+            function writeAudit(entry) {
+                try {
+                    const list = readAudit();
+                    list.unshift(entry);
+                    localStorage.setItem(AUDIT_KEY, JSON.stringify(list.slice(0, AUDIT_MAX)));
+                } catch (e) { /* nhật ký hỏng không được phép làm hỏng việc lưu */ }
+            }
+
+            async function commit(intent) {
+                const { label, doc, keys, validate, afterLocalWrite } = intent;
+
+                // 1. Kiểm dữ liệu TRƯỚC khi chạm vào bất cứ thứ gì. Sai thì không ghi gì cả,
+                //    nên không có trạng thái nửa vời để dọn.
+                if (typeof validate === 'function') {
+                    const v = validate();
+                    if (!v.ok) return { ok: false, saved: false, synced: false, reason: v.reason };
+                }
+
+                // 2. Chụp lại giá trị cũ để hoàn tác được.
+                const before = {};
+                Object.keys(keys).forEach(k => { before[k] = localStorage.getItem(k); });
+
+                // 3. Ghi cục bộ. Giá trị rỗng nghĩa là XOÁ, không phải bỏ qua — bỏ qua chính
+                //    là lỗi khiến Hall of Fame không xoá trắng một năm được.
+                Object.keys(keys).forEach(k => {
+                    const v = keys[k];
+                    if (v === null || v === undefined || v === '') localStorage.removeItem(k);
+                    else localStorage.setItem(k, String(v));
+                });
+                if (typeof afterLocalWrite === 'function') afterLocalWrite();
+
+                // 4. Đẩy lên cloud và CHỜ kết quả thật.
+                //
+                // Chuẩn hoá kết quả trước khi dùng. Nếu push() được sửa sau này và trả về
+                // thứ khác {ok, reason} thì chỗ này vẫn phải nói được câu tử tế, thay vì
+                // đưa "THẤT BẠI (undefined)" ra trước mặt người dùng.
+                const raw = await ptxCloudSync.push(doc);
+                const cloud = (raw && typeof raw === 'object')
+                    ? { ok: raw.ok === true, reason: raw.reason || 'unknown' }
+                    : { ok: false, reason: 'unknown' };
+
+                // 5. Ghi nhật ký kèm kết quả đồng bộ, để sau này trả lời được câu
+                //    "sửa lúc nào, ai sửa, và nó đã lên cloud chưa".
+                const snapshot = JSON.stringify({ before, after: keys });
+                const undoable = snapshot.length <= SNAPSHOT_MAX;
+                writeAudit({
+                    id: 'c' + readAudit().length + '-' + label.replace(/\s+/g, '-').slice(0, 20),
+                    at: new Date().toISOString(),
+                    by: localStorage.getItem('ptx_admin_user') || 'admin',
+                    label, doc,
+                    synced: cloud.ok,
+                    undoable,
+                    before: undoable ? before : null
+                });
+
+                return { ok: true, saved: true, synced: cloud.ok, reason: cloud.reason };
+            }
+
+            function history() { return readAudit(); }
+
+            // Hoàn tác = ghi lại giá trị cũ qua đúng cổng này, nên nó cũng được kiểm,
+            // cũng được đồng bộ, và bản thân nó cũng vào nhật ký.
+            async function undo(id) {
+                const entry = readAudit().find(e => e.id === id);
+                if (!entry) return { ok: false, reason: 'không tìm thấy mục nhật ký' };
+                if (!entry.undoable || !entry.before) return { ok: false, reason: 'mục này quá lớn nên không lưu bản cũ' };
+                return commit({
+                    label: 'Hoàn tác: ' + entry.label,
+                    doc: entry.doc,
+                    keys: entry.before,
+                    afterLocalWrite: () => { if (typeof refreshAll === 'function') refreshAll(); }
+                });
+            }
+
+            // Câu thông báo chuẩn cho MỌI nút Lưu. Gom ở đây để không nơi nào còn tự chế ra
+            // một câu "đã lưu" không phản ánh kết quả thật.
+            function describe(result, whatSaved) {
+                if (!result.ok) return { text: `❌ Chưa lưu: ${result.reason}`, type: 'error' };
+                if (result.synced) return { text: `✅ Đã lưu ${whatSaved} và đồng bộ lên cloud`, type: 'success' };
+                if (result.reason === 'not-configured') return { text: `✅ Đã lưu ${whatSaved} (máy này chưa nối Firebase)`, type: 'success' };
+                if (result.reason === 'not-signed-in') return { text: `⚠️ Đã lưu ${whatSaved} trên máy này, nhưng CHƯA đồng bộ — hãy đăng nhập lại BTC`, type: 'warning' };
+                return { text: `⚠️ Đã lưu ${whatSaved} trên máy này, nhưng đồng bộ lên cloud THẤT BẠI (${result.reason})`, type: 'warning' };
+            }
+
+            async function commitAndReport(intent, whatSaved) {
+                const result = await commit(intent);
+                const msg = describe(result, whatSaved);
+                if (typeof showToast === 'function') showToast(msg.text, msg.type);
+                return result;
+            }
+
+            return { commit, commitAndReport, describe, history, undo };
+        })();
+        window.ptxCommit = ptxCommit;
 
         // ============================================================
         // SECURITY
@@ -13583,7 +13745,7 @@ function renderGallery() {
             document.getElementById('admin-p-avatar').value = player.avatar || '';
         }
 
-        function savePlayerAdminDetail() {
+        async function savePlayerAdminDetail() {
             const select = document.getElementById('adminPlayerSelect');
             if (!select) return;
             const player = PLAYERS_DATA.find(p => p.id === parseInt(select.value));
@@ -13596,16 +13758,17 @@ function renderGallery() {
             const newAvatar = document.getElementById('admin-p-avatar').value;
             if (newAvatar) player.avatar = newAvatar;
 
-            // Thiếu đúng dòng này là toàn bộ hàm thành vô nghĩa: trước đây nó chỉ sửa mảng
-            // trong bộ nhớ rồi vẽ lại giao diện, nên chỉ số đổi ngay trước mắt, hiện dòng
-            // "Đã cập nhật", rồi tải lại trang là mất sạch — và không có gì lên cloud để
-            // máy kia hay người xem thấy. Nhập chỉ số cho cả 24 cầu thủ rồi đóng tab là
-            // mất trắng, không một dấu hiệu báo lỗi. savePlayersData() đã tồn tại sẵn và
-            // làm đúng cả hai việc (ghi localStorage + đẩy Firestore); chỉ là chưa ai gọi.
-            savePlayersData();
-
-            renderPlayerCards();
-            showToast(`💾 Đã lưu chỉ số cầu thủ: ${player.name}`, 'success');
+            // Trước đây hàm dừng lại ngay trước dòng này: chỉ sửa mảng trong bộ nhớ rồi vẽ
+            // lại giao diện, nên chỉ số đổi ngay trước mắt, hiện dòng "Đã cập nhật", rồi
+            // tải lại trang là mất sạch — và không có gì lên cloud để máy kia hay người xem
+            // thấy. Nhập chỉ số cho cả 24 cầu thủ rồi đóng tab là mất trắng, không một dấu
+            // hiệu báo lỗi. Nay đi qua cổng ghi nên không thể quên một nửa việc nữa.
+            return ptxCommit.commitAndReport({
+                label: 'Chỉ số cầu thủ: ' + player.name,
+                doc: 'players',
+                keys: { ptx_players_data: JSON.stringify(PLAYERS_DATA) },
+                afterLocalWrite: () => renderPlayerCards()
+            }, `chỉ số của ${player.name}`);
         }
 
         function checkAdminNavClick(e) {
@@ -13733,61 +13896,85 @@ function renderGallery() {
             populateAdminPlayerSelect();
         }
 
-        function saveContentAdmin() {
-            const slogan = document.getElementById('admin-slogan').value;
-            const msg = document.getElementById('admin-msg').value;
-            const date = document.getElementById('admin-date').value;
-            const location = document.getElementById('admin-location').value;
-            if (slogan) { localStorage.setItem('ptx_slogan', slogan);
-                document.getElementById('heroSlogan').textContent = slogan; }
-            if (msg) { localStorage.setItem('ptx_msg', msg);
-                document.getElementById('organizerMsg').textContent = msg; }
-            if (date) { localStorage.setItem('ptx_date', date);
-                document.getElementById('scheduleDate').innerText = date;
-                document.getElementById('scheduleDate2').innerText = date; }
-            if (location) { localStorage.setItem('ptx_location', location);
-                document.getElementById('scheduleLocation').innerText = location;
-                document.getElementById('scheduleLocation2').innerText = location; }
-            showToast('Đã lưu nội dung!', 'success');
-            ptxCloudSync.push('eventInfo');
-            refreshAll();
-        }
-
-        function updateStatsAdmin() {
-            ['goals', 'matches', 'yellow', 'red'].forEach(s => {
-                const val = document.getElementById('admin-' + s).value;
-                if (val) {
-                    localStorage.setItem('ptx_stat_' + s, val);
-                }
+        async function saveContentAdmin() {
+            // Chỉ đưa vào những ô người dùng thật sự điền. Ô để trống nghĩa là "không đổi
+            // mục này", chứ không phải "xoá trắng khẩu hiệu của giải".
+            const keys = {};
+            const fields = { ptx_slogan: 'admin-slogan', ptx_msg: 'admin-msg', ptx_date: 'admin-date', ptx_location: 'admin-location' };
+            Object.keys(fields).forEach(k => {
+                const v = document.getElementById(fields[k]).value.trim();
+                if (v) keys[k] = v;
             });
-            showToast('Đã cập nhật thống kê!', 'success');
-            ptxCloudSync.push('stats');
-            refreshAll();
+            if (!Object.keys(keys).length) {
+                showToast('Chưa điền gì để lưu.', 'error');
+                return { ok: false, reason: 'không có nội dung nào' };
+            }
+            return ptxCommit.commitAndReport({
+                label: 'Nội dung giải',
+                doc: 'eventInfo',
+                keys,
+                afterLocalWrite: () => refreshAll()
+            }, 'nội dung giải');
         }
 
-        function updateStandingsAndResults() {
-            const r1 = document.getElementById('admin-result1').value;
-            const r2 = document.getElementById('admin-result2').value;
-            const r3 = document.getElementById('admin-result3').value;
-            const hadPrev1 = localStorage.getItem('ptx_result_1');
-            const prevResults = { 2: localStorage.getItem('ptx_result_2'), 3: localStorage.getItem('ptx_result_3') };
-            if (r1) localStorage.setItem('ptx_result_1', r1); else localStorage.removeItem('ptx_result_1');
-            if (r2) localStorage.setItem('ptx_result_2', r2); else localStorage.removeItem('ptx_result_2');
-            if (r3) localStorage.setItem('ptx_result_3', r3); else localStorage.removeItem('ptx_result_3');
-            // Confetti if a new result was added
-            if ((r1 && !hadPrev1) || r1 !== hadPrev1) launchConfetti();
-            refreshAll();
-            ptxCloudSync.push('results');
-            showToast('Đã cập nhật BXH & kết quả Live! 🎉', 'success');
+        async function updateStatsAdmin() {
+            const keys = {};
+            ['goals', 'matches', 'yellow', 'red'].forEach(s => {
+                const val = document.getElementById('admin-' + s).value.trim();
+                if (val) keys['ptx_stat_' + s] = val;
+            });
+            return ptxCommit.commitAndReport({
+                label: 'Thống kê giải',
+                doc: 'stats',
+                keys,
+                // Thống kê là con số, nên chặn chữ ngay tại cổng thay vì để nó lọt xuống
+                // rồi hiện ra "NaN bàn thắng" trên trang chủ.
+                validate: () => {
+                    const xau = Object.keys(keys).filter(k => !/^\d+$/.test(keys[k]));
+                    return xau.length
+                        ? { ok: false, reason: 'phải là số nguyên: ' + xau.join(', ') }
+                        : { ok: true };
+                },
+                afterLocalWrite: () => refreshAll()
+            }, 'thống kê');
+        }
+
+        async function updateStandingsAndResults() {
+            const values = [1, 2, 3].map(i => document.getElementById('admin-result' + i).value.trim());
+            const prev = [1, 2, 3].map(i => localStorage.getItem('ptx_result_' + i));
+            const keys = { ptx_result_1: values[0], ptx_result_2: values[1], ptx_result_3: values[2] };
+
+            const result = await ptxCommit.commitAndReport({
+                label: 'Tỷ số 3 trận',
+                doc: 'results',
+                keys,
+                // Tỷ số là dữ liệu quan trọng nhất của cả trang — nó chảy vào BXH, vua phá
+                // lưới, thống kê và cả bản tin. Ô nhập là text tự do, nên gõ nhầm "3 - x"
+                // trước đây lưu được và làm hỏng mọi thứ ở hạ nguồn mà không báo gì.
+                validate: () => {
+                    const xau = values
+                        .map((v, i) => ({ v, i: i + 1 }))
+                        .filter(x => x.v && !/^\d+\s*-\s*\d+/.test(x.v));
+                    return xau.length
+                        ? { ok: false, reason: 'tỷ số trận ' + xau.map(x => x.i).join(', ') + ' phải bắt đầu bằng dạng số-số (ví dụ "3-1")' }
+                        : { ok: true };
+                },
+                afterLocalWrite: () => {
+                    if (values[0] && values[0] !== prev[0]) launchConfetti();
+                    refreshAll();
+                }
+            }, 'tỷ số & BXH');
+
+            // Tỷ số không lưu được thì tuyệt đối không soạn bản tin: bài viết sẽ mô tả một
+            // kết quả không tồn tại.
+            if (!result.ok) return result;
 
             // Trận nào tỷ số vừa ĐỔI thì sinh bản tin mới cho trận đó. So với giá trị cũ
             // chứ không đăng lại tất cả: bấm lưu để sửa mỗi trận 3 thì không có lý do gì
             // viết lại bài của trận 1 và 2.
-            const changed = [
-                { id: 1, before: hadPrev1, after: r1 },
-                { id: 2, before: prevResults[2], after: r2 },
-                { id: 3, before: prevResults[3], after: r3 }
-            ].filter(x => x.after && x.after !== x.before);
+            const changed = [1, 2, 3]
+                .map(id => ({ id, before: prev[id - 1], after: values[id - 1] }))
+                .filter(x => x.after && x.after !== x.before);
 
             if (changed.length) {
                 showToast(`📰 Đang soạn bản tin cho ${changed.length} trận…`, 'success');
@@ -13812,16 +13999,17 @@ function renderGallery() {
         //    tức Vinh danh chưa bao giờ rời khỏi trình duyệt của một người.
         // 3. `if (val)` khiến xoá trắng một năm là không làm gì cả: sửa nhầm rồi muốn bỏ
         //    thì không có cách nào, giá trị cũ nằm lại vĩnh viễn.
-        function saveHallOfFameAdmin() {
+        async function saveHallOfFameAdmin() {
+            const keys = {};
             document.querySelectorAll('[id^="admin-hof-"]').forEach(el => {
-                const year = el.id.replace('admin-hof-', '');
-                const val = el.value.trim();
-                if (val) localStorage.setItem('hof_' + year, val);
-                else localStorage.removeItem('hof_' + year);
+                keys['hof_' + el.id.replace('admin-hof-', '')] = el.value.trim();
             });
-            try { ptxCloudSync.push('hof'); } catch (e) { /* offline: vẫn lưu máy này */ }
-            if (typeof renderHallOfFame === 'function') renderHallOfFame();
-            showToast('🏆 Đã lưu Hall of Fame và đồng bộ lên cloud', 'success');
+            return ptxCommit.commitAndReport({
+                label: 'Hall of Fame',
+                doc: 'hof',
+                keys,
+                afterLocalWrite: () => { if (typeof renderHallOfFame === 'function') renderHallOfFame(); }
+            }, 'Hall of Fame');
         }
 
         function addQuickGoal() {

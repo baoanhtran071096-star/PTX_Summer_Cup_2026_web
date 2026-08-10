@@ -543,7 +543,7 @@ module.exports = async function runMatchDataTests(browser) {
         // ---- Hall of Fame ----
         // Hỏng ba kiểu cùng lúc: lặp cứng 2025→2030 trong khi chỉ có 3 ô nên ném lỗi ở
         // 2028 (không kịp báo gì), không đẩy cloud, và không xoá trắng được một năm.
-        const hof = await page.evaluate(() => {
+        const hof = await page.evaluate(async () => {
             const dayLen = [];
             ptxCloudSync.push = (d) => dayLen.push(d);
             let toast = null;
@@ -552,14 +552,15 @@ module.exports = async function runMatchDataTests(browser) {
             const oInput = document.querySelectorAll('[id^="admin-hof-"]');
             oInput.forEach(el => { el.value = 'THỬ ' + el.id.replace('admin-hof-', ''); });
             let loi = null;
-            try { saveHallOfFameAdmin(); } catch (e) { loi = e.message; }
+            // Phải await: từ khi đi qua cổng ghi, hàm chờ kết quả đẩy cloud rồi mới báo.
+            try { await saveHallOfFameAdmin(); } catch (e) { loi = e.message; }
             const daLuu = [...oInput].every(el => {
                 const y = el.id.replace('admin-hof-', '');
                 return localStorage.getItem('hof_' + y) === 'THỬ ' + y;
             });
             // Xoá trắng một năm phải thật sự xoá.
             oInput[0].value = '';
-            saveHallOfFameAdmin();
+            await saveHallOfFameAdmin();
             const namDau = oInput[0].id.replace('admin-hof-', '');
             return {
                 loi, toast, dayLen: dayLen.join(','), soO: oInput.length, daLuu,
@@ -591,6 +592,82 @@ module.exports = async function runMatchDataTests(browser) {
             assert(r.daHoi && r.conNguyen,
                 `${ten}() hỏi xác nhận trước, bấm Huỷ thì không xoá gì`);
         }
+
+        // ============================================================
+        // Cổng ghi ptxCommit — ba đảm bảo trước đây không tồn tại
+        // ============================================================
+        // (a) sai dữ liệu thì KHÔNG ghi gì cả, không để lại trạng thái nửa vời;
+        // (b) thông báo phản ánh ĐÚNG kết quả thật, kể cả khi đồng bộ hỏng;
+        // (c) mọi thay đổi vào nhật ký và hoàn tác được.
+        const cong = await page.evaluate(async () => {
+            localStorage.setItem('ptx_result_1', '9-2 | GIỮ NGUYÊN');
+            localStorage.removeItem('ptx_audit_log');
+
+            // (a) Tỷ số sai định dạng — ô nhập là text tự do nên "3 - x" từng lưu được.
+            document.getElementById('admin-result1').value = '3 - x';
+            document.getElementById('admin-result2').value = '';
+            document.getElementById('admin-result3').value = '';
+            // Gom TẤT CẢ toast chứ không giữ mỗi cái cuối: sau khi lưu tỷ số còn một toast
+            // "đang soạn bản tin" chạy sau, sẽ che mất đúng câu cần kiểm.
+            let toasts = [];
+            window.showToast = (m, t) => { toasts.push({ m, t }); };
+            const cauLuu = () => toasts.find(x => /lưu|Chưa lưu/i.test(x.m)) || null;
+
+            await updateStandingsAndResults();
+            const sauKhiSai = {
+                conNguyen: localStorage.getItem('ptx_result_1') === '9-2 | GIỮ NGUYÊN',
+                toast: cauLuu(), khongGhiNhatKy: JSON.parse(localStorage.getItem('ptx_audit_log') || '[]').length === 0
+            };
+
+            // (b) Thông báo phải nói đúng trạng thái đồng bộ. Firebase không chạy trong
+            //     test nên push trả not-configured — không được báo nhầm là đã lên cloud.
+            // Đặt lại push cho tường minh: khối test phía trên đã thay nó bằng bản giả
+            // ghi log, và trạng thái đó dính lại trên cùng một trang.
+            toasts = [];
+            ptxCloudSync.push = async () => ({ ok: false, reason: 'not-configured' });
+            document.getElementById('admin-result1').value = '5-0';
+            await updateStandingsAndResults();
+            const sauKhiDung = {
+                daGhi: localStorage.getItem('ptx_result_1') === '5-0',
+                toast: cauLuu()
+            };
+
+            // Giả lập đăng nhập hỏng: phải CẢNH BÁO, tuyệt đối không báo thành công.
+            toasts = [];
+            ptxCloudSync.push = async () => ({ ok: false, reason: 'not-signed-in' });
+            document.getElementById('admin-result1').value = '6-0';
+            await updateStandingsAndResults();
+            const khiDongBoHong = cauLuu();
+
+            // (c) Nhật ký & hoàn tác.
+            const nhatKy = ptxCommit.history();
+            const mucMoiNhat = nhatKy[0];
+            await ptxCommit.undo(mucMoiNhat.id);
+            const sauHoanTac = localStorage.getItem('ptx_result_1');
+
+            return { sauKhiSai, sauKhiDung, khiDongBoHong, soMuc: nhatKy.length, mucMoiNhat, sauHoanTac };
+        });
+
+        assert(cong.sauKhiSai.conNguyen,
+            `Tỷ số sai định dạng thì KHÔNG ghi gì cả, giá trị cũ nguyên vẹn`);
+        assert(cong.sauKhiSai.toast && cong.sauKhiSai.toast.t === 'error' && /số-số/.test(cong.sauKhiSai.toast.m),
+            `Báo rõ vì sao bị chặn ("${(cong.sauKhiSai.toast || {}).m}")`);
+        assert(cong.sauKhiSai.khongGhiNhatKy,
+            `Lần lưu bị chặn không để lại mục nào trong nhật ký`);
+
+        assert(cong.sauKhiDung.daGhi, `Tỷ số đúng định dạng thì lưu được`);
+        assert(/chưa nối Firebase/.test(cong.sauKhiDung.toast.m) && cong.sauKhiDung.toast.t === 'success',
+            `Máy chưa nối Firebase thì báo lưu thành công nhưng nói rõ là chưa lên cloud ("${cong.sauKhiDung.toast.m}")`);
+
+        assert(cong.khiDongBoHong.t === 'warning' && /CHƯA đồng bộ/.test(cong.khiDongBoHong.m),
+            `Đồng bộ hỏng thì CẢNH BÁO chứ không báo thành công ("${cong.khiDongBoHong.m}")`);
+
+        assert(cong.soMuc >= 2 && cong.mucMoiNhat.label && cong.mucMoiNhat.by,
+            `Mỗi lần lưu ghi lại nhật ký kèm việc gì và ai làm (${cong.soMuc} mục)`);
+        assert(cong.mucMoiNhat.synced === false,
+            `Nhật ký ghi lại cả việc thay đổi đó đã lên cloud hay chưa`);
+        assert(cong.sauHoanTac === '5-0',
+            `Hoàn tác trả về đúng giá trị trước đó (nhận "${cong.sauHoanTac}")`);
 
         assert(pageErrors.length === 0, `Không có uncaught exception trong luồng lưu của trang quản trị: ${pageErrors.length} lỗi`);
     });

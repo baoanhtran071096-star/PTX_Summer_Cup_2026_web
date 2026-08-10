@@ -256,10 +256,10 @@ module.exports = async function runMediaCenterTests(browser) {
             `Khách chưa đăng nhập không thấy bản nháp, cũng không thấy khung rỗng`);
 
         // Bấm Đăng: bản nháp chuyển sang kho bài đã đăng, hàng chờ rỗng đi.
-        const duyet = await page.evaluate(() => {
+        const duyet = await page.evaluate(async () => {
             localStorage.setItem('adminLoggedIn', 'true');
             const id = getPendingNews()[0].id;
-            const kq = approveNewsArticle(id);
+            const kq = await approveNewsArticle(id);
             return {
                 daDang: getNewsArticles().length,
                 conNhap: getPendingNews().length,
