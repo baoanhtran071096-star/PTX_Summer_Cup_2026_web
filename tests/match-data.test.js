@@ -331,6 +331,89 @@ module.exports = async function runMatchDataTests(browser) {
         assert(afterLangSwitch.en.startsWith('3 / 3') && afterLangSwitch.vi.startsWith('3 / 3'),
             `Số trận trên thanh trạng thái không bị mất khi đổi ngôn ngữ (EN: "${afterLangSwitch.en}")`);
 
+        // ----------------------------------------------------------
+        // 10. Chữ không được tràn ra ngoài khung sự kiện
+        // ----------------------------------------------------------
+        // Cột sự kiện chỉ rộng ~180px. Một cái tên kèm chú thích "phản lưới" không vừa
+        // một dòng, và khi chú thích nằm chung dòng với tên thì phần thừa tràn ra khỏi
+        // khung bo góc — đọc thành chữ chồng lên nhau. Đo ở cả bề rộng máy tính lẫn
+        // điện thoại vì đây đúng là chỗ layout hẹp nhất.
+        const measureOverflow = () => page.evaluate(() => {
+            const bad = [];
+            document.querySelectorAll('.goal-item, .mrs-event').forEach(item => {
+                const box = item.getBoundingClientRect();
+                [...item.children].forEach(child => {
+                    const c = child.getBoundingClientRect();
+                    if (c.width === 0 && c.height === 0) return;
+                    if (c.bottom > box.bottom + 0.5 || c.top < box.top - 0.5 || c.right > box.right + 0.5) {
+                        bad.push(item.innerText.replace(/\s+/g, ' ').trim());
+                    }
+                });
+            });
+            return [...new Set(bad)];
+        });
+
+        const overflowWide = await measureOverflow();
+        assert(overflowWide.length === 0,
+            `Không có chữ tràn khỏi khung sự kiện ở bề rộng máy tính` +
+            (overflowWide.length ? ` — tràn ở: ${overflowWide.join(' | ')}` : ''));
+
+        // Ràng buộc thẳng vào quyết định trình bày: nhãn "phản lưới" phải nằm HÀNG RIÊNG
+        // bên dưới tên. Để nó chen cùng dòng thì tên bị ép vỡ chữ giữa chừng trong cột
+        // hẹp — đúng cảnh đã thấy trên máy người dùng. Phép đo "tràn khỏi khung" ở trên
+        // không bắt được kiểu hỏng này vì hàng vẫn tự cao lên, chỉ là xuống dòng rất xấu.
+        const ogLayout = await page.evaluate(() => {
+            const item = [...document.querySelectorAll('.goal-item')].find(e => e.querySelector('.goal-og'));
+            if (!item) return null;
+            const name = item.querySelector('.goal-scorer').getBoundingClientRect();
+            const og = item.querySelector('.goal-og').getBoundingClientRect();
+            return {
+                ownLine: og.top >= name.bottom - 1,
+                nameWrapped: name.height > 26,
+                text: item.innerText.replace(/\s+/g, ' ').trim()
+            };
+        });
+        assert(ogLayout && ogLayout.ownLine && !ogLayout.nameWrapped,
+            `Nhãn "phản lưới" nằm hàng riêng dưới tên, tên không bị vỡ chữ ("${ogLayout ? ogLayout.text : 'không tìm thấy'}")`);
+
+        await page.setViewportSize({ width: 390, height: 900 });
+        await page.waitForTimeout(400);
+        const overflowNarrow = await measureOverflow();
+        assert(overflowNarrow.length === 0,
+            `Không có chữ tràn khỏi khung sự kiện ở bề rộng điện thoại (390px)` +
+            (overflowNarrow.length ? ` — tràn ở: ${overflowNarrow.join(' | ')}` : ''));
+        await page.setViewportSize({ width: 1400, height: 900 });
+
+        // ----------------------------------------------------------
+        // 11. Vinh danh mùa giải: đủ hạng mục & đúng dữ liệu từng mùa
+        // ----------------------------------------------------------
+        const hofRows = await page.evaluate(() => {
+            const parse = year => getSeasonAwards(year).split('|').map(s => s.trim());
+            const card = document.querySelector('#hofGridV2Page .hof-card-v2, #hofGridV2 .hof-card-v2');
+            return {
+                labels: card ? [...card.querySelectorAll('.award-label')].map(e => e.textContent.trim()) : [],
+                y2025: parse(2025),
+                y2026: parse(2026)
+            };
+        });
+        assert(hofRows.labels.length === 6 && /th[ủu] m[ôo]n/i.test(hofRows.labels.join(' ')),
+            `Thẻ Vinh danh có đủ 6 hạng mục, gồm Thủ môn xuất sắc (${hofRows.labels.join(' · ')})`);
+        assert(hofRows.y2026[4].includes('Quang Toàn') && hofRows.y2026[5].includes('Tường Khánh'),
+            `Mùa 2026: MVP ${hofRows.y2026[4]} · Thủ môn ${hofRows.y2026[5]}`);
+        assert(hofRows.y2025[0] === 'TEAM DS+' && hofRows.y2025[1] === 'TEAM HV' &&
+            hofRows.y2025[2] === '' && hofRows.y2025[3] === 'Tường Khánh' && hofRows.y2025[4] === 'Anh Trương',
+            `Mùa 2025: 2 đội, không có hạng ba, vua phá lưới & MVP đúng tư liệu`);
+
+        // MVP phải khớp giữa trang Vinh danh và trang Thống kê — hai nơi đọc hai nguồn
+        // khác nhau nên rất dễ nói ngược nhau nếu chỉ sửa một chỗ.
+        const mvpConsistency = await page.evaluate(() => ({
+            fromPlayers: PLAYERS_DATA.filter(p => p.mvp > 0).map(p => p.name),
+            fromAwards: OFFICIAL_AWARDS_2026.mvp
+        }));
+        assert(mvpConsistency.fromPlayers.length === 1 &&
+            mvpConsistency.fromPlayers[0] === mvpConsistency.fromAwards,
+            `MVP thống nhất giữa danh hiệu và chỉ số cầu thủ (${mvpConsistency.fromAwards})`);
+
         assert(pageErrors.length === 0, `Không có uncaught exception trong luồng dữ liệu trận đấu: ${pageErrors.length} lỗi`);
     });
 

@@ -1731,14 +1731,18 @@
         .goal-timeline .goal-col-rest {
             grid-column: 1 / -1;
         }
+        /* Lưới 3 cột thay cho flex: nhãn "phản lưới" xuống hàng riêng ngay dưới tên,
+           thay vì chen vào cùng dòng rồi ép tên vỡ chữ và tràn khỏi khung. Cột sự kiện
+           chỉ rộng ~180px nên một cái tên kèm chú thích không thể vừa một dòng. */
         .goal-timeline .goal-item {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            gap: 8px;
+            column-gap: 8px;
             font-size: 13px;
             font-weight: 500;
             color: var(--text-primary);
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 6px;
             background: var(--bg-body);
             width: 100%;
@@ -1752,6 +1756,9 @@
         .goal-timeline .goal-item .goal-scorer {
             font-weight: 600;
             min-width: 0;
+            /* Ô lưới rộng bằng cả cột nên chữ thừa hưởng text-align:center của thẻ trận;
+               với flex trước đây span chỉ rộng bằng nội dung nên không lộ ra. */
+            text-align: left;
             overflow-wrap: anywhere;
         }
         .goal-timeline .goal-item.goal-empty {
@@ -1759,7 +1766,11 @@
             border-left-color: transparent;
         }
         .goal-timeline .goal-item .goal-og {
+            grid-column: 2 / -1;
+            font-size: 11px;
             font-weight: 600;
+            line-height: 1.3;
+            text-align: left;
             color: var(--text-muted);
         }
         .goal-timeline .goal-item .goal-time {
@@ -8682,6 +8693,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 hof_third: 'Giải ba',
                 hof_goldenboot: 'Vua phá lưới',
                 hof_mvp: 'MVP',
+                hof_goalkeeper: 'Thủ môn xuất sắc',
                 thanks_title: '🙏 LỜI CẢM ƠN',
                 thanks_intro: 'Xin chân thành cảm ơn:',
                 thanks_footer: 'Hẹn gặp lại tất cả mọi người ở PTX Summer Cup mùa tiếp theo!',
@@ -8972,6 +8984,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 hof_third: 'Third place',
                 hof_goldenboot: 'Golden Boot',
                 hof_mvp: 'MVP',
+                hof_goalkeeper: 'Best goalkeeper',
                 thanks_title: '🙏 THANK YOU',
                 thanks_intro: 'Sincere thanks to:',
                 thanks_footer: 'See you all at the next PTX Summer Cup!',
@@ -9702,12 +9715,15 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             // đội nhà đều tô màu TEAM P — trận X vs T hiện ra màu xanh của Phoenix.
             const row = e => {
                 const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
-                const ogTag = e.ownGoal ? ' <span class="goal-og">(phản lưới)</span>' : '';
+                // Nhãn phản lưới là phần tử ANH EM của tên, không lồng bên trong: có vậy
+                // lưới mới đẩy được nó xuống hàng riêng thay vì cho chen cùng dòng với tên.
+                const ogTag = e.ownGoal ? '<span class="goal-og">phản lưới</span>' : '';
                 return `
                                 <div class="goal-item goal-${e.team}">
                                     <span class="goal-icon">${icon}</span>
-                                    <span class="goal-scorer">${e.scorer}${ogTag}</span>
+                                    <span class="goal-scorer">${e.scorer}</span>
                                     <span class="goal-time">${e.minute}'</span>
+                                    ${ogTag}
                                 </div>`;
             };
             const column = teamId => {
@@ -11812,11 +11828,17 @@ function renderGallery() {
 
         const CURRENT_SEASON_YEAR = 2026;
 
+        // Thứ tự các ô: Vô địch | Á quân | Hạng ba | Vua phá lưới | MVP | Thủ môn xuất sắc.
+        // Ô để trống sẽ hiện dấu "—". Mùa 2025 chỉ có 2 đội nên không có hạng ba.
         const DEFAULT_HOF_DATA = {
-            2025: 'Đang cập nhật tư liệu lịch sử... | Đang cập nhật... | Đang cập nhật... | Đang cập nhật... | Đang cập nhật...',
-            2026: 'PTX Summer Cup 2026 (Đang tranh cúp) | Chờ VCK | Chờ VCK | Vòng 1 (Live) | Đang bình chọn',
-            2027: 'Mùa giải 2027 (Khởi tranh 08/2027) | Dự kiến 4 đội | Sắp diễn ra | Sắp diễn ra | Sắp diễn ra'
+            2025: 'TEAM DS+ | TEAM HV |  | Tường Khánh | Anh Trương | ',
+            2026: 'PTX Summer Cup 2026 (Đang tranh cúp) | Chờ VCK | Chờ VCK | Vòng 1 (Live) | Đang bình chọn | Chờ công bố',
+            2027: 'Mùa giải 2027 (Khởi tranh 08/2027) | Dự kiến 4 đội | Sắp diễn ra | Sắp diễn ra | Sắp diễn ra | Sắp diễn ra'
         };
+
+        // Mùa đã có kết quả đầy đủ thì thẻ mang huy hiệu "ĐÃ XÁC LẬP". Trước đây năm 2025 bị
+        // ghi cứng là "ĐANG TÌM DỮ LIỆU CŨ", nên khi có tư liệu rồi thẻ vẫn nói ngược lại.
+        const HOF_SEASONS_WITH_DATA = [2025];
 
         // Mùa hiện tại KHÔNG đọc chuỗi ghi cứng: vô địch, á quân, hạng ba và vua phá
         // lưới đều suy ra từ bảng xếp hạng và nhật ký ghi bàn. Nhờ vậy trang Vinh danh
@@ -11831,16 +11853,20 @@ function renderGallery() {
             if (status.phase !== 'finished') return DEFAULT_HOF_DATA[year] || '';
 
             const table = calculateStandings();
-            const podium = i => table[i] ? `${table[i].fullName} (${table[i].label})` : '—';
-            const mvp = getMostValuablePlayer();
+            const podium = i => table[i] ? `${table[i].fullName} (${table[i].label})` : '';
+            const withTeam = name => {
+                const p = PLAYERS_DATA.find(x => x.name.toLowerCase() === (name || '').toLowerCase());
+                return p ? `${p.name} (${(TEAMS_DATA[p.team] || {}).name || ''})`.trim() : (name || '');
+            };
             return [
                 podium(0),
                 podium(1),
                 podium(2),
                 getGoldenBoot().label,
-                // Chưa có dữ liệu MVP thì để trống, rơi về dấu "—" mà thẻ Vinh danh vẫn
-                // dùng cho ô chưa có giá trị — không tự đặt ra một danh hiệu chưa hề trao.
-                mvp ? `${mvp.name} (${(TEAMS_DATA[mvp.team] || {}).name || ''})`.trim() : ''
+                // Danh hiệu chưa trao thì để trống, rơi về dấu "—" mà thẻ Vinh danh vẫn dùng
+                // cho ô chưa có giá trị — không tự đặt ra một danh hiệu chưa hề công bố.
+                withTeam(OFFICIAL_AWARDS_2026.mvp),
+                withTeam(OFFICIAL_AWARDS_2026.goalkeeper)
             ].join(' | ');
         }
 
@@ -11857,7 +11883,8 @@ function renderGallery() {
                 { icon: '🥈', labelKey: 'hof_runnerup', labelFallback: 'Á Quân', gold: false },
                 { icon: '🥉', labelKey: 'hof_third', labelFallback: 'Hạng Ba', gold: false },
                 { icon: '⚽', labelKey: 'hof_goldenboot', labelFallback: 'Vua Phá Lưới', gold: false },
-                { icon: '⭐', labelKey: 'hof_mvp', labelFallback: 'Cầu Thủ MVP', gold: false }
+                { icon: '⭐', labelKey: 'hof_mvp', labelFallback: 'Cầu Thủ MVP', gold: false },
+                { icon: '🧤', labelKey: 'hof_goalkeeper', labelFallback: 'Thủ Môn Xuất Sắc', gold: false }
             ];
             const t = (window.translations && window.translations[currentLang]) || {};
 
@@ -11901,17 +11928,18 @@ function renderGallery() {
                 // Mùa hiện tại đã đá xong thì phải mang huy hiệu "ĐÃ XÁC LẬP" như các mùa
                 // cũ, chứ không còn là "MÙA HIỆN TẠI (đang diễn ra)".
                 const isCurrentYear = (y === CURRENT_SEASON_YEAR);
-                const seasonDone = isCurrentYear && getTournamentStatus().phase === 'finished';
-                const badgeText = (y === 2025) ? '⏳ ĐANG TÌM DỮ LIỆU CŨ'
-                    : seasonDone ? '🏆 ĐÃ XÁC LẬP'
-                    : isCurrentYear ? '🔥 MÙA HIỆN TẠI'
-                    : y < CURRENT_SEASON_YEAR ? '🏆 ĐÃ XÁC LẬP' : '📅 HOẠCH ĐỊNH';
-                const badgeColor = (y === 2025) ? '#94a3b8'
-                    : seasonDone ? '#fbbf24'
-                    : isCurrentYear ? 'var(--ptx-orange)'
-                    : y < CURRENT_SEASON_YEAR ? '#fbbf24' : '#38bdf8';
-                const borderStyle = (y === 2025) ? 'rgba(148,163,184,0.3)'
-                    : seasonDone ? 'rgba(251,191,36,0.6)'
+                const seasonDone = isCurrentYear
+                    ? getTournamentStatus().phase === 'finished'
+                    : (y < CURRENT_SEASON_YEAR && HOF_SEASONS_WITH_DATA.includes(y));
+                const isPast = y < CURRENT_SEASON_YEAR;
+                const badgeText = seasonDone ? '🏆 ĐÃ XÁC LẬP'
+                    : isPast ? '⏳ ĐANG TÌM DỮ LIỆU CŨ'
+                    : isCurrentYear ? '🔥 MÙA HIỆN TẠI' : '📅 HOẠCH ĐỊNH';
+                const badgeColor = seasonDone ? '#fbbf24'
+                    : isPast ? '#94a3b8'
+                    : isCurrentYear ? 'var(--ptx-orange)' : '#38bdf8';
+                const borderStyle = seasonDone ? 'rgba(251,191,36,0.6)'
+                    : isPast ? 'rgba(148,163,184,0.3)'
                     : isCurrentYear ? 'rgba(249,115,22,0.6)' : 'rgba(255,255,255,0.1)';
 
                 return `
@@ -13188,9 +13216,17 @@ function renderGallery() {
             3: "2-9 | Hoàng Nam 2', Đăng Quân 3', Hoàng Nam 5', Bảo Anh (OG) 7', Hoàng Nam 14', Hoàng Nam 16', 🟨 Quang Toàn 17', Đăng Quân 19', Minh Thế 23', Đình Huy 25', Đình Huy 28', Quang Toàn 30'"
         };
 
+        // Danh hiệu do BTC trao — KHÔNG suy ra được từ nhật ký trận đấu như vua phá lưới,
+        // nên phải ghi tay ở đây. MVP còn được nạp vào PLAYERS_DATA lúc seed để trang Thống kê
+        // và thẻ cầu thủ cũng hiện đúng, tránh hai nơi nói khác nhau.
+        const OFFICIAL_AWARDS_2026 = {
+            mvp: 'Quang Toàn',
+            goalkeeper: 'Tường Khánh'
+        };
+
         // Đổi giá trị này mỗi khi kết quả chính thức thay đổi: máy đã từng mở trang (localStorage
         // còn giữ dữ liệu cũ) sẽ tự nạp lại bản mới, thay vì kẹt ở dữ liệu rỗng của lần seed trước.
-        const OFFICIAL_SEED_VERSION = 'official_2026_08_07';
+        const OFFICIAL_SEED_VERSION = 'official_2026_08_07_awards';
 
         function applyOfficialResults() {
             Object.keys(OFFICIAL_RESULTS).forEach(id => {
@@ -13208,7 +13244,7 @@ function renderGallery() {
 
             // Số bàn từng cầu thủ cũng lấy từ nhật ký ghi bàn; bàn phản lưới không tính cho người đá phản.
             localStorage.removeItem('ptx_players_data');
-            PLAYERS_DATA.forEach(p => { p.goals = 0; });
+            PLAYERS_DATA.forEach(p => { p.goals = 0; p.mvp = 0; });
             (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []).forEach(m => {
                 parseMatchEvents(OFFICIAL_RESULTS[m.id], m).forEach(e => {
                     if (e.type !== 'goal' || e.ownGoal) return;
@@ -13216,6 +13252,8 @@ function renderGallery() {
                     if (scorer) scorer.goals++;
                 });
             });
+            const mvp = PLAYERS_DATA.find(p => p.name.toLowerCase() === OFFICIAL_AWARDS_2026.mvp.toLowerCase());
+            if (mvp) mvp.mvp = 1;
             savePlayersData();
         }
 
