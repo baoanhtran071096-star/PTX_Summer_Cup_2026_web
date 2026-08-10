@@ -104,7 +104,20 @@ module.exports = async function runMediaCenterTests(browser) {
         // bị chèn vào file Biên bản giải đấu xuất ra để in.
         const MODALS = ['aiMediaCenterModal', 'audioCenterModal', 'exportCenterModal',
             'sponsorSupportModal', 'varSimulatorModal'];
+
+        // Media Center là khu vực Ban tổ chức: mỗi lần bấm là một lượt gọi worker AI với
+        // hạn mức dài hơn hẳn nhánh chat, để công khai thì bào hết quota miễn phí của cả
+        // trang. Kiểm cửa khoá TRƯỚC, rồi mới đăng nhập để kiểm phần còn lại.
+        const gate = await page.evaluate(() => {
+            localStorage.removeItem('adminLoggedIn');
+            openAiMediaCenterModal();
+            return document.getElementById('aiMediaCenterModal').style.display;
+        });
+        assert(gate !== 'flex',
+            `Chưa đăng nhập BTC thì không mở được AI Media Center (display = "${gate}")`);
+
         const modalState = await page.evaluate(ids => {
+            localStorage.setItem('adminLoggedIn', 'true');
             const missing = ids.filter(id => !document.getElementById(id));
             let opened = null;
             if (typeof openAiMediaCenterModal === 'function') {

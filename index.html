@@ -5703,6 +5703,16 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
         // Unified Modals Controller Functions
         function openAiMediaCenterModal() {
+            // Chỉ Ban tổ chức. Không phải để giấu tính năng, mà vì mỗi lần bấm là một lượt
+            // gọi lên worker AI — nhánh media gửi tới 2500 ký tự và sinh 900 token, tốn hơn
+            // hẳn nhánh chat. Để công khai thì một người bấm liên tục là hết hạn mức miễn
+            // phí, và trợ lý AI của cả trang chết theo. Bài viết cũng là việc của BTC chứ
+            // không phải của người xem.
+            if (localStorage.getItem('adminLoggedIn') !== 'true') {
+                if (typeof showToast === 'function') showToast('🔒 Khu vực Ban tổ chức — vui lòng đăng nhập admin', 'error');
+                if (typeof openLogin === 'function') openLogin();
+                return;
+            }
             const m = document.getElementById('aiMediaCenterModal');
             if (m) m.style.display = 'flex';
             // Danh sách trận dựng từ MATCHES_CONFIG, mặc định chọn trận cuối đã có kết quả
@@ -6629,8 +6639,8 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                                 <a href="#" onclick="openAiMediaCenterModal(); return false;" class="util-card-item">
                                     <span class="util-icon-badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">🤖</span>
                                     <span class="util-text-wrap">
-                                        <span class="util-title" style="color:#60a5fa;">AI Media Center <span style="font-size:9px; background:#3b82f6; color:#fff; padding:1px 6px; border-radius:6px; font-weight:900;">AI</span></span>
-                                        <span class="util-desc" data-i18n="ut_ai_s">Tạo nội dung truyền thông AI</span>
+                                        <span class="util-title" style="color:#60a5fa;">AI Media Center <span style="font-size:9px; background:#3b82f6; color:#fff; padding:1px 6px; border-radius:6px; font-weight:900;">AI</span> <span style="font-size:9px; background:rgba(148,163,184,0.25); color:#cbd5e1; padding:1px 6px; border-radius:6px; font-weight:900;">🔒 BTC</span></span>
+                                        <span class="util-desc" data-i18n="ut_ai_s">Tạo nội dung truyền thông AI (cần đăng nhập BTC)</span>
                                     </span>
                                 </a>
                                 <a href="#" onclick="openAudioCenterModal(); return false;" class="util-card-item">
