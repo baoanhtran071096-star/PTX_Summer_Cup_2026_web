@@ -669,6 +669,55 @@ module.exports = async function runMatchDataTests(browser) {
         assert(cong.sauHoanTac === '5-0',
             `Hoàn tác trả về đúng giá trị trước đó (nhận "${cong.sauHoanTac}")`);
 
-        assert(pageErrors.length === 0, `Không có uncaught exception trong luồng lưu của trang quản trị: ${pageErrors.length} lỗi`);
+        // Nhật ký phải XEM ĐƯỢC trong trang quản trị, không chỉ gọi được từ console.
+        const bang = await page.evaluate(async () => {
+            ptxCloudSync.push = async () => ({ ok: false, reason: 'not-configured' });
+            localStorage.removeItem('ptx_audit_log');
+            document.getElementById('admin-result1').value = '7-1';
+            await updateStandingsAndResults();
+            renderAuditLog();
+            const box = document.getElementById('auditLogList');
+            const truoc = localStorage.getItem('ptx_result_1');
+
+            // Bấm đúng nút Hoàn tác trên giao diện, không gọi thẳng hàm.
+            const nut = box.querySelector('button[onclick^="undoAuditEntry"]');
+            if (nut) nut.click();
+            await new Promise(r => setTimeout(r, 400));
+
+            return {
+                soDong: box.querySelectorAll('div[style*="border"]').length,
+                coChipDongBo: /CHỈ MÁY NÀY|ĐÃ ĐỒNG BỘ/.test(box.innerHTML),
+                coNutHoanTac: !!nut,
+                truoc, sauHoanTac: localStorage.getItem('ptx_result_1')
+            };
+        });
+        assert(bang.soDong >= 1 && bang.coChipDongBo,
+            `Nhật ký hiện ra trong trang quản trị kèm dấu trạng thái đồng bộ (${bang.soDong} dòng)`);
+        assert(bang.coNutHoanTac, `Mỗi mục có nút Hoàn tác bấm được`);
+        assert(bang.truoc === '7-1' && bang.sauHoanTac !== '7-1',
+            `Bấm Hoàn tác trên giao diện thật sự trả dữ liệu về trước đó ("${bang.truoc}" → "${bang.sauHoanTac}")`);
+
+        // Hero phải quay lại được đồng hồ đếm ngược khi giải không còn ở trạng thái kết thúc.
+        // renderHeroFinished() ghi đè innerHTML nên xoá mất bốn ô đếm ngược; trước khi vá,
+        // sửa tỷ số lúc trang đang mở làm bộ đếm ném TypeError mỗi giây và hero kẹt luôn.
+        const hero = await page.evaluate(async () => {
+            localStorage.setItem('ptx_result_1', '9-2 | A 1\'');
+            localStorage.setItem('ptx_result_2', '3-1 | B 2\'');
+            localStorage.setItem('ptx_result_3', '2-0 | C 3\'');
+            updateHeroCountdown();
+            const khiKetThuc = !document.getElementById('heroDays');
+            ['1', '2', '3'].forEach(i => localStorage.removeItem('ptx_result_' + i));
+            updateHeroCountdown();
+            updateHeroCountdown();
+            const d = document.getElementById('heroDays');
+            return { khiKetThuc, quayLai: !!d, coSo: !!(d && /^\d{2}$/.test(d.innerText)) };
+        });
+        assert(hero.khiKetThuc, `Giải kết thúc thì hero thay đồng hồ bằng bảng tổng kết`);
+        assert(hero.quayLai && hero.coSo,
+            `Xoá kết quả thì hero dựng lại được đồng hồ đếm ngược, không kẹt ở bảng tổng kết`);
+
+        assert(pageErrors.length === 0,
+            `Không có uncaught exception trong luồng lưu của trang quản trị: ${pageErrors.length} lỗi` +
+            (pageErrors.length ? ` — ${pageErrors.map(e => String(e).split('\n')[0]).join(' | ')}` : ''));
     });
 };

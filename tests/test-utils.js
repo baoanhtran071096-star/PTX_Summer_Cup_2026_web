@@ -88,7 +88,15 @@ async function withPage(browser, fn, { blockMedia = true } = {}) {
     const page = await context.newPage();
     const pageErrors = [];
     const consoleErrors = [];
-    page.on('pageerror', (err) => pageErrors.push(String(err)));
+    // Giữ cả stack, không chỉ câu thông báo.
+    //
+    // "TypeError: Cannot set properties of null" mà không có stack thì gần như vô dụng:
+    // trong một file 17.000 dòng có hàng chục chỗ có thể sinh ra đúng câu đó, và người
+    // đọc log phải đi đoán. Dòng đầu của stack chỉ thẳng ra hàm và số dòng.
+    page.on('pageerror', (err) => {
+        const noi = (err && err.stack ? String(err.stack).split('\n')[1] : '') || '';
+        pageErrors.push(String(err) + (noi ? ` @${noi.trim()}` : ''));
+    });
     page.on('console', (msg) => {
         if (msg.type() === 'error') consoleErrors.push(msg.text());
     });

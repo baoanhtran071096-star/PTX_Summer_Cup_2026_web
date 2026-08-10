@@ -8414,6 +8414,20 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
                 <!-- TAB 4: SYSTEM & SECURITY -->
                 <div id="adminTabContent4" style="display:none;">
+                    <!-- Nhật ký nằm NGOÀI admin-grid và đặt trên cùng: nó là thứ để trả lời
+                         "ai vừa sửa gì" khi có tranh chấp kết quả, nên phải thấy ngay chứ
+                         không nằm lẫn trong lưới thẻ cùng cỡ với các mục khác. -->
+                    <div class="admin-card" style="margin-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                            <h4 style="color:#38bdf8;font-size:15px;margin:0;">🕒 Nhật Ký Thay Đổi</h4>
+                            <button onclick="renderAuditLog()" style="margin-left:auto;width:auto;padding:4px 12px;font-size:11px;background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.4);">Làm mới</button>
+                        </div>
+                        <p style="font-size:11px;color:var(--text-muted);margin:0 0 12px;">
+                            Chỉ lưu trên máy này — xem chú thích trong mã nguồn về lý do không đồng bộ.
+                        </p>
+                        <div id="auditLogList" style="display:grid;gap:8px;max-height:340px;overflow-y:auto;"></div>
+                    </div>
+
                     <div class="admin-grid">
                         <div class="admin-card">
                             <h4 style="color:#ef4444;margin-bottom:12px;font-size:15px;">🔐 Đổi Mật Khẩu Đăng Nhập Admin</h4>
@@ -10313,14 +10327,28 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 renderHeroFinished();
                 return;
             }
+            // Đường quay lại từ trạng thái "đã kết thúc".
+            //
+            // renderHeroFinished() ghi đè innerHTML của #heroCountdown, tức XOÁ luôn bốn ô
+            // đồng hồ. Khi admin sửa hoặc xoá tỷ số khiến giải không còn là "đã kết thúc",
+            // hàm này rẽ xuống nhánh đếm ngược và đọc phải null — ném TypeError MỖI GIÂY,
+            // và hero kẹt vĩnh viễn ở bảng tổng kết cho tới khi tải lại trang. Đã đo được
+            // đúng hai lỗi này khi hoàn tác một thay đổi tỷ số.
+            restoreHeroCountdown();
+
             const target = new Date('2026-08-07T16:00:00+07:00').getTime();
             const now = Date.now();
             const diff = Math.max(0, Math.floor((target - now) / 1000));
             const days = Math.floor(diff / 86400);
-            document.getElementById('heroDays').innerText = String(days).padStart(2, '0');
-            document.getElementById('heroHours').innerText = String(Math.floor((diff % 86400) / 3600)).padStart(2, '0');
-            document.getElementById('heroMinutes').innerText = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
-            document.getElementById('heroSeconds').innerText = String(diff % 60).padStart(2, '0');
+            // Vẫn kiểm null sau khi khôi phục: hàm chạy theo bộ đếm mỗi giây, nên bất kỳ
+            // đoạn mã nào sau này thay ruột hero cũng không được phép biến nó thành một
+            // nguồn ném lỗi liên tục.
+            const el = id => document.getElementById(id);
+            if (!el('heroDays') || !el('heroHours') || !el('heroMinutes') || !el('heroSeconds')) return;
+            el('heroDays').innerText = String(days).padStart(2, '0');
+            el('heroHours').innerText = String(Math.floor((diff % 86400) / 3600)).padStart(2, '0');
+            el('heroMinutes').innerText = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+            el('heroSeconds').innerText = String(diff % 60).padStart(2, '0');
             // Hype effects
             const heroSection = document.querySelector('.hero-v3');
             const cdBox = document.querySelector('.countdown-wrapper') || document.querySelector('.countdown-row');
@@ -10339,9 +10367,25 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
 
         // Bảng tổng kết thay chỗ đồng hồ đếm ngược khi giải đã kết thúc.
         let heroFinishedSignature = '';
+        // Markup gốc của đồng hồ, chụp lại TRƯỚC lần ghi đè đầu tiên. Không có nó thì không
+        // có đường quay lại: bảng tổng kết đã ăn mất bốn ô đếm ngược.
+        let heroCountdownMarkup = null;
+
+        function restoreHeroCountdown() {
+            const box = document.getElementById('heroCountdown');
+            if (!box || heroCountdownMarkup === null) return;
+            if (!box.classList.contains('hero-finished')) return;
+            box.classList.remove('hero-finished');
+            box.innerHTML = heroCountdownMarkup;
+            heroFinishedSignature = null;   // để lần "kết thúc" sau vẽ lại được
+            const heroSection = document.querySelector('.hero-v3');
+            if (heroSection) heroSection.style.background = '';
+        }
+
         function renderHeroFinished() {
             const box = document.getElementById('heroCountdown');
             if (!box) return;
+            if (heroCountdownMarkup === null) heroCountdownMarkup = box.innerHTML;
             const status = getTournamentStatus();
             const table = calculateStandings();
             const champ = table[0];
@@ -13877,6 +13921,58 @@ function renderGallery() {
             showToast('Đã đăng xuất khỏi tài khoản Quản trị.', 'info');
         }
 
+        // Nhật ký thay đổi — thứ trả lời được câu "ai vừa sửa gì, lúc nào, đã lên cloud chưa".
+        //
+        // Trước đây câu đó không trả lời được: mỗi tài liệu chỉ giữ updatedBy của lần ghi
+        // cuối, nên hai người cùng sửa thì người sau đè người trước trong im lặng, và nhập
+        // nhầm tỷ số rồi lưu là không có đường lùi. Với một giải đấu có tranh chấp kết quả,
+        // đây là thứ đầu tiên bị hỏi tới.
+        function renderAuditLog() {
+            const box = document.getElementById('auditLogList');
+            if (!box) return;
+            const list = ptxCommit.history();
+
+            if (!list.length) {
+                box.innerHTML = `<div style="font-size:12px;color:var(--text-muted);padding:10px 0;">Chưa có thay đổi nào được ghi lại.</div>`;
+                return;
+            }
+
+            const esc = s => String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            box.innerHTML = list.map(e => {
+                const d = new Date(e.at);
+                const when = isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                // Trạng thái đồng bộ hiện thành chip riêng: một thay đổi chỉ nằm ở máy này
+                // trông y hệt một thay đổi đã lên cloud, nếu không đánh dấu.
+                const chip = e.synced
+                    ? `<span style="font-size:9px;font-weight:900;color:#10b981;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);padding:1px 7px;border-radius:8px;">ĐÃ ĐỒNG BỘ</span>`
+                    : `<span style="font-size:9px;font-weight:900;color:#f59e0b;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);padding:1px 7px;border-radius:8px;">CHỈ MÁY NÀY</span>`;
+                const nut = e.undoable
+                    ? `<button onclick="undoAuditEntry('${esc(e.id)}')" style="width:auto;padding:3px 10px;font-size:11px;background:rgba(148,163,184,0.15);color:var(--text-primary);border:1px solid rgba(148,163,184,0.4);">↩ Hoàn tác</button>`
+                    : `<span title="Bản cũ quá lớn nên không lưu để hoàn tác" style="font-size:10px;color:var(--text-muted);">không hoàn tác được</span>`;
+                return `
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;border:1px solid rgba(148,163,184,0.2);border-radius:10px;">
+                        <span style="font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums;">${when}</span>
+                        <span style="font-size:12px;font-weight:700;color:var(--text-primary);">${esc(e.label)}</span>
+                        ${chip}
+                        <span style="font-size:11px;color:var(--text-muted);">bởi ${esc(e.by)}</span>
+                        <span style="margin-left:auto;">${nut}</span>
+                    </div>`;
+            }).join('');
+        }
+        window.renderAuditLog = renderAuditLog;
+
+        async function undoAuditEntry(id) {
+            const r = await ptxCommit.undo(id);
+            if (!r.ok) { showToast('❌ Không hoàn tác được: ' + r.reason, 'error'); return; }
+            const msg = ptxCommit.describe(r, 'bản cũ');
+            showToast(msg.text, msg.type);
+            loadAdminData();          // nạp lại các ô nhập theo giá trị vừa khôi phục
+            renderAuditLog();
+        }
+        window.undoAuditEntry = undoAuditEntry;
+
         function loadAdminData() {
             document.getElementById('admin-slogan').value = localStorage.getItem('ptx_slogan') || '';
             document.getElementById('admin-msg').value = localStorage.getItem('ptx_msg') || '';
@@ -13894,6 +13990,7 @@ function renderGallery() {
                 if (hofEl) hofEl.value = localStorage.getItem('hof_' + y) || '';
             });
             populateAdminPlayerSelect();
+            renderAuditLog();
         }
 
         async function saveContentAdmin() {
