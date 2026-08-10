@@ -11692,10 +11692,13 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         function renderPlayerCards() {
             renderTeamRosters('teamsPageRostersView');
 
+            // Chỉ hai lưới, và mỗi lưới đúng MỘT lần. Trước đây có mục thứ ba trỏ lại
+            // chính #playerGridFifaPage nhưng đặt isPage:false, nên nó vẽ đè toàn bộ 24
+            // cầu thủ lên trên kết quả đã lọc ở mục thứ hai — bấm "Team P (8)" vẫn ra đủ
+            // 24 thẻ, khiến nút lọc trông như hỏng hoàn toàn.
             const containers = [
                 { el: document.getElementById('playerGridFifaHome'), isPage: false },
-                { el: document.getElementById('playerGridFifaPage'), isPage: true },
-                { el: document.getElementById('playerGridFifaPage') || document.getElementById('playerGridFifaHome'), isPage: false }
+                { el: document.getElementById('playerGridFifaPage'), isPage: true }
             ];
 
             containers.forEach(({ el, isPage }) => {
