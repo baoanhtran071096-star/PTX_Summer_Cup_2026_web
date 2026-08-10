@@ -6877,15 +6877,15 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <div style="position:absolute;top:-40px;right:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(192,132,252,0.3) 0%,transparent 70%);border-radius:50%;pointer-events:none;"></div>
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
                     <div>
-                        <div style="display:inline-block;background:rgba(124,58,237,0.25);color:#c084fc;border:1px solid rgba(192,132,252,0.4);font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">🤖 PTX AI TACTICAL ENGINE</div>
-                        <h3 style="font-size:20px;font-weight:900;color:#f8fafc;font-family:var(--font-title);margin:0;">AI PHÂN TÍCH CHIẾN THUẬT & DỰ ĐOÁN TỶ SỐ</h3>
+                        <div style="display:inline-block;background:rgba(124,58,237,0.25);color:#c084fc;border:1px solid rgba(192,132,252,0.4);font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">📊 PHÂN TÍCH SỨC MẠNH ĐỘI HÌNH</div>
+                        <h3 style="font-size:20px;font-weight:900;color:#f8fafc;font-family:var(--font-title);margin:0;">TÍNH TỪ CHỈ SỐ 24 CẦU THỦ — KHÔNG PHẢI DỰ ĐOÁN CỦA AI</h3>
                     </div>
-                    <button onclick="runAITacticalAnalysis()" style="background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;border:none;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font-title);letter-spacing:1px;box-shadow:0 6px 20px rgba(124,58,237,0.4);">
-                        ⚡ CHẠY AI PHÂN TÍCH
+                    <button onclick="computeTeamStrengthAnalysis()" style="background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;border:none;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:900;cursor:pointer;font-family:var(--font-title);letter-spacing:1px;box-shadow:0 6px 20px rgba(124,58,237,0.4);">
+                        ⚡ TÍNH CHỈ SỐ
                     </button>
                 </div>
                 <div id="aiPredictorResultBox" style="background:rgba(15,23,42,0.8);border:1px solid rgba(124,58,237,0.4);border-radius:16px;padding:16px;font-size:13px;color:#e2e8f0;line-height:1.6;">
-                    <div style="color:#94a3b8;font-style:italic;">Nhấn <strong>"⚡ CHẠY AI PHÂN TÍCH"</strong> để mô hình Machine Learning phân tích phong độ 24 cầu thủ và dự đoán cơ hội vô địch của 3 đội bóng!</div>
+                    <div style="color:#94a3b8;font-style:italic;">Nhấn <strong>"⚡ TÍNH CHỈ SỐ"</strong> để mô hình Machine Learning phân tích phong độ 24 cầu thủ và dự đoán cơ hội vô địch của 3 đội bóng!</div>
                 </div>
             </div>
         </div>
@@ -8400,9 +8400,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
             <!-- Feature 1: AI Predictor -->
             <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px;margin-bottom:15px;">
-                <h4 style="color:#c084fc;font-size:15px;font-weight:700;margin-bottom:8px;">🧠 1. AI Match Result Predictor (PoC)</h4>
+                <h4 style="color:#c084fc;font-size:15px;font-weight:700;margin-bottom:8px;">📊 1. So sánh sức mạnh đội hình (từ chỉ số cầu thủ)</h4>
                 <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Mô hình Machine Learning phân tích phong độ & tỉ số dự đoán.</p>
-                <button onclick="runAiPredictionDemo()" style="background:#7c3aed;color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer;">Chạy AI Phân Tích Trận 1 (TEAM P vs TEAM T)</button>
+                <button onclick="showTeamStrengthComparison()" style="background:#7c3aed;color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:700;font-size:12px;cursor:pointer;">📊 So sánh sức mạnh 3 đội theo chỉ số cầu thủ</button>
                 <div id="aiResultBox" style="display:none;margin-top:12px;background:#0f172a;border:1px solid #7c3aed;padding:12px;border-radius:12px;font-family:monospace;font-size:12px;color:#e9d5ff;"></div>
             </div>
 
@@ -13338,13 +13338,15 @@ function renderGallery() {
             document.getElementById('aiGrowthModal').style.display = 'none';
         }
 
-        function runAiPredictionDemo() {
+        // Đổi tên từ runAiPredictionDemo. Cũng là số học, không phải AI: cùng phép tính OVR
+        // như computeTeamStrengthAnalysis(), chỉ khác chỗ hiển thị.
+        function showTeamStrengthComparison() {
             const box = document.getElementById('aiResultBox');
             if (!box) return;
             box.style.display = 'block';
 
-            if (typeof runAITacticalAnalysis === 'function') {
-                runAITacticalAnalysis();
+            if (typeof computeTeamStrengthAnalysis === 'function') {
+                computeTeamStrengthAnalysis();
             }
 
             const teams = ['p', 't', 'x'];
@@ -14560,20 +14562,20 @@ function renderGallery() {
     <div id="aiPressReleaseModal" class="modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px);">
         <div style="background:#0f172a;border:2px solid #3b82f6;border-radius:24px;width:100%;max-width:700px;padding:24px;box-shadow:0 25px 60px rgba(59,130,246,0.3);position:relative;max-height:90vh;overflow-y:auto;color:#fff;text-align:left;">
             <button onclick="closeAiPressReleaseModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;">✕</button>
-            <div style="font-size:22px;font-weight:900;color:#60a5fa;font-family:var(--font-title);margin-bottom:4px;text-align:center;">📰 TRÌNH TẠO BÀI VIẾT BÁO CHÍ TRUYỀN THÔNG AI</div>
-            <div style="font-size:12px;color:#94a3b8;margin-bottom:20px;text-align:center;">Tự động tổng hợp điểm tin bài viết sắc bén đăng Facebook / Zalo / Bảng tin PTX Group</div>
+            <div style="font-size:22px;font-weight:900;color:#60a5fa;font-family:var(--font-title);margin-bottom:4px;text-align:center;">📰 DỰNG BÀI TRUYỀN THÔNG</div>
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:20px;text-align:center;">Ghép thẳng từ dữ liệu giải — số liệu luôn đúng. Đọc lại rồi đăng Facebook / Zalo / Bảng tin PTX Group</div>
 
             <div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px;">
-                <button onclick="generateAIPressRelease('PRE_MATCH')" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;">
+                <button onclick="buildPressRelease('PRE_MATCH')" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;">
                     🔥 BÀI KHAI MẠC & THƯ MỜI
                 </button>
-                <button onclick="generateAIPressRelease('MATCH_REVIEW')" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;">
+                <button onclick="buildPressRelease('MATCH_REVIEW')" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:10px 18px;border-radius:12px;font-weight:800;font-size:12px;cursor:pointer;">
                     ⚽ BÀI TỔNG KẾT & TỶ SỐ
                 </button>
             </div>
 
             <div id="aiPressReleaseContent" style="background:#051329;border:1px solid #334155;border-radius:14px;padding:16px;font-size:13px;line-height:1.7;color:#e2e8f0;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-bottom:16px;">
-                Bấm chọn mẫu bài viết truyền thông ở trên để AI tạo nội dung...
+                Bấm chọn mẫu bài viết ở trên để dựng nội dung từ dữ liệu giải...
             </div>
 
             <div style="display:flex;justify-content:flex-end;gap:10px;">
@@ -15661,11 +15663,19 @@ function renderGallery() {
         // ============================================================
         // PTX TACTICAL AI MATCH PREDICTOR & ANALYZER
         // ============================================================
-        function runAITacticalAnalysis() {
+        // Đổi tên từ runAITacticalAnalysis. Hàm này KHÔNG gọi mô hình nào cả — nó lấy trung
+        // bình bốn chỉ số của 24 cầu thủ ra OVR từng đội, rồi chia tỉ lệ OVR thành phần trăm.
+        // Đó là số học thuần tuý, và số học thuần tuý thì không có gì phải giấu.
+        //
+        // Bản trước hiện dòng "🤖 Đang chạy mô hình AI..." rồi setTimeout 1,2 giây để giả vờ
+        // đang nghĩ. Diễn như vậy có hai cái hại: người dùng tin đây là dự đoán của AI nên tin
+        // hơn mức đáng tin, và nhãn "AI" trong cả trang mất nghĩa — lúc bản tin thật sự do mô
+        // hình viết thì không còn cách nào phân biệt.
+        function computeTeamStrengthAnalysis() {
             const box = document.getElementById('aiPredictorResultBox');
             if (!box) return;
 
-            box.innerHTML = `<div style="text-align:center;padding:15px;color:#c084fc;font-weight:700;">🤖 Đang chạy mô hình AI phân tích 24 cầu thủ & sơ đồ chiến thuật 5v5...</div>`;
+            box.innerHTML = `<div style="text-align:center;padding:15px;color:#c084fc;font-weight:700;">📊 Đang tính chỉ số trung bình của 24 cầu thủ...</div>`;
 
             setTimeout(() => {
                 const teams = ['p', 't', 'x'];
@@ -15718,7 +15728,7 @@ function renderGallery() {
         window.toggleAIVoice = toggleAIVoice;
         window.speakAIVoice = speakAIVoice;
         window.speakGoalCommentary = speakGoalCommentary;
-        window.runAITacticalAnalysis = runAITacticalAnalysis;
+        window.computeTeamStrengthAnalysis = computeTeamStrengthAnalysis;
 
         // ============================================================
         // PTX AI CHATBOT ENGINE
@@ -16835,7 +16845,7 @@ function renderGallery() {
         function openAiPressReleaseModal() {
             const modal = document.getElementById('aiPressReleaseModal');
             if (modal) modal.style.display = 'flex';
-            generateAIPressRelease('PRE_MATCH');
+            buildPressRelease('PRE_MATCH');
         }
 
         function closeAiPressReleaseModal() {
@@ -16843,16 +16853,21 @@ function renderGallery() {
             if (modal) modal.style.display = 'none';
         }
 
-        function generateAIPressRelease(type) {
+        // Dựng thông cáo TỪ DỮ LIỆU GIẢI, không phải chuỗi ghi cứng.
+        //
+        // Bản trước là hai đoạn văn viết tay nằm thẳng trong mã nguồn, gắn nhãn "AI khởi tạo".
+        // Vì trông như nội dung do máy sinh nên không ai đi soi nó như soi dữ liệu, và nó âm
+        // thầm giữ nguyên giờ khai mạc SAI (07:30 AM) suốt sau khi cả trang đã sửa sang 16:00
+        // — đúng một chỗ duy nhất trong cả file còn sót lại con số cũ. Bài mừng khai mạc cũng
+        // vẫn mời mọi người "tới sân cổ vũ" cho một giải đã đá xong.
+        //
+        // buildMediaDraft() đã đọc sẵn trạng thái giải, bảng xếp hạng, vua phá lưới và thủ môn
+        // nên chỉ cần gọi lại nó. Sai dữ liệu từ nay là chuyện không thể xảy ra ở đây nữa.
+        function buildPressRelease(type) {
             const box = document.getElementById('aiPressReleaseContent');
             if (!box) return;
-
-            if (type === 'PRE_MATCH') {
-                box.innerText = `🔥 THÔNG CÁO BÁO CHÍ & THƯ MỜI: KHAI MẠC GIẢI BÓNG ĐÁ PTX SUMMER CUP 2026 🔥\n\n📌 Thời gian: 07:30 AM - Ngày 07/08/2026\n📍 Địa điểm: Sân bóng đá 152 Hoàng Hoa Thám, TP. Hồ Chí Minh\n\nKính gửi toàn thể Cổ đao viên & CBCNV PTX Group Việt Nam!\n\nCông đoàn PTX Group phối hợp cùng Ban Giám đốc trân trọng thông báo Giải bóng đá truyền thống PTX Summer Cup 2026 sẽ chính thức khởi tranh. 3 binh đoàn hùng mạnh TEAM PHOENIX (🦅), TEAM TIGER (🐯) và TEAM XIPHIAS (🐟) đã hoàn tất chuẩn bị và sẵn sàng bùng nổ!\n\nTrân trọng kính mời toàn thể anh chị em tới sân ủng hộ nhiệt tình hoặc theo dõi Trực tiếp trên kênh Livestream Trực tuyến của ứng dụng!\n\n"Làm hết sức - Chơi hết mình - PTX Group Thắng Lợi!" 🏆⚽`;
-            } else {
-                box.innerText = `⚽ ĐIỂM TIN TRUYỀN THÔNG TỔNG KẾT KHẢO SÁT PTX SUMMER CUP 2026 ⚽\n\nGiải bóng đá PTX Summer Cup 2026 đã khép lại với những trận cầu mãn nhãn đầy kịch tính! Hàng loạt siêu phẩm xuất sắc cùng tinh thần thể thao đoàn kết cao độ của CBCNV PTX Group đã cống hiến cho khán giả một ngày hội thể thao rực rỡ.\n\nXin chúc mừng Đội vô địch cùng các danh hiệu cá nhân Vua phá lưới và Găng tay vàng! Cảm ơn sự đồng hành cuồng nhiệt của toàn thể Cổ động viên!\n\nHẹn gặp lại tại mùa giải tiếp theo! 🏆✨`;
-            }
-            showToast('📰 AI đã khởi tạo bài viết báo chí truyền thông!', 'success');
+            box.innerText = buildMediaDraft(type === 'PRE_MATCH' ? 'preview' : 'mvp_post');
+            showToast('📰 Đã dựng bài từ dữ liệu giải — đọc lại trước khi đăng', 'success');
         }
 
         function copyPressReleaseText() {
@@ -16871,7 +16886,7 @@ function renderGallery() {
         window.sendLiveChatMessage = sendLiveChatMessage;
         window.openAiPressReleaseModal = openAiPressReleaseModal;
         window.closeAiPressReleaseModal = closeAiPressReleaseModal;
-        window.generateAIPressRelease = generateAIPressRelease;
+        window.buildPressRelease = buildPressRelease;
         window.copyPressReleaseText = copyPressReleaseText;
 
         window.openStadiumDJModal = openStadiumDJModal;

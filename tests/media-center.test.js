@@ -273,6 +273,53 @@ module.exports = async function runMediaCenterTests(browser) {
         assert(duyet.coNguoiDuyet, `Bài đã đăng có ghi lại ai là người duyệt`);
         assert(duyet.hienVoiKhach === 1, `Sau khi duyệt thì khách mới đọc được bài`);
 
+        // ------------------------------------------------------------
+        // "AI" chỉ được dùng cho thứ thật sự gọi mô hình
+        // ------------------------------------------------------------
+        // Ba tính năng từng mang nhãn AI thực ra là số học hoặc chuỗi ghi cứng. Cái giá không
+        // chỉ là tên gọi: bài thông cáo ghi cứng giữ nguyên giờ khai mạc SAI (07:30 AM) rất
+        // lâu sau khi cả trang đã sửa sang 16:00, vì nội dung trông như do máy sinh thì không
+        // ai đi soi như soi dữ liệu. Nay nó dựng từ buildMediaDraft() nên không thể lệch nữa.
+        const baoChi = await page.evaluate(() => {
+            buildPressRelease('PRE_MATCH');
+            const truocGiai = document.getElementById('aiPressReleaseContent').innerText;
+            buildPressRelease('MATCH_REVIEW');
+            const tongKet = document.getElementById('aiPressReleaseContent').innerText;
+            return { truocGiai, tongKet };
+        });
+        assert(!/07:30/.test(baoChi.truocGiai + baoChi.tongKet),
+            `Bài truyền thông không còn giờ khai mạc sai 07:30`);
+        assert(/đã kết thúc/i.test(baoChi.truocGiai),
+            `Bài truyền thông nêu đúng trạng thái giải đã kết thúc, không mời "tới sân cổ vũ" nữa`);
+        assert(/Hoàng Nam/.test(baoChi.tongKet) && /TIGER|TEAM T/.test(baoChi.tongKet),
+            `Bài tổng kết lấy vua phá lưới và nhà vô địch từ dữ liệu thật`);
+
+        const nhanAI = await page.evaluate(() => ({
+            // Hàm số học phải mang tên số học, và tên cũ phải biến mất hẳn.
+            coTenMoi: typeof computeTeamStrengthAnalysis === 'function'
+                      && typeof showTeamStrengthComparison === 'function'
+                      && typeof buildPressRelease === 'function',
+            conTenCu: typeof window.runAITacticalAnalysis !== 'undefined'
+                      || typeof window.runAiPredictionDemo !== 'undefined'
+                      || typeof window.generateAIPressRelease !== 'undefined'
+                      || typeof window.autoPublishMatchNews !== 'undefined',
+            // Chỉ soi nhãn của BA tính năng số học. Cố ý KHÔNG cấm chữ "AI" nói chung:
+            // AI Media Center thật sự gọi mô hình nên nhãn AI của nó là đúng, và một test
+            // cấm bừa sẽ ép người sau gỡ mất nhãn đáng có.
+            chuAItrenTrang: /AI TACTICAL|AI PHÂN TÍCH|AI Match Result/i
+                            .test(document.body.innerHTML)
+        }));
+        assert(nhanAI.coTenMoi, `Ba tính năng số học đã mang tên đúng bản chất`);
+        assert(!nhanAI.conTenCu, `Tên cũ mang nhãn AI đã bị gỡ hẳn, không còn alias`);
+        assert(!nhanAI.chuAItrenTrang,
+            `Giao diện không gán nhãn AI cho ba tính năng chỉ tính chỉ số`);
+
+        // Ngược lại: nhãn AI của Media Center PHẢI còn, vì nó gọi mô hình thật. Test này giữ
+        // cho lần dọn dẹp sau không quét sạch cả nhãn đúng lẫn nhãn sai.
+        const nhanDung = await page.evaluate(() =>
+            /Tạo nội dung truyền thông AI/i.test(document.body.innerHTML));
+        assert(nhanDung, `AI Media Center — thứ thật sự gọi mô hình — vẫn giữ nhãn AI`);
+
         assert(pageErrors.length === 0, `Không có uncaught exception trong Media Center: ${pageErrors.length} lỗi`);
     });
 };
