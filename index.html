@@ -8992,18 +8992,27 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             return 'h_fb_' + Math.abs(hash).toString(16);
         }
 
+        // KHÔNG tự tạo tài khoản mặc định nữa.
+        //
+        // Trước đây hàm này gieo sẵn admin/ptx2026 khi máy chưa có tài khoản. Nghe thì tiện,
+        // nhưng mật khẩu đó nằm NGUYÊN VĂN trong index.html của một repo công khai — ai đọc
+        // mã nguồn cũng biết. Tệ hơn: tài khoản chỉ nằm ở localStorage, nên bất kỳ ai xoá dữ
+        // liệu site trên máy họ là hàm này gieo lại đúng mật khẩu ai cũng biết đó và họ vào
+        // được trang Admin. Đổi mật khẩu mặc định sang chuỗi khác cũng vô nghĩa vì hashPassword()
+        // trộn salt ngẫu nhiên của từng máy, không thể nhúng sẵn hash — muốn có mật khẩu mặc
+        // định thì buộc phải để plaintext trong mã nguồn.
+        //
+        // Nay máy chưa có tài khoản thì không có tài khoản. Lần đầu thiết lập đi qua
+        // reset-admin.html, cửa đó chặn bằng Mã khôi phục (chỉ lưu hash, không suy ngược được).
+        //
+        // Nhắc lại cho rõ: lớp này chỉ chặn người bấm nhầm. Hàng rào thật là Firebase Auth +
+        // Firestore rules — không sửa JS phía trình duyệt nào ghi được dữ liệu của cả giải.
         async function initAdminAccount() {
-            try {
-                const storedHash = localStorage.getItem(ADMIN_HASH_KEY);
-                const storedUser = localStorage.getItem(ADMIN_USER_KEY);
-                if (!storedHash || !storedUser) {
-                    const hash = await hashPassword('ptx2026');
-                    localStorage.setItem(ADMIN_HASH_KEY, hash);
-                    localStorage.setItem(ADMIN_USER_KEY, 'admin');
-                }
-            } catch (e) {
-                console.warn('[PTX] initAdminAccount fallback:', e);
-            }
+            return;
+        }
+
+        function hasAdminAccount() {
+            return !!(localStorage.getItem(ADMIN_HASH_KEY) && localStorage.getItem(ADMIN_USER_KEY));
         }
 
         async function verifyPassword(input) {
@@ -13398,7 +13407,10 @@ function renderGallery() {
             const pass = document.getElementById('passInput').value;
             const storedUser = localStorage.getItem(ADMIN_USER_KEY);
             if (!storedUser) {
-                showToast('Chưa có tài khoản admin. Vui lòng khởi tạo!', 'error');
+                // Máy này chưa thiết lập tài khoản. Câu thông báo phải chỉ luôn đường đi,
+                // nếu không người dùng đứng trước ô đăng nhập không biết gõ gì.
+                loginErrorEl.innerHTML = 'Máy này chưa thiết lập tài khoản Ban tổ chức.<br>Mở <a href="reset-admin.html" style="color:var(--ptx-orange);font-weight:800;">reset-admin.html</a> và nhập Mã khôi phục để đặt tài khoản lần đầu.';
+                loginErrorEl.style.display = 'block';
                 return;
             }
             if (user === storedUser && await verifyPassword(pass)) {
@@ -13427,14 +13439,8 @@ function renderGallery() {
                     }
                 }
 
-                // Warn if the account is still using the factory-default password.
-                try {
-                    const defaultHash = await hashPassword('ptx2026');
-                    const currentHash = localStorage.getItem(ADMIN_HASH_KEY);
-                    if (currentHash === defaultHash) {
-                        showToast('⚠️ Bạn đang dùng mật khẩu mặc định! Vào Tab "Hệ thống & Bảo mật" để đổi ngay.', 'warning');
-                    }
-                } catch (e) { /* non-fatal */ }
+                // Cảnh báo "đang dùng mật khẩu mặc định" đã bỏ cùng lúc với chính mật khẩu
+                // mặc định: không còn tài khoản nào được gieo sẵn nên không còn gì để cảnh báo.
             } else {
                 const attempts = parseInt(localStorage.getItem(LOGIN_ATTEMPTS_KEY) || '0', 10) + 1;
                 if (attempts >= MAX_LOGIN_ATTEMPTS) {
