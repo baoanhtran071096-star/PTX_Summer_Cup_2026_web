@@ -5918,9 +5918,15 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             try {
                 const polished = await askPTXMediaModel(type, draft);
                 output.value = polished.text;
-                // Hiện tên model đã phục vụ: worker có chuỗi dự phòng, nên khi model chính
-                // bị nhà cung cấp gỡ thì đây là dấu hiệu duy nhất nhìn thấy được trên giao diện.
-                if (statusEl) statusEl.textContent = `✅ Đã viết lại bằng mô hình AI${polished.model ? ` (${polished.model})` : ''} — số liệu giữ nguyên từ dữ liệu giải.`;
+                if (polished.rejected) {
+                    // Cổng đã bác bản của model và trả lại bản nháp. Phải nói thẳng lý do:
+                    // im lặng ở đây thì admin tưởng đang đọc văn AI đã qua kiểm.
+                    if (statusEl) statusEl.textContent = `⚠️ Bản AI bị từ chối (${polished.rejected}) — đang hiển thị bản dựng từ dữ liệu, số liệu chắc chắn đúng.`;
+                } else {
+                    // Hiện tên model đã phục vụ: worker có chuỗi dự phòng, nên khi model chính
+                    // bị nhà cung cấp gỡ thì đây là dấu hiệu duy nhất nhìn thấy được trên giao diện.
+                    if (statusEl) statusEl.textContent = `✅ Đã viết lại bằng mô hình AI${polished.model ? ` (${polished.model})` : ''} — đã đối chiếu số liệu với dữ liệu giải.`;
+                }
             } catch (e) {
                 if (statusEl) statusEl.textContent = '⚠️ Mô hình AI không phản hồi — đang hiển thị bản dựng thẳng từ dữ liệu giải (vẫn đăng được).';
             } finally {
@@ -5952,14 +5958,33 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         // thì 20 giây là quá lâu, còn admin bấm dựng một bài dài thì chờ được. Điều đổi là nó
         // được KHAI BÁO ở một bảng, thay vì nằm rải rác thành hai con số rời nhau.
         const ptxAI = (function () {
+            // Kiểm chứng là CHÍNH SÁCH CỦA TỪNG VIỆC, không phải thứ mỗi chỗ gọi tự nhớ làm.
+            //
+            // Trước đây chỉ nhánh bản tin tự động mới đối chiếu văn của model với bản nháp.
+            // Media Center gọi đúng model đó rồi hiện thẳng kết quả cho admin — thậm chí còn
+            // ghi "số liệu giữ nguyên từ dữ liệu giải", một câu nó không hề kiểm. Admin copy
+            // đoạn ấy đăng Facebook/Zalo. Cùng một mô hình, cùng một loại rủi ro, mà một
+            // đường có rào còn đường kia không.
+            //
+            // Chat KHÔNG kiểm, và đó là quyết định có chủ ý chứ không phải bỏ sót: bộ kiểm
+            // làm việc bằng cách đối chiếu với một bản nháp dựng từ dữ liệu, mà câu trả lời
+            // hội thoại thì không có bản nháp nào để đối chiếu. Gắn bừa vào đó sẽ bác oan
+            // gần hết câu trả lời đúng.
             const CAPABILITIES = {
-                chat:  { timeoutMs: 12000 },  // người dùng đang chờ trực tiếp
-                media: { timeoutMs: 20000 }   // bài dài hơn, admin chấp nhận chờ
+                chat:  { timeoutMs: 12000, verifyAgainstReference: false }, // người dùng chờ trực tiếp
+                media: { timeoutMs: 20000, verifyAgainstReference: true }   // bài dài hơn, và phải đúng số liệu
             };
 
-            async function request(capability, message) {
+            async function request(capability, message, options) {
+                const opts = options || {};
                 const policy = CAPABILITIES[capability];
                 if (!policy) throw new Error('Việc AI chưa khai báo trong cổng: ' + capability);
+                if (policy.verifyAgainstReference && !opts.reference) {
+                    // Ném lỗi chứ không lặng lẽ bỏ qua bước kiểm: gọi việc "media" mà quên
+                    // đưa bản nháp là lỗi lập trình, và hậu quả của nó là văn chưa kiểm lọt
+                    // ra ngoài — đúng thứ bước này sinh ra để chặn.
+                    throw new Error('Việc "' + capability + '" bắt buộc có options.reference để đối chiếu');
+                }
                 if (!PTX_AI_PROXY_URL) throw new Error('PTX_AI_PROXY_URL chưa được cấu hình');
 
                 const controller = new AbortController();
@@ -5976,7 +6001,18 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
                     const data = await resp.json();
                     if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
-                    return { text: String(data.reply).trim(), model: data.model || '' };
+                    const text = String(data.reply).trim();
+
+                    if (policy.verifyAgainstReference) {
+                        const check = verifyArticleAgainstFacts(text, opts.reference);
+                        if (!check.ok) {
+                            // Bác thì TỤT VỀ BẢN NHÁP, không trả về rỗng. Bản nháp dựng thẳng
+                            // từ dữ liệu nên luôn đúng số liệu — "suy giảm về đúng" phục vụ
+                            // người dùng tốt hơn hẳn "từ chối và không đưa gì".
+                            return { text: opts.reference, model: '', source: 'data', rejected: check.reason };
+                        }
+                    }
+                    return { text, model: data.model || '', source: data.model || 'ai', rejected: '' };
                 } finally {
                     clearTimeout(timeoutId);
                 }
@@ -5990,7 +6026,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             const brief = `${PTX_MEDIA_BRIEF[type] || PTX_MEDIA_BRIEF.preview}\n`
                 + 'Chỉ dùng đúng số liệu trong bản nháp dưới đây, không thêm bất kỳ con số hay tên nào khác.\n\n'
                 + 'BẢN NHÁP:\n' + draft;
-            return ptxAI.request('media', brief);
+            return ptxAI.request('media', brief, { reference: draft });
         }
         window.buildMediaDraft = buildMediaDraft;
 
@@ -6120,16 +6156,14 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             if (!match || !getMatchResult(match.id)) return null;
 
             const draft = buildMediaDraft('match_report', match.id);
+            // Việc đối chiếu đã chuyển vào cổng ptxAI, nên ở đây chỉ đọc kết luận. Nhờ vậy
+            // Media Center cũng được kiểm y hệt mà không phải nhớ tự gọi bộ kiểm.
             let body = draft, source = 'data', note = '';
             try {
                 const polished = await askPTXMediaModel('match_report', draft);
-                const check = verifyArticleAgainstFacts(polished.text, draft);
-                if (check.ok) {
-                    body = polished.text;
-                    source = polished.model || 'ai';
-                } else {
-                    note = check.reason;
-                }
+                body = polished.text;
+                source = polished.source;
+                note = polished.rejected;
             } catch (e) {
                 note = 'mô hình AI không phản hồi';
             }

@@ -366,6 +366,67 @@ module.exports = async function runMediaCenterTests(browser) {
         assert(cong.chatTraChuoi && cong.mediaTraModel,
             `Hai chỗ gọi giữ nguyên kiểu trả về cũ — chatbot nhận chuỗi, Media Center nhận kèm tên model`);
 
+        // ------------------------------------------------------------
+        // Kiểm chứng là chính sách của cổng, không phải việc mỗi chỗ tự nhớ
+        // ------------------------------------------------------------
+        // Trước đây chỉ nhánh bản tin đối chiếu văn của model với bản nháp; Media Center gọi
+        // đúng model đó rồi hiện thẳng cho admin copy đi đăng, không kiểm gì. Nay cổng kiểm,
+        // nên cả hai đường được che như nhau.
+        const kiem = await page.evaluate(async () => {
+            const fetchThat = window.fetch;
+            const datTraLoi = (reply) => { window.fetch = async () => ({ ok: true, json: async () => ({ reply, model: 'model-thử' }) }); };
+
+            // 1. Model bịa tỷ số → cổng phải bác và tụt về bản nháp.
+            datTraLoi('TEAM T thắng 5-1 trước TEAM X trong trận cầu nghẹt thở.');
+            const biBac = await askPTXMediaModel('match_report', buildMediaDraft('match_report', 3));
+
+            // 2. Model viết lại trung thực → cổng phải cho qua.
+            const nhapThat = buildMediaDraft('match_report', 3);
+            datTraLoi(nhapThat);
+            const choQua = await askPTXMediaModel('match_report', nhapThat);
+
+            // 3. Gọi việc media mà quên bản nháp → phải ném lỗi, không lặng lẽ bỏ kiểm.
+            let loiThieuNhap = null;
+            try { await ptxAI.request('media', 'viết gì đó'); }
+            catch (e) { loiThieuNhap = e.message; }
+
+            // 4. Chat cố ý KHÔNG kiểm — không có bản nháp nào để đối chiếu.
+            datTraLoi('Câu trả lời hội thoại bất kỳ 5-1 gì đó.');
+            const chat = await ptxAI.request('chat', 'hỏi linh tinh');
+
+            window.fetch = fetchThat;
+            return {
+                biBacTraVeNhap: biBac.text === buildMediaDraft('match_report', 3),
+                biBacCoLyDo: !!biBac.rejected,
+                biBacNguonLaData: biBac.source === 'data',
+                choQuaGiuVanAI: choQua.source === 'model-thử' && !choQua.rejected,
+                loiThieuNhap,
+                chatKhongBiKiem: chat.text.includes('5-1') && !chat.rejected
+            };
+        });
+        assert(kiem.biBacTraVeNhap && kiem.biBacNguonLaData,
+            `Model bịa số liệu thì cổng bác và tụt về bản nháp đúng, không trả về rỗng`);
+        assert(kiem.biBacCoLyDo, `Bản bị bác luôn kèm lý do để hiển thị cho admin`);
+        assert(kiem.choQuaGiuVanAI, `Model viết trung thực thì cổng cho qua, giữ nguyên tên model`);
+        assert(/bắt buộc có options.reference/.test(kiem.loiThieuNhap || ''),
+            `Gọi việc media mà quên bản nháp thì ném lỗi, không lặng lẽ bỏ qua bước kiểm`);
+        assert(kiem.chatKhongBiKiem,
+            `Chat cố ý không bị bộ kiểm bác oan, vì không có bản nháp để đối chiếu`);
+
+        // Media Center phải nói thật khi bản AI bị bác — trước đây nó ghi "số liệu giữ
+        // nguyên từ dữ liệu giải" cho cả văn chưa hề được kiểm.
+        const trangThai = await page.evaluate(async () => {
+            const fetchThat = window.fetch;
+            window.fetch = async () => ({ ok: true, json: async () => ({ reply: 'TEAM T thắng 5-1 trước TEAM X.', model: 'model-thử' }) });
+            const sel = document.getElementById('aiMediaMatchSelect');
+            if (sel) sel.value = '3';
+            await generateAiContent('match_report');
+            window.fetch = fetchThat;
+            return document.getElementById('aiMediaStatus').textContent;
+        });
+        assert(/từ chối/i.test(trangThai),
+            `Media Center báo rõ khi bản AI bị bác ("${trangThai.slice(0, 60)}…")`);
+
         assert(pageErrors.length === 0, `Không có uncaught exception trong Media Center: ${pageErrors.length} lỗi`);
     });
 };
