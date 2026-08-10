@@ -41,7 +41,26 @@ const ALLOWED_ORIGINS = [
 // liệu thật (tỷ số, người ghi bàn, thẻ phạt) nên dài hơn hẳn — dùng chung một hạn
 // mức thì hoặc chat bị mở quá rộng, hoặc media luôn bị chặn 400.
 const MAX_MESSAGE_LENGTH = { chat: 300, media: 2500 };
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+// Danh sách theo THỨ TỰ ƯU TIÊN, không phải một tên duy nhất. Groq định kỳ ngừng
+// phục vụ model cũ, và nếu worker chỉ ghi cứng đúng một tên thì đến ngày tên đó bị
+// gỡ, mọi câu hỏi đều trả về lỗi 400 và trợ lý AI chết câm — đúng kịch bản đã xảy
+// ra với Gemini trước đây, chỉ khác nguyên nhân. Gọi lần lượt, model nào phục vụ
+// được thì dùng; chỉ tụt xuống model sau khi lỗi đến từ chính model.
+//
+// Thứ tự dưới đây là kết quả đo thật, không phải xếp theo "model nào mới hơn":
+//   - moonshotai/kimi-k2-instruct: tài khoản này không gọi được, đã bỏ khỏi danh
+//     sách. Để một model không khả dụng ở đầu chuỗi thì MỌI request đều tốn thêm
+//     một lượt gọi hỏng trước khi tới model thật.
+//   - openai/gpt-oss-120b: gọi được nhưng tiếng Việt kém hơn rõ rệt — đã sinh ra
+//     "chiến thắng đậm thắng lợi", "ghi bại lộ", và tệ hơn là câu "TEAM X mở tỷ số"
+//     cho đội ghi bàn ở phút 25 trong khi đối thủ đã ghi từ phút 2. Giữ lại làm
+//     phương án dự phòng vì vẫn hơn là không có gì.
+//   - llama-3.3-70b-versatile: câu chữ tự nhiên, không suy diễn sai diễn biến.
+const GROQ_MODELS = [
+    'llama-3.3-70b-versatile',
+    'openai/gpt-oss-120b'
+];
 
 // Kênh xem trước của Firebase Hosting (`firebase hosting:channel:deploy`) có
 // tên miền dạng <project-id>--<tên-kênh>-<hash ngẫu nhiên>.web.app, tức mỗi lần
@@ -104,7 +123,30 @@ DỮ LIỆU GIẢI ĐẤU (JSON):
 ${JSON.stringify(grounding)}`;
 }
 
+// Lỗi do chính model (không tồn tại, đã bị gỡ, đang quá tải) thì thử model kế tiếp.
+// Lỗi khác — sai khoá, hết hạn mức, request hỏng — thì dừng ngay: thử lại với model
+// khác chỉ tốn thêm thời gian chờ mà kết quả vẫn thế.
+function isModelUnavailable(err) {
+    const status = err && err.status;
+    if (status === 404 || status === 503) return true;
+    if (status === 400 && /model/i.test(String(err.message || ''))) return true;
+    return false;
+}
+
 async function callGroq(apiKey, message, grounding, task) {
+    let lastErr;
+    for (const model of GROQ_MODELS) {
+        try {
+            return await callGroqModel(apiKey, model, message, grounding, task);
+        } catch (err) {
+            lastErr = err;
+            if (!isModelUnavailable(err)) throw err;
+        }
+    }
+    throw lastErr || new Error('Không model nào phục vụ được');
+}
+
+async function callGroqModel(apiKey, GROQ_MODEL, message, grounding, task) {
     const isMedia = task === 'media';
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -127,13 +169,15 @@ async function callGroq(apiKey, message, grounding, task) {
 
     if (!resp.ok) {
         const errText = await resp.text().catch(() => '');
-        throw new Error(`Groq API lỗi ${resp.status}: ${errText.slice(0, 300)}`);
+        const err = new Error(`Groq API lỗi ${resp.status} (${GROQ_MODEL}): ${errText.slice(0, 300)}`);
+        err.status = resp.status;
+        throw err;
     }
 
     const data = await resp.json();
     const text = data?.choices?.[0]?.message?.content;
     if (!text) throw new Error('Groq không trả về nội dung');
-    return text.trim();
+    return { text: text.trim(), model: GROQ_MODEL };
 }
 
 export default {
@@ -185,8 +229,10 @@ export default {
                 });
             }
 
-            const reply = await callGroq(env.GROQ_API_KEY.trim(), message, grounding, task);
-            return new Response(JSON.stringify({ reply }), {
+            const { text: reply, model } = await callGroq(env.GROQ_API_KEY.trim(), message, grounding, task);
+            // Trả kèm tên model đã phục vụ: khi chuỗi dự phòng tụt xuống model khác,
+            // đây là cách duy nhất biết được mà không phải mò log worker.
+            return new Response(JSON.stringify({ reply, model }), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) }
             });

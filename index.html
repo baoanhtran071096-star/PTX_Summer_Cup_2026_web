@@ -5859,8 +5859,10 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
             try {
                 const polished = await askPTXMediaModel(type, draft);
-                output.value = polished;
-                if (statusEl) statusEl.textContent = '✅ Đã viết lại bằng mô hình AI — số liệu giữ nguyên từ dữ liệu giải.';
+                output.value = polished.text;
+                // Hiện tên model đã phục vụ: worker có chuỗi dự phòng, nên khi model chính
+                // bị nhà cung cấp gỡ thì đây là dấu hiệu duy nhất nhìn thấy được trên giao diện.
+                if (statusEl) statusEl.textContent = `✅ Đã viết lại bằng mô hình AI${polished.model ? ` (${polished.model})` : ''} — số liệu giữ nguyên từ dữ liệu giải.`;
             } catch (e) {
                 if (statusEl) statusEl.textContent = '⚠️ Mô hình AI không phản hồi — đang hiển thị bản dựng thẳng từ dữ liệu giải (vẫn đăng được).';
             } finally {
@@ -5893,7 +5895,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 if (!resp.ok) throw new Error('Proxy trả về lỗi ' + resp.status);
                 const data = await resp.json();
                 if (!data || !data.reply) throw new Error('Proxy không trả về nội dung');
-                return String(data.reply).trim();
+                return { text: String(data.reply).trim(), model: data.model || '' };
             } finally {
                 clearTimeout(timeoutId);
             }
