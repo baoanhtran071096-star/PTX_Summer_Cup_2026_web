@@ -5972,6 +5972,27 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         const PTX_NEWS_KEY = 'ptx_news';
         const PTX_NEWS_MAX = 20;
 
+        // Hàng chờ duyệt — CỐ Ý chỉ nằm ở máy này, không có trong DOC_MAP.
+        //
+        // Bản nháp chưa ai đọc thì chưa phải nội dung của giải, nên không có lý do gì để nó
+        // xuất hiện trên máy người khác. Người lưu tỷ số cũng chính là người bấm Đăng, nên
+        // hàng chờ cục bộ là đủ. Chỉ bài ĐÃ DUYỆT mới đi qua ptx_news và được đồng bộ.
+        const PTX_NEWS_PENDING_KEY = 'ptx_news_pending';
+
+        function getPendingNews() {
+            try {
+                const raw = localStorage.getItem(PTX_NEWS_PENDING_KEY);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch (e) { return []; }
+        }
+        window.getPendingNews = getPendingNews;
+
+        function savePendingNews(list) {
+            localStorage.setItem(PTX_NEWS_PENDING_KEY, JSON.stringify(list.slice(0, PTX_NEWS_MAX)));
+            if (typeof renderNewsFeed === 'function') renderNewsFeed();
+        }
+
         function getNewsArticles() {
             try {
                 const raw = localStorage.getItem(PTX_NEWS_KEY);
@@ -5986,9 +6007,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             if (typeof renderNewsFeed === 'function') renderNewsFeed();
         }
 
-        // Máy kiểm thay cho người duyệt.
+        // Máy kiểm chạy TRƯỚC người duyệt, không thay người duyệt.
         //
-        // Bài do AI viết được đăng thẳng, không ai đọc trước, nên phải có thứ chặn ở giữa.
+        // Trước đây bài do AI viết được đăng thẳng lên trang chủ, không ai đọc trước, nên bộ
+        // kiểm này là thứ duy nhất chặn ở giữa. Nay đã có hàng chờ và nút Đăng, nó lùi về
+        // đúng vai: lọc sạch phần máy bắt được để người duyệt không phải soi số liệu, chỉ
+        // cần đọc xem câu chuyện có xuôi không.
         // Đã đo được mô hình bịa diễn biến từ dữ liệu đúng: gpt-oss-120b viết "TEAM X mở
         // tỷ số" cho đội ghi bàn ở phút 25 trong khi đối thủ đã ghi từ phút 2 — số liệu
         // không sai chữ nào nhưng câu chuyện thì sai.
@@ -6050,7 +6074,14 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         }
         window.verifyArticleAgainstFacts = verifyArticleAgainstFacts;
 
-        async function autoPublishMatchNews(matchId) {
+        // Đổi tên từ autoPublishMatchNews: hàm này KHÔNG còn đăng gì cả.
+        //
+        // Trước đây lưu tỷ số là bài AI lên thẳng trang chủ, không qua một cú bấm nào của con
+        // người. Bộ kiểm chặn được số liệu bịa, nhưng không chặn được văn sai giọng, sai trọng
+        // tâm, hay vô duyên với một trận có chấn thương. Với một giải đấu có người thật đọc,
+        // để máy tự xuất bản là rủi ro không cần thiết — nhất là khi việc thêm một cú bấm
+        // duyệt gần như không tốn gì.
+        async function generateMatchNewsDraft(matchId) {
             const match = MATCHES_CONFIG.find(m => String(m.id) === String(matchId));
             if (!match || !getMatchResult(match.id)) return null;
 
@@ -6080,28 +6111,80 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 matchId: match.id,
                 publishedAt: new Date().toISOString()
             };
-            // Cùng một trận thì thay bài cũ, không chồng thêm: admin sửa lại tỷ số là
+            // Cùng một trận thì thay bản nháp cũ, không chồng thêm: admin sửa lại tỷ số là
             // bản tin phải theo, chứ không để hai bài mâu thuẫn nằm cạnh nhau.
-            const list = getNewsArticles().filter(a => a.id !== article.id);
+            const list = getPendingNews().filter(a => a.id !== article.id);
             list.unshift(article);
-            saveNewsArticles(list);
+            savePendingNews(list);
             return article;
         }
-        window.autoPublishMatchNews = autoPublishMatchNews;
+        window.generateMatchNewsDraft = generateMatchNewsDraft;
+
+        // Duyệt: chuyển một bản nháp từ hàng chờ sang kho bài đã đăng. Đây là chỗ DUY NHẤT
+        // nội dung do AI viết được phép ra trang chủ, và nó luôn cần một cú bấm của con người.
+        function approveNewsArticle(id) {
+            const pending = getPendingNews();
+            const article = pending.find(a => a.id === id);
+            if (!article) return null;
+
+            article.publishedAt = new Date().toISOString();
+            article.approvedBy = localStorage.getItem('ptx_admin_user') || 'admin';
+
+            const list = getNewsArticles().filter(a => a.id !== article.id);
+            list.unshift(article);
+            saveNewsArticles(list);                                   // đẩy cloud nằm trong đây
+            savePendingNews(pending.filter(a => a.id !== id));
+            if (typeof showToast === 'function') showToast('✅ Đã đăng bản tin lên trang chủ', 'success');
+            return article;
+        }
+        window.approveNewsArticle = approveNewsArticle;
+
+        function discardNewsArticle(id) {
+            savePendingNews(getPendingNews().filter(a => a.id !== id));
+            if (typeof showToast === 'function') showToast('🗑️ Đã bỏ bản nháp', 'success');
+        }
+        window.discardNewsArticle = discardNewsArticle;
 
         function renderNewsFeed() {
             const section = document.getElementById('newsFeedSection');
             const list = document.getElementById('newsFeedList');
             if (!section || !list) return;
             const articles = getNewsArticles();
-            if (articles.length === 0) { section.style.display = 'none'; return; }
+            const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
+            // Hàng chờ chỉ tồn tại với admin. Khách vào trang không thấy bản nháp, và cũng
+            // không thấy khung rỗng khi chưa có bài nào được duyệt.
+            const pending = isAdmin ? getPendingNews() : [];
+            if (articles.length === 0 && pending.length === 0) {
+                // Phải xoá HTML cũ chứ không chỉ ẩn khung. Ẩn suông thì thẻ bản nháp vừa vẽ
+                // vẫn nằm nguyên trong DOM — mắt không thấy nhưng vẫn đọc được, tức bản nháp
+                // chưa duyệt vẫn rò ra ngoài đúng theo cách mà hàng chờ sinh ra để ngăn.
+                list.innerHTML = '';
+                section.style.display = 'none';
+                return;
+            }
             section.style.display = '';
 
-            const isAdmin = localStorage.getItem('adminLoggedIn') === 'true';
             const esc = s => String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-            list.innerHTML = articles.map(a => {
+            // Bản nháp hiện ngay trên bài đã đăng, trông đúng như lúc sẽ lên trang — duyệt
+            // bằng cách đọc thứ thật, không phải đọc một ô xem trước khác kiểu.
+            const pendingHtml = pending.map(a => `
+                    <article class="card" style="padding:18px 20px;border:1px solid rgba(245,158,11,0.5);background:rgba(245,158,11,0.06);">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                            <span style="font-size:10px;font-weight:900;color:#f59e0b;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.45);padding:2px 8px;border-radius:10px;">⏳ CHỜ DUYỆT</span>
+                            <span style="font-size:10px;font-weight:900;color:${a.source === 'data' ? '#94a3b8' : '#60a5fa'};">${a.source === 'data' ? 'DỰNG TỪ DỮ LIỆU' : '🤖 AI VIẾT'}</span>
+                            <span style="margin-left:auto;display:flex;gap:8px;">
+                                <button onclick="approveNewsArticle('${esc(a.id)}')" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.45);padding:3px 12px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">✓ Đăng</button>
+                                <button onclick="discardNewsArticle('${esc(a.id)}')" style="background:rgba(148,163,184,0.15);color:var(--text-muted);border:1px solid rgba(148,163,184,0.4);padding:3px 12px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;">Bỏ</button>
+                            </span>
+                        </div>
+                        <h3 style="font-size:17px;font-weight:900;color:var(--text-primary);font-family:var(--font-title);margin-bottom:8px;">${esc(a.title)}</h3>
+                        <div style="font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;">${esc(a.body)}</div>
+                        ${a.note ? `<div style="font-size:11px;color:var(--text-muted);margin-top:10px;font-style:italic;">Bản AI bị từ chối (${esc(a.note)}) — đây là bản dựng từ dữ liệu.</div>` : ''}
+                    </article>`).join('');
+
+            list.innerHTML = pendingHtml + articles.map(a => {
                 const d = new Date(a.publishedAt);
                 const when = isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
                 // Ghi rõ bài do AI viết hay do dữ liệu dựng — người đọc có quyền biết mình
@@ -13601,14 +13684,14 @@ function renderGallery() {
             ].filter(x => x.after && x.after !== x.before);
 
             if (changed.length) {
-                showToast(`📰 Đang tạo bản tin cho ${changed.length} trận…`, 'success');
-                Promise.all(changed.map(x => autoPublishMatchNews(x.id)))
+                showToast(`📰 Đang soạn bản tin cho ${changed.length} trận…`, 'success');
+                Promise.all(changed.map(x => generateMatchNewsDraft(x.id)))
                     .then(articles => {
                         const done = articles.filter(Boolean);
                         const byAi = done.filter(a => a.source !== 'data').length;
-                        showToast(`📰 Đã đăng ${done.length} bản tin lên trang chủ (${byAi} bài do AI viết)`, 'success');
+                        showToast(`📰 ${done.length} bản nháp đang CHỜ DUYỆT ở mục Bản tin (${byAi} bài do AI viết). Đọc rồi bấm Đăng.`, 'warning');
                     })
-                    .catch(() => showToast('⚠️ Không tạo được bản tin, kết quả vẫn đã lưu', 'error'));
+                    .catch(() => showToast('⚠️ Không soạn được bản tin, kết quả vẫn đã lưu', 'error'));
             }
         }
 

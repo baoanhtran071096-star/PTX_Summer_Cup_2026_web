@@ -10,6 +10,11 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Cấu hình Claude Code riêng của từng máy. launch.json thì dùng chung được (nó mô tả
+# cách chạy server xem trước), còn settings.local.json là quyền/tuỳ chọn của riêng máy đó
+# — đẩy lên repo chung sẽ ghi đè lựa chọn của máy kia.
+.claude/settings.local.json
+
 # Firebase & build
 .firebase/
 

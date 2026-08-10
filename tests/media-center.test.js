@@ -203,30 +203,75 @@ module.exports = async function runMediaCenterTests(browser) {
         assert(!guard.tySoBia && !guard.phutBia && !guard.nguoiLa && !guard.soLa,
             `Bộ kiểm chặn tỷ số bịa, phút bịa, cầu thủ không đá trận, và số liệu bịa`);
 
-        // Đăng bài & hiển thị
-        const news = await page.evaluate(async () => {
+        // ------------------------------------------------------------
+        // Bản tin AI phải qua người duyệt mới lên trang chủ
+        // ------------------------------------------------------------
+        // Trước đây lưu tỷ số là bài AI đăng thẳng, không ai đọc trước. Bộ kiểm ở trên chặn
+        // được số liệu bịa nhưng không chặn được văn sai giọng hay sai trọng tâm. Các test
+        // dưới đây khoá ranh giới: sinh bản nháp KHÔNG được chạm vào ptx_news, và chỉ
+        // approveNewsArticle() — tức một cú bấm của con người — mới đưa bài ra trang.
+        const nhap = await page.evaluate(async () => {
             localStorage.removeItem('ptx_news');
+            localStorage.removeItem('ptx_news_pending');
+            localStorage.setItem('adminLoggedIn', 'true');
             renderNewsFeed();
             const anTrangTrong = document.getElementById('newsFeedSection').style.display === 'none';
-            const a = await autoPublishMatchNews(3);
-            const b = await autoPublishMatchNews(3); // đăng lại cùng trận
+
+            const a = await generateMatchNewsDraft(3);
+            const b = await generateMatchNewsDraft(3); // soạn lại cùng trận
             return {
                 anTrangTrong,
                 title: a.title,
                 source: a.source,
-                soBai: document.querySelectorAll('#newsFeedList article').length,
-                hienMuc: document.getElementById('newsFeedSection').style.display !== 'none',
-                trungTitle: a.title === b.title
+                trungTitle: a.title === b.title,
+                soNhap: getPendingNews().length,
+                daDang: getNewsArticles().length,
+                soTheChoDuyet: document.querySelectorAll('#newsFeedList article').length,
+                coNutDang: /✓ Đăng/.test(document.getElementById('newsFeedList').innerHTML)
             };
         });
-        assert(news.anTrangTrong, `Chưa có bản tin nào thì mục Bản tin ẩn hẳn, không để khung trống`);
-        assert(news.hienMuc && news.soBai === 1 && news.trungTitle,
-            `Đăng bản tin cho một trận hai lần chỉ ra MỘT bài, không nhân đôi (${news.soBai} bài)`);
-        assert(/2 - 9|9 - 2/.test(news.title),
-            `Tiêu đề bản tin lấy đúng tỷ số thật ("${news.title}")`);
+        assert(nhap.anTrangTrong, `Chưa có bản tin nào thì mục Bản tin ẩn hẳn, không để khung trống`);
+        assert(nhap.daDang === 0,
+            `Soạn bản tin KHÔNG tự đăng lên trang chủ (${nhap.daDang} bài đã đăng)`);
+        assert(nhap.soNhap === 1 && nhap.trungTitle,
+            `Soạn hai lần cho một trận chỉ ra MỘT bản nháp, không nhân đôi (${nhap.soNhap} nháp)`);
+        assert(nhap.soTheChoDuyet === 1 && nhap.coNutDang,
+            `Admin thấy bản nháp kèm nút Đăng ngay trong mục Bản tin`);
+        assert(/2 - 9|9 - 2/.test(nhap.title),
+            `Tiêu đề bản tin lấy đúng tỷ số thật ("${nhap.title}")`);
         // Test chặn mọi request ra ngoài nên AI luôn hỏng — phải rơi về bản dữ liệu.
-        assert(news.source === 'data',
-            `Mô hình AI hỏng thì vẫn đăng được bản dựng từ dữ liệu (nguồn: ${news.source})`);
+        assert(nhap.source === 'data',
+            `Mô hình AI hỏng thì vẫn soạn được bản dựng từ dữ liệu (nguồn: ${nhap.source})`);
+
+        // Khách chưa đăng nhập tuyệt đối không được thấy bản nháp.
+        const khach = await page.evaluate(() => {
+            localStorage.setItem('adminLoggedIn', 'false');
+            renderNewsFeed();
+            return {
+                an: document.getElementById('newsFeedSection').style.display === 'none',
+                soThe: document.querySelectorAll('#newsFeedList article').length
+            };
+        });
+        assert(khach.an && khach.soThe === 0,
+            `Khách chưa đăng nhập không thấy bản nháp, cũng không thấy khung rỗng`);
+
+        // Bấm Đăng: bản nháp chuyển sang kho bài đã đăng, hàng chờ rỗng đi.
+        const duyet = await page.evaluate(() => {
+            localStorage.setItem('adminLoggedIn', 'true');
+            const id = getPendingNews()[0].id;
+            const kq = approveNewsArticle(id);
+            return {
+                daDang: getNewsArticles().length,
+                conNhap: getPendingNews().length,
+                coNguoiDuyet: !!(kq && kq.approvedBy),
+                hienVoiKhach: (localStorage.setItem('adminLoggedIn', 'false'), renderNewsFeed(),
+                               document.querySelectorAll('#newsFeedList article').length)
+            };
+        });
+        assert(duyet.daDang === 1 && duyet.conNhap === 0,
+            `Bấm Đăng thì bài ra trang chủ và rời hàng chờ (${duyet.daDang} đã đăng, ${duyet.conNhap} còn chờ)`);
+        assert(duyet.coNguoiDuyet, `Bài đã đăng có ghi lại ai là người duyệt`);
+        assert(duyet.hienVoiKhach === 1, `Sau khi duyệt thì khách mới đọc được bài`);
 
         assert(pageErrors.length === 0, `Không có uncaught exception trong Media Center: ${pageErrors.length} lỗi`);
     });
