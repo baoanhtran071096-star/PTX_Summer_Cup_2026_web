@@ -123,17 +123,47 @@ DỮ LIỆU GIẢI ĐẤU (JSON):
 ${JSON.stringify(grounding)}`;
 }
 
-// Lỗi do chính model (không tồn tại, đã bị gỡ, đang quá tải) thì thử model kế tiếp.
-// Lỗi khác — sai khoá, hết hạn mức, request hỏng — thì dừng ngay: thử lại với model
-// khác chỉ tốn thêm thời gian chờ mà kết quả vẫn thế.
+// Lỗi do chính model (không tồn tại, đã bị gỡ, đang quá tải, hoặc CẠN HẠN MỨC) thì
+// thử model kế tiếp. Lỗi khác — sai khoá, request hỏng — thì dừng ngay: thử lại với
+// model khác chỉ tốn thêm thời gian chờ mà kết quả vẫn thế.
+//
+// 429 nằm trong nhóm "thử tiếp" chứ không phải nhóm dừng, và đây là chỗ đã từng sai.
+// Hạn mức free của Groq tính THEO TỪNG MODEL (llama-3.3-70b-versatile: 30 lượt/phút,
+// 1.000 lượt/ngày), nên cạn hạn mức của model này KHÔNG có nghĩa model kế cũng cạn.
+// Coi 429 là lỗi dừng hẳn tức là tự tay tắt trợ lý AI trong khi vẫn còn đường đi.
 function isModelUnavailable(err) {
     const status = err && err.status;
-    if (status === 404 || status === 503) return true;
+    if (status === 404 || status === 503 || status === 429) return true;
     if (status === 400 && /model/i.test(String(err.message || ''))) return true;
     return false;
 }
 
-async function callGroq(apiKey, message, grounding, task) {
+// Lớp cuối: Workers AI chạy ngay trong chính worker này.
+//
+// Vì sao đáng có, dù Groq đã có chuỗi hai model: cả hai đều là hạn mức của MỘT tài
+// khoản Groq. Ngày nào tài khoản đó chạm trần — hoặc Groq gặp sự cố — thì cả chuỗi
+// tắt cùng lúc, và trợ lý AI câm trước mặt người xem. Workers AI là hạn mức KHÁC,
+// nhà cung cấp KHÁC, và không cần thêm khoá API nào: nó là một binding của worker.
+// 10.000 neuron/ngày miễn phí, thừa sức cho một giải nội bộ.
+const WORKERS_AI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+async function callWorkersAI(env, message, grounding, task) {
+    if (!env.AI) throw new Error('Chưa bật binding Workers AI (thiếu [ai] trong wrangler.toml)');
+    const isMedia = task === 'media';
+    const out = await env.AI.run(WORKERS_AI_MODEL, {
+        messages: [
+            { role: 'system', content: isMedia ? buildMediaSystemPrompt(grounding) : buildSystemPrompt(grounding) },
+            { role: 'user', content: message }
+        ],
+        temperature: isMedia ? 0.6 : 0.4,
+        max_tokens: isMedia ? 900 : 400
+    });
+    const text = out && (out.response || out.result);
+    if (!text) throw new Error('Workers AI không trả về nội dung');
+    return { text: String(text).trim(), model: WORKERS_AI_MODEL };
+}
+
+async function callGroq(apiKey, message, grounding, task, env) {
     let lastErr;
     for (const model of GROQ_MODELS) {
         try {
@@ -143,7 +173,17 @@ async function callGroq(apiKey, message, grounding, task) {
             if (!isModelUnavailable(err)) throw err;
         }
     }
-    throw lastErr || new Error('Không model nào phục vụ được');
+    // Groq hết đường thì sang nhà cung cấp khác thay vì trả lỗi cho người dùng.
+    try {
+        return await callWorkersAI(env, message, grounding, task);
+    } catch (err) {
+        // Giữ lỗi Groq làm lỗi chính: nó mô tả nguyên nhân gốc rõ hơn, còn lỗi của
+        // lớp dự phòng chỉ nói rằng phương án cuối cũng không cứu được.
+        throw new Error(
+            `${(lastErr && lastErr.message) || 'Không model Groq nào phục vụ được'} `
+            + `| dự phòng Workers AI cũng lỗi: ${err.message}`
+        );
+    }
 }
 
 async function callGroqModel(apiKey, GROQ_MODEL, message, grounding, task) {
@@ -229,7 +269,7 @@ export default {
                 });
             }
 
-            const { text: reply, model } = await callGroq(env.GROQ_API_KEY.trim(), message, grounding, task);
+            const { text: reply, model } = await callGroq(env.GROQ_API_KEY.trim(), message, grounding, task, env);
             // Trả kèm tên model đã phục vụ: khi chuỗi dự phòng tụt xuống model khác,
             // đây là cách duy nhất biết được mà không phải mò log worker.
             return new Response(JSON.stringify({ reply, model }), {

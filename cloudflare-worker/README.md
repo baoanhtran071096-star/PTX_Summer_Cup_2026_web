@@ -114,13 +114,35 @@ tạo lại sinh một hash khác nhau, không liệt kê sẵn được. Regex 
 `...web.app.attacker.com` hay project Firebase khác — đã kiểm tra bằng 15
 trường hợp gồm cả các biến thể giả mạo.
 
+## Chuỗi dự phòng khi model hỏng
+
+Worker gọi lần lượt cho tới khi có bên phục vụ được:
+
+```
+1. Groq · llama-3.3-70b-versatile      ← chính, tiếng Việt tốt nhất
+2. Groq · openai/gpt-oss-120b          ← cùng tài khoản Groq
+3. Workers AI · llama-3.3-70b-fp8-fast ← NHÀ CUNG CẤP KHÁC, hạn mức khác
+```
+
+Bước 3 mới là lớp đỡ thật. Hai bước đầu dùng chung một tài khoản Groq, nên
+ngày tài khoản đó chạm trần thì cả hai tắt cùng lúc. Workers AI chạy ngay
+trong worker này qua binding `env.AI` — không cần thêm khoá API nào, chỉ cần
+khối `[ai]` trong `wrangler.toml`.
+
+Hạn mức được coi là "thử bên kế tiếp" chứ không phải lỗi dừng hẳn: hạn mức
+Groq tính theo TỪNG model, nên model này cạn không có nghĩa model sau cũng cạn.
+
 ## Giới hạn free tier (tham khảo)
 
 - **Cloudflare Workers free**: 100.000 request/ngày.
-- **Groq free tier**: có giới hạn request/phút và token/phút tùy model, đủ
-  dùng cho quy mô 1 giải đấu nội bộ. Nếu vượt giới hạn, Groq trả lỗi và bot
-  sẽ tự động fallback về câu "chưa có dữ liệu" — trang web không bao giờ
-  bị lỗi.
+- **Workers AI free**: 10.000 neuron/ngày (khoảng 375k token vào / 49k token
+  ra với model 70B), reset 00:00 UTC.
+- **Groq free tier**: `llama-3.3-70b-versatile` khoảng 30 lượt/phút, 1.000
+  lượt/ngày, 100.000 token/ngày — thừa cho quy mô một giải nội bộ.
+
+Nếu cả ba đều hỏng, trang web vẫn không vỡ: Media Center hiện bản nháp dựng
+thẳng từ dữ liệu giải (số liệu luôn đúng), còn chatbot lùi về câu "chưa có
+dữ liệu".
 
 ## Cập nhật / rollback
 

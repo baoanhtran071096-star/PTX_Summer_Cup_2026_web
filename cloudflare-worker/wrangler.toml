@@ -1,3 +1,12 @@
 name = "ptx-ai-proxy"
 main = "worker.js"
 compatibility_date = "2024-11-01"
+
+# Workers AI làm lớp dự phòng cuối khi chuỗi model Groq hết đường (cạn hạn mức ngày,
+# hoặc Groq gặp sự cố). Chỉ cần binding này, KHÔNG cần thêm khoá API nào — worker gọi
+# thẳng qua env.AI. Miễn phí 10.000 neuron/ngày.
+#
+# Nếu gỡ khối này thì worker vẫn chạy: callWorkersAI() kiểm env.AI và báo lỗi rõ ràng
+# thay vì đổ vỡ, chỉ là mất lớp đỡ cuối.
+[ai]
+binding = "AI"
