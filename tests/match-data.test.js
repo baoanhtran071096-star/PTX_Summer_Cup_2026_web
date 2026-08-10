@@ -500,4 +500,98 @@ module.exports = async function runMatchDataTests(browser) {
             `Vinh danh hiện đúng vua phá lưới với khách quay lại`);
         assert(pageErrors.length === 0, `Không có uncaught exception ở lần mở thứ hai: ${pageErrors.length} lỗi`);
     });
+
+    // ============================================================
+    // Các nút "Lưu" trong trang quản trị phải thật sự lưu
+    // ============================================================
+    // Ba trong sáu nút Lưu hỏng theo cùng một kiểu: báo thành công mà không lưu, hoặc
+    // vỡ giữa chừng nên không báo gì. Không test nào cũ chạm tới chúng vì tất cả đều
+    // kiểm dữ liệu hiển thị, không kiểm dữ liệu có sống sót qua lần tải lại hay không.
+    await withPage(browser, async (page, { pageErrors }) => {
+        console.log('  — trang quản trị: dữ liệu có sống sót qua tải lại không');
+        await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await page.waitForTimeout(1500);
+
+        // ---- Chỉ số cầu thủ ----
+        // Trước đây hàm chỉ sửa mảng trong bộ nhớ rồi vẽ lại: chỉ số đổi ngay trước mắt,
+        // hiện "Đã cập nhật", tải lại trang là mất trắng, và không có gì lên cloud.
+        const luuCauThu = await page.evaluate(() => {
+            const dayLen = [];
+            ptxCloudSync.push = (d) => dayLen.push(d);
+            loadAdminData();
+            const s = document.getElementById('adminPlayerSelect');
+            s.value = s.options[0].value;
+            document.getElementById('admin-p-goals').value = '77';
+            savePlayerAdminDetail();
+            return {
+                id: parseInt(s.value),
+                vaoLocalStorage: (localStorage.getItem('ptx_players_data') || '').includes('"goals":77'),
+                dayLen: dayLen.join(',')
+            };
+        });
+        assert(luuCauThu.vaoLocalStorage, `Lưu chỉ số cầu thủ có ghi xuống localStorage`);
+        assert(luuCauThu.dayLen === 'players', `Lưu chỉ số cầu thủ có đẩy lên cloud (push: "${luuCauThu.dayLen}")`);
+
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await page.waitForTimeout(1500);
+        const conSau = await page.evaluate((id) => {
+            const p = PLAYERS_DATA.find(x => x.id === id);
+            return p ? p.goals : null;
+        }, luuCauThu.id);
+        assert(conSau === 77, `Chỉ số cầu thủ SỐNG SÓT qua lần tải lại (goals = ${conSau})`);
+
+        // ---- Hall of Fame ----
+        // Hỏng ba kiểu cùng lúc: lặp cứng 2025→2030 trong khi chỉ có 3 ô nên ném lỗi ở
+        // 2028 (không kịp báo gì), không đẩy cloud, và không xoá trắng được một năm.
+        const hof = await page.evaluate(() => {
+            const dayLen = [];
+            ptxCloudSync.push = (d) => dayLen.push(d);
+            let toast = null;
+            window.showToast = (m) => { toast = m; };
+            loadAdminData();
+            const oInput = document.querySelectorAll('[id^="admin-hof-"]');
+            oInput.forEach(el => { el.value = 'THỬ ' + el.id.replace('admin-hof-', ''); });
+            let loi = null;
+            try { saveHallOfFameAdmin(); } catch (e) { loi = e.message; }
+            const daLuu = [...oInput].every(el => {
+                const y = el.id.replace('admin-hof-', '');
+                return localStorage.getItem('hof_' + y) === 'THỬ ' + y;
+            });
+            // Xoá trắng một năm phải thật sự xoá.
+            oInput[0].value = '';
+            saveHallOfFameAdmin();
+            const namDau = oInput[0].id.replace('admin-hof-', '');
+            return {
+                loi, toast, dayLen: dayLen.join(','), soO: oInput.length, daLuu,
+                xoaDuoc: localStorage.getItem('hof_' + namDau) === null
+            };
+        });
+        assert(!hof.loi, `Nút Lưu Hall of Fame không ném lỗi (${hof.loi || 'sạch'})`);
+        assert(hof.daLuu && hof.soO > 0, `Lưu đủ ${hof.soO} ô Hall of Fame có thật trong trang`);
+        assert(!!hof.toast, `Có báo cho người dùng biết đã lưu ("${String(hof.toast).slice(0, 45)}")`);
+        assert(/hof/.test(hof.dayLen), `Hall of Fame ĐƯỢC đồng bộ lên cloud (push: "${hof.dayLen}")`);
+        assert(hof.xoaDuoc, `Xoá trắng một năm thì năm đó bị xoá thật, không giữ lại giá trị cũ`);
+
+        // ---- Nút phá huỷ ----
+        // Bốn nút xoá/ghi đè kết quả thật, trước đây không nút nào hỏi lại một câu.
+        const raoChan = await page.evaluate(async () => {
+            const ketQua = {};
+            for (const ten of ['setZeroMatchesState', 'setDemoScoresState', 'switchToPreMatchState', 'resetSystemDataToOfficialDefaults']) {
+                localStorage.setItem('ptx_result_1', 'GIỮ NGUYÊN');
+                let daHoi = false;
+                const confirmThat = window.confirm;
+                window.confirm = () => { daHoi = true; return false; }; // người dùng bấm Huỷ
+                window[ten]();
+                window.confirm = confirmThat;
+                ketQua[ten] = { daHoi, conNguyen: localStorage.getItem('ptx_result_1') === 'GIỮ NGUYÊN' };
+            }
+            return ketQua;
+        });
+        for (const [ten, r] of Object.entries(raoChan)) {
+            assert(r.daHoi && r.conNguyen,
+                `${ten}() hỏi xác nhận trước, bấm Huỷ thì không xoá gì`);
+        }
+
+        assert(pageErrors.length === 0, `Không có uncaught exception trong luồng lưu của trang quản trị: ${pageErrors.length} lỗi`);
+    });
 };

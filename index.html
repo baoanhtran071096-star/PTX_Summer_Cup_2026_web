@@ -6297,7 +6297,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 return;
             }
             if (typeof resetSystemDataToOfficialDefaults === 'function') {
-                resetSystemDataToOfficialDefaults();
+                resetSystemDataToOfficialDefaults(true); // đã gõ đúng chuỗi xác nhận ở trên
             }
         }
         window.executeDangerZoneReset = executeDangerZoneReset;
@@ -9013,6 +9013,11 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 // Bản tin tự động: đi qua đúng cơ chế đồng bộ sẵn có nên bài admin đăng
                 // hiện trên máy mọi người xem trong vài giây, không cần deploy lại trang.
                 news: ['ptx_news'],
+                // Vinh danh từng bị bỏ quên hoàn toàn ở đây: saveHallOfFameAdmin() ghi
+                // localStorage rồi dừng, nên danh hiệu chỉ tồn tại trên trình duyệt của
+                // một người. Liệt sẵn cả sáu mùa dù HTML mới có ba ô, để năm sau thêm ô
+                // là đồng bộ chạy luôn, không phải nhớ quay lại sửa chỗ này.
+                hof: ['hof_2025', 'hof_2026', 'hof_2027', 'hof_2028', 'hof_2029', 'hof_2030'],
             };
 
             function isConfigured() {
@@ -13495,7 +13500,26 @@ function renderGallery() {
             if (index === 2) populateAdminPlayerSelect();
         }
 
+        // ============================================================
+        // RÀO CHẮN CHO CÁC THAO TÁC PHÁ HUỶ
+        // ============================================================
+        // Bốn nút bên dưới xoá hoặc ghi đè kết quả thật của giải, và trước đây KHÔNG nút nào
+        // hỏi lại một câu. Chúng nằm ngay cạnh các nút Lưu bình thường, cùng kích thước, cùng
+        // kiểu — bấm nhầm là chuyện sẽ xảy ra chứ không phải có thể xảy ra.
+        //
+        // Chúng không tự đẩy lên cloud, nên bấm nhầm chưa hỏng ngay. Nhưng lần bấm "Lưu" hợp
+        // lệ kế tiếp sẽ đẩy đúng trạng thái giả đó lên cho toàn bộ người xem. Đường lây gián
+        // tiếp nên khi đã xảy ra thì rất khó lần ra nguyên nhân.
+        function confirmDestructive(action, consequence) {
+            return confirm(`⚠️ ${action}\n\n${consequence}\n\nBấm OK để tiếp tục, Cancel để huỷ.`);
+        }
+        window.confirmDestructive = confirmDestructive;
+
         function setZeroMatchesState() {
+            if (!confirmDestructive(
+                'Đưa giải về trạng thái CHƯA ĐÁ TRẬN NÀO?',
+                'Tỷ số của cả 3 trận và toàn bộ thống kê trên máy này sẽ bị xoá.'
+            )) return;
             localStorage.removeItem('ptx_result_1');
             localStorage.removeItem('ptx_result_2');
             localStorage.removeItem('ptx_result_3');
@@ -13513,6 +13537,10 @@ function renderGallery() {
         }
 
         function setDemoScoresState() {
+            if (!confirmDestructive(
+                'Ghi đè bằng TỶ SỐ MÔ PHỎNG?',
+                'Kết quả thật của cả 3 trận sẽ bị thay bằng số liệu giả, kèm tên người ghi bàn giả.'
+            )) return;
             localStorage.setItem('ptx_result_1', "2-1 | Hiền 12', Huy 23'");
             localStorage.setItem('ptx_result_2', "1-1 | Nam 30', Lân 44'");
             localStorage.setItem('ptx_result_3', "0-0");
@@ -13568,8 +13596,16 @@ function renderGallery() {
             const newAvatar = document.getElementById('admin-p-avatar').value;
             if (newAvatar) player.avatar = newAvatar;
 
+            // Thiếu đúng dòng này là toàn bộ hàm thành vô nghĩa: trước đây nó chỉ sửa mảng
+            // trong bộ nhớ rồi vẽ lại giao diện, nên chỉ số đổi ngay trước mắt, hiện dòng
+            // "Đã cập nhật", rồi tải lại trang là mất sạch — và không có gì lên cloud để
+            // máy kia hay người xem thấy. Nhập chỉ số cho cả 24 cầu thủ rồi đóng tab là
+            // mất trắng, không một dấu hiệu báo lỗi. savePlayersData() đã tồn tại sẵn và
+            // làm đúng cả hai việc (ghi localStorage + đẩy Firestore); chỉ là chưa ai gọi.
+            savePlayersData();
+
             renderPlayerCards();
-            showToast(`💾 Đã cập nhật chỉ số cho cầu thủ: ${player.name}`, 'success');
+            showToast(`💾 Đã lưu chỉ số cầu thủ: ${player.name}`, 'success');
         }
 
         function checkAdminNavClick(e) {
@@ -13765,13 +13801,27 @@ function renderGallery() {
             }
         }
 
+        // Hàm này từng hỏng theo ba cách cùng lúc, và cả ba đều im lặng.
+        //
+        // 1. Lặp cứng 2025→2030 trong khi HTML chỉ có ba ô (2025, 2026, 2027). Tới 2028 nó
+        //    đọc .value của null và ném lỗi, nên renderHallOfFame() lẫn dòng thông báo
+        //    thành công đều không bao giờ chạy — người dùng bấm Lưu và không thấy gì cả.
+        //    Nay duyệt đúng những ô CÓ THẬT trong DOM, nên thêm hay bớt năm ở HTML cũng
+        //    không thể làm hàm này vỡ nữa.
+        // 2. Không hề gọi ptxCloudSync.push, và DOC_MAP cũng không có mục nào cho hof —
+        //    tức Vinh danh chưa bao giờ rời khỏi trình duyệt của một người.
+        // 3. `if (val)` khiến xoá trắng một năm là không làm gì cả: sửa nhầm rồi muốn bỏ
+        //    thì không có cách nào, giá trị cũ nằm lại vĩnh viễn.
         function saveHallOfFameAdmin() {
-            [2025, 2026, 2027, 2028, 2029, 2030].forEach(y => {
-                const val = document.getElementById('admin-hof-' + y).value;
-                if (val) localStorage.setItem('hof_' + y, val);
+            document.querySelectorAll('[id^="admin-hof-"]').forEach(el => {
+                const year = el.id.replace('admin-hof-', '');
+                const val = el.value.trim();
+                if (val) localStorage.setItem('hof_' + year, val);
+                else localStorage.removeItem('hof_' + year);
             });
+            try { ptxCloudSync.push('hof'); } catch (e) { /* offline: vẫn lưu máy này */ }
             if (typeof renderHallOfFame === 'function') renderHallOfFame();
-            showToast('Đã lưu Hall of Fame!', 'success');
+            showToast('🏆 Đã lưu Hall of Fame và đồng bộ lên cloud', 'success');
         }
 
         function addQuickGoal() {
@@ -13873,12 +13923,19 @@ function renderGallery() {
                                 if (pSaved.name) target.name = pSaved.name;
                                 if (pSaved.number) target.number = pSaved.number;
                                 if (pSaved.position) target.position = pSaved.position;
+                                // Trang admin cho sửa ảnh đại diện, nên phải nạp lại ở đây.
+                                // Thiếu dòng này thì ảnh có được ghi xuống localStorage cũng
+                                // không bao giờ quay về — vẫn đúng kiểu mất dữ liệu âm thầm.
+                                if (pSaved.avatar) target.avatar = pSaved.avatar;
                             }
                         });
                     }
                 }
+                // Ảnh mặc định cho cầu thủ 21, nhưng chỉ khi CHƯA có ảnh nào được lưu.
+                // Gán vô điều kiện như trước sẽ đè lên đúng ảnh mà admin vừa đặt ở trang
+                // quản trị — sửa xong, tải lại, thấy ảnh cũ, không hiểu vì sao.
                 const p21 = PLAYERS_DATA.find(p => p.id === 21);
-                if (p21) p21.avatar = 'th%C6%B0%20vi%E1%BB%87n/%E1%BA%A2nh%20c%E1%BA%A7u%20th%E1%BB%A7/B%E1%BA%A3o%20Anh.webp';
+                if (p21 && !p21.avatar) p21.avatar = 'th%C6%B0%20vi%E1%BB%87n/%E1%BA%A2nh%20c%E1%BA%A7u%20th%E1%BB%A7/B%E1%BA%A3o%20Anh.webp';
             } catch (e) {
                 console.error('Failed to load PLAYERS_DATA from localStorage:', e);
             }
@@ -13986,7 +14043,16 @@ function renderGallery() {
         }
 
         // Global System Recovery Function (100% Restores Default Tournament Data)
-        function resetSystemDataToOfficialDefaults() {
+        // daXacNhan = true khi gọi từ Danger Zone, nơi người dùng đã phải gõ đúng chuỗi
+        // "RESET PTX 2026". Hỏi lại lần nữa ở đó chỉ làm người ta bấm OK theo quán tính.
+        //
+        // Nhưng còn một nút gọi THẲNG hàm này, đi vòng qua cổng gõ-xác-nhận đó — nên nhánh
+        // không-xác-nhận vẫn phải có rào riêng, nếu không thì cái cổng kia coi như không tồn tại.
+        function resetSystemDataToOfficialDefaults(daXacNhan) {
+            if (!daXacNhan && !confirmDestructive(
+                'Đặt lại toàn bộ dữ liệu về BẢN CHÍNH THỨC?',
+                'Mọi chỉnh sửa tỷ số, thống kê và chỉ số cầu thủ trên máy này sẽ bị ghi đè.'
+            )) return;
             applyOfficialResults();
             localStorage.setItem('ptx_seeded_flag', OFFICIAL_SEED_VERSION);
 
@@ -15190,6 +15256,10 @@ function renderGallery() {
         }
 
         function switchToPreMatchState() {
+            if (!confirmDestructive(
+                'Chuyển về trạng thái TRƯỚC GIẢI?',
+                'Tỷ số 3 trận, số bàn thắng và số thẻ phạt trên máy này sẽ bị xoá hết.'
+            )) return;
             localStorage.removeItem('ptx_result_1');
             localStorage.removeItem('ptx_result_2');
             localStorage.removeItem('ptx_result_3');
