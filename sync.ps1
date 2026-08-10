@@ -68,7 +68,17 @@ if ($LASTEXITCODE -ne 0) {
     Fail "Khong keo ve duoc bang fast-forward."
 }
 
-$baseCommit = (git rev-parse HEAD).Trim()
+# Moc so sanh la origin/main SAU KHI pull, khong phai HEAD.
+#
+# HEAD la sai va da gay loi that: neu ban commit BANG TAY roi moi chay script, HEAD da
+# chua san commit do, nen `git diff $baseCommit..HEAD` ra rong va buoc 6 ket luan
+# "khong co thay doi trong cloudflare-worker/" du worker vua bi sua. Worker khong duoc
+# deploy, ma man hinh van bao XONG — dung kieu hong im lang ma script nay sinh ra de
+# chong. HEAD chi dung khi commit duoc tao BEN TRONG buoc 3.
+#
+# origin/main sau pull chinh la thu GitHub dang co, nen `origin/main..HEAD` la dung
+# "nhung gi sap duoc day len va deploy", bat duoc ca hai truong hop.
+$baseCommit = (git rev-parse origin/main).Trim()
 
 # ------------------------------------------------------------
 # 2. TEST — chạy TRƯỚC khi push
