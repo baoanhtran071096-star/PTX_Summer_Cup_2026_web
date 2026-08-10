@@ -404,6 +404,44 @@ module.exports = async function runMatchDataTests(browser) {
             hofRows.y2025[2] === '' && hofRows.y2025[3] === 'Tường Khánh' && hofRows.y2025[4] === 'Anh Trương',
             `Mùa 2025: 2 đội, không có hạng ba, vua phá lưới & MVP đúng tư liệu`);
 
+        // ----------------------------------------------------------
+        // 12. Khu tổng kết trang chủ phải nói cùng một chuyện với Vinh danh
+        // ----------------------------------------------------------
+        // Thẻ "Thủ môn xuất sắc" ở đây từng tự chấm điểm bằng công thức bịa
+        // (giữ sạch lưới = kiến tạo × 2), nên luôn hiện "Chưa xác định" trong khi trang
+        // Vinh danh đã ghi rõ tên — hai chỗ trên cùng một trang chủ nói ngược nhau.
+        const hub = await page.evaluate(() => {
+            const cards = [...document.querySelectorAll('#tournamentHub .hub-card')];
+            return {
+                texts: cards.map(c => c.innerText.replace(/\s+/g, ' ').trim()),
+                gk: getBestGoalkeeper(),
+                awardGk: OFFICIAL_AWARDS_2026.goalkeeper,
+                standings: calculateStandings().map(t => ({ id: t.id, ga: t.obj.goalsAgainst, played: t.obj.played }))
+            };
+        });
+        const gkCard = hub.texts.find(t => /th[ủu] m[ôo]n/i.test(t)) || '';
+        assert(hub.gk && gkCard.includes(hub.awardGk) && !/Chưa xác định/i.test(gkCard),
+            `Thẻ Thủ môn xuất sắc ở trang chủ hiện đúng người ("${gkCard}")`);
+        const gkRow = hub.standings.find(t => t.id === (hub.gk && hub.gk.player.team));
+        assert(gkRow && hub.gk.conceded === gkRow.ga && hub.gk.played === gkRow.played,
+            `Số bàn thua của thủ môn lấy từ bảng xếp hạng thật (${hub.gk.conceded} bàn thua / ${hub.gk.played} trận)`);
+
+        const championCard = hub.texts.find(t => /TEAM/i.test(t)) || '';
+        assert(/Vô địch/i.test(championCard) && !/dẫn đầu/i.test(championCard),
+            `Giải đã xong thì thẻ đội đứng đầu ghi "Vô địch", không phải "Đội dẫn đầu" ("${championCard}")`);
+
+        // Tiêu đề khu LIVE không được mâu thuẫn với nội dung ngay bên dưới nó.
+        const liveHeader = await page.evaluate(() => ({
+            badge: (document.getElementById('liveCenterBadgeText') || {}).textContent || '',
+            sub: (document.getElementById('liveCenterSub') || {}).textContent || '',
+            body: (document.getElementById('liveCenterContent') || {}).innerText || '',
+            idle: (document.getElementById('liveCenterBadge') || { classList: { contains: () => false } }).classList.contains('is-idle')
+        }));
+        assert(!/LIVE/i.test(liveHeader.badge) && /kết thúc/i.test(liveHeader.sub) && liveHeader.idle,
+            `Khu LIVE báo đúng trạng thái đã kết thúc, chấm đỏ ngừng nhấp nháy ("${liveHeader.badge} — ${liveHeader.sub}")`);
+        assert(!(/đang diễn ra/i.test(liveHeader.sub) && /Chưa có trận/i.test(liveHeader.body)),
+            `Tiêu đề khu LIVE không mâu thuẫn với nội dung bên dưới`);
+
         // MVP phải khớp giữa trang Vinh danh và trang Thống kê — hai nơi đọc hai nguồn
         // khác nhau nên rất dễ nói ngược nhau nếu chỉ sửa một chỗ.
         const mvpConsistency = await page.evaluate(() => ({

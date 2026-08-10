@@ -1412,6 +1412,12 @@
             position: relative;
             overflow: hidden;
         }
+        /* Khung đỏ là tín hiệu "đang trực tiếp"; không có trận nào đang đá thì trả về
+           viền trung tính, khỏi hiểu nhầm là giải vẫn đang diễn ra. */
+        .live-center.is-idle {
+            border-color: var(--border-color);
+            box-shadow: none;
+        }
         .live-center::before {
             content: '';
             position: absolute;
@@ -1456,6 +1462,12 @@
             border-radius: 50%;
             background: #fff;
             animation: pulseLiveDot 1s infinite;
+        }
+        /* Không có trận nào đang đá thì chấm đỏ ngừng nhấp nháy — nhấp nháy là tín hiệu
+           "đang trực tiếp", để nó chạy khi giải đã xong là báo sai. */
+        .live-center .live-badge.is-idle .dot {
+            animation: none;
+            opacity: 0.7;
         }
         .live-center .live-content {
             display: flex;
@@ -6370,8 +6382,8 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         <div class="container section-gap reveal" style="padding-top:20px;padding-bottom:20px;">
             <div class="live-center" id="liveCenter">
                 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;position:relative;z-index:1;">
-                    <span class="live-badge"><span class="dot"></span> 🔴 LIVE</span>
-                    <span style="font-size:14px;color:var(--text-muted);font-family:var(--font-ui);" data-i18n="live_center_sub">Trận đấu đang diễn ra</span>
+                    <span class="live-badge" id="liveCenterBadge"><span class="dot"></span> <span id="liveCenterBadgeText">🔴 LIVE</span></span>
+                    <span id="liveCenterSub" style="font-size:14px;color:var(--text-muted);font-family:var(--font-ui);" data-i18n="live_center_sub">Trận đấu đang diễn ra</span>
                 </div>
                 <div id="liveCenterContent" style="position:relative;z-index:1;">
                     <!-- Render by JS -->
@@ -8791,6 +8803,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 modal_mvp: '⭐ MVP',
                 live_now: 'LIVE NOW',
                 live_center_sub: 'Trận đấu đang diễn ra',
+                live_center_sub_done: 'Giải đấu đã kết thúc',
+                live_done: 'Giải đấu đã kết thúc',
+                live_done_sub: 'Xem lại toàn bộ kết quả và bảng xếp hạng chung cuộc',
+                live_center_sub_soon: 'Chưa tới giờ thi đấu',
                 possession: '⚡ Possession',
                 shots: '🎯 Shots',
                 corners: '🔄 Corners',
@@ -9082,6 +9098,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 modal_mvp: '⭐ MVP',
                 live_now: 'LIVE NOW',
                 live_center_sub: 'Match in progress',
+                live_center_sub_done: 'Tournament finished',
+                live_done: 'The tournament has finished',
+                live_done_sub: 'Review all results and the final standings',
+                live_center_sub_soon: 'Not started yet',
                 possession: '⚡ Possession',
                 shots: '🎯 Shots',
                 corners: '🔄 Corners',
@@ -9626,6 +9646,24 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         function getMostValuablePlayer() {
             const rated = PLAYERS_DATA.filter(p => p.mvp > 0).sort((a, b) => b.mvp - a.mvp);
             return rated.length ? rated[0] : null;
+        }
+
+        // Thủ môn xuất sắc là danh hiệu BTC trao, không suy ra được từ số liệu trận đấu.
+        // Cách cũ tự bịa ra chỉ số để chấm: "giữ sạch lưới = kiến tạo × 2" và "cứu thua =
+        // bàn thắng × 3" — hai đại lượng chẳng liên quan gì đến nhau. Vì thủ môn nào cũng
+        // 0 kiến tạo nên điểm luôn bằng 0 và thẻ vĩnh viễn hiện "Chưa xác định".
+        // Số bàn thua thì có thật, lấy từ bảng xếp hạng của đội thủ môn đó.
+        function getBestGoalkeeper() {
+            const name = (typeof OFFICIAL_AWARDS_2026 !== 'undefined' && OFFICIAL_AWARDS_2026.goalkeeper) || '';
+            if (!name) return null;
+            const player = PLAYERS_DATA.find(p => p.name.toLowerCase() === name.toLowerCase());
+            if (!player) return null;
+            const row = calculateStandings().find(t => t.id === player.team);
+            return {
+                player,
+                conceded: row ? row.obj.goalsAgainst : 0,
+                played: row ? row.obj.played : 0
+            };
         }
 
         function renderTournamentStatusBar() {
@@ -10525,13 +10563,8 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             const topScorer = sortedByGoals[0] || null;
             const sortedByMVP = [...PLAYERS_DATA].sort((a, b) => b.mvp - a.mvp);
             const topMVP = sortedByMVP[0] || null;
-            const gks = PLAYERS_DATA.filter(p => p.position === 'GK');
-            const gkWithStats = gks.map(gk => {
-                const cleanSheets = gk.assists * 2;
-                const saves = gk.goals * 3;
-                return { ...gk, cleanSheets, saves, score: (cleanSheets * 5) + (saves * 0.5) };
-            });
-            const bestGK = gkWithStats.sort((a, b) => b.score - a.score)[0] || null;
+            const bestGK = getBestGoalkeeper();
+            const seasonFinished = getTournamentStatus().phase === 'finished';
 
             const standings = calculateStandings();
             const leaderRaw = standings.length > 0 ? standings[0] : null;
@@ -10541,14 +10574,15 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
             const leader = (leaderRaw && leaderRaw.obj && leaderRaw.obj.pts > 0) ? leaderRaw : null;
             const topScorerValid = (topScorer && topScorer.goals > 0) ? topScorer : null;
             const topMVPValid = (topMVP && topMVP.mvp > 0) ? topMVP : null;
-            const bestGKValid = (bestGK && bestGK.cleanSheets > 0) ? bestGK : null;
 
             const items = [
                 {
                     icon: '🏆',
                     value: leader ? leader.label : '<span data-i18n="st_undetermined">Chưa xác định</span>',
-                    labelKey: 'leader_label',
-                    labelTitle: 'Đội dẫn đầu',
+                    // Giải đã đá xong thì đội đứng đầu là NHÀ VÔ ĐỊCH, gọi "đội dẫn đầu"
+                    // nghe như giải vẫn đang diễn ra.
+                    labelKey: seasonFinished ? 'hof_champion' : 'leader_label',
+                    labelTitle: seasonFinished ? 'Vô địch' : 'Đội dẫn đầu',
                     sub: leader ? leader.obj.pts + ' điểm • Hạng 1' : '<span data-i18n="st_no_finished">Chưa có trận nào kết thúc</span>',
                     borderColor: '#fbbf24',
                     avatar: leader ? leader.logo : null
@@ -10574,12 +10608,12 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 },
                 {
                     icon: '🧤',
-                    value: bestGKValid ? bestGKValid.name : '<span data-i18n="st_undetermined">Chưa xác định</span>',
+                    value: bestGK ? bestGK.player.name : '<span data-i18n="st_undetermined">Chưa xác định</span>',
                     labelKey: 'best_gk_label',
                     labelTitle: 'Thủ môn xuất sắc',
-                    sub: bestGKValid ? bestGKValid.cleanSheets + ' lần giữ sạch lưới' : '<span data-i18n="st_no_data">Chưa có dữ liệu</span>',
+                    sub: bestGK ? `${bestGK.conceded} bàn thua • ${bestGK.played} trận` : '<span data-i18n="st_no_data">Chưa có dữ liệu</span>',
                     borderColor: '#38bdf8',
-                    avatar: bestGKValid ? bestGKValid.avatar : null
+                    avatar: bestGK ? bestGK.player.avatar : null
                 }
             ];
 
@@ -11985,6 +12019,32 @@ function renderGallery() {
                 }
             }
 
+            // Tiêu đề khu này là markup tĩnh, không ai cập nhật: huy hiệu đỏ nhấp nháy
+            // "🔴 LIVE — Trận đấu đang diễn ra" đứng ngay trên dòng chữ "Chưa có trận đấu
+            // nào đang diễn ra" do chính hàm này sinh ra. Hai câu phủ định nhau, và sau khi
+            // giải kết thúc thì câu trên còn sai hẳn.
+            const badgeEl = document.getElementById('liveCenterBadge');
+            const badgeTextEl = document.getElementById('liveCenterBadgeText');
+            const subEl = document.getElementById('liveCenterSub');
+            const liveState = liveMatch ? 'live'
+                : (getTournamentStatus().phase === 'finished' ? 'finished' : 'upcoming');
+            const headline = {
+                live: { badge: '🔴 LIVE', key: 'live_center_sub', text: 'Trận đấu đang diễn ra', color: 'var(--live-red)' },
+                finished: { badge: '🏁 KẾT THÚC', key: 'live_center_sub_done', text: 'Giải đấu đã kết thúc', color: '#16a34a' },
+                upcoming: { badge: '⏳ SẮP DIỄN RA', key: 'live_center_sub_soon', text: 'Chưa tới giờ thi đấu', color: '#0284c7' }
+            }[liveState];
+            if (badgeTextEl) badgeTextEl.textContent = headline.badge;
+            if (badgeEl) {
+                badgeEl.style.background = headline.color;
+                badgeEl.classList.toggle('is-idle', liveState !== 'live');
+            }
+            const liveCenterEl = document.getElementById('liveCenter');
+            if (liveCenterEl) liveCenterEl.classList.toggle('is-idle', liveState !== 'live');
+            if (subEl) {
+                subEl.setAttribute('data-i18n', headline.key);
+                subEl.textContent = headline.text;
+            }
+
             if (liveMatch) {
                 const homeTeam = TEAMS_DATA[liveMatch.home];
                 const awayTeam = TEAMS_DATA[liveMatch.away];
@@ -12015,13 +12075,16 @@ function renderGallery() {
                     </div>
                 `;
             } else {
+                // Giải đã đá xong thì lời mời "quay lại đúng giờ để theo dõi trực tiếp"
+                // là thông tin sai — không còn giờ nào để quay lại. Dẫn sang bảng xếp hạng.
+                const done = liveState === 'finished';
                 container.innerHTML = `
                     <div class="no-live">
-                        <span class="big-icon">⏳</span>
-                        <p style="font-size:18px;font-weight:600;color:var(--text-primary);" data-i18n="live_none">Chưa có trận đấu nào đang diễn ra</p>
-                        <p style="font-size:14px;color:var(--text-muted);" data-i18n="live_none_sub">Hãy quay lại đúng giờ để theo dõi trực tiếp!</p>
+                        <span class="big-icon">${done ? '🏁' : '⏳'}</span>
+                        <p style="font-size:18px;font-weight:600;color:var(--text-primary);" data-i18n="${done ? 'live_done' : 'live_none'}">${done ? 'Giải đấu đã kết thúc' : 'Chưa có trận đấu nào đang diễn ra'}</p>
+                        <p style="font-size:14px;color:var(--text-muted);" data-i18n="${done ? 'live_done_sub' : 'live_none_sub'}">${done ? 'Xem lại toàn bộ kết quả và bảng xếp hạng chung cuộc' : 'Hãy quay lại đúng giờ để theo dõi trực tiếp!'}</p>
                         <div style="margin-top:12px;">
-                            <a href="#schedule" class="live-cta" style="display:inline-block;padding:10px 32px;font-size:14px;text-decoration:none;" data-i18n="schedule_cta">📅 Xem lịch thi đấu</a>
+                            <a href="#${done ? 'standings' : 'schedule'}" class="live-cta" style="display:inline-block;padding:10px 32px;font-size:14px;text-decoration:none;" data-i18n="${done ? 'standings_cta' : 'schedule_cta'}">${done ? '📊 Bảng xếp hạng' : '📅 Xem lịch thi đấu'}</a>
                         </div>
                     </div>
                 `;
