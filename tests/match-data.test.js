@@ -498,6 +498,24 @@ module.exports = async function runMatchDataTests(browser) {
             `Hero hiện đúng vua phá lưới với khách quay lại ("${second.hero}")`);
         assert(second.hof.includes(second.boot),
             `Vinh danh hiện đúng vua phá lưới với khách quay lại`);
+
+        // ----------------------------------------------------------
+        // Nhãn nút lọc trận phải khớp THỂ THỨC THẬT
+        // ----------------------------------------------------------
+        // Ba nút từng ghi cứng "(Mở Màn)", "(Bán kết)", "(Chung kết)". Giải này ba đội đá
+        // vòng tròn một lượt rồi xếp hạng theo điểm — không có trận loại trực tiếp nào.
+        // Gọi trận cuối là "chung kết" còn khiến người xem hiểu sai cách định đoạt ngôi vô
+        // địch: nó do tổng điểm cả ba trận quyết, không phải do ai thắng trận thứ ba.
+        const tabs = await page.evaluate(() => ({
+            nhan: [...document.querySelectorAll('.match-round-tab')].map(b => b.innerText.replace(/\s+/g, ' ').trim()),
+            capDau: MATCHES_CONFIG.map(m => `${TEAMS_DATA[m.home].name} – ${TEAMS_DATA[m.away].name}`)
+        }));
+        const loaiTrucTiep = tabs.nhan.filter(t => /Bán kết|Chung kết|Semi-final|Final|Mở Màn|Opener/i.test(t));
+        assert(loaiTrucTiep.length === 0,
+            `Nút lọc trận không dùng từ loại trực tiếp cho giải đấu vòng tròn` +
+            (loaiTrucTiep.length ? ` — còn: ${loaiTrucTiep.join(', ')}` : ''));
+        assert(tabs.capDau.every((cap, i) => (tabs.nhan[i + 1] || '').includes(cap)),
+            `Mỗi nút lọc ghi đúng cặp đấu lấy từ lịch thi đấu (${tabs.capDau.join(' | ')})`);
         assert(pageErrors.length === 0, `Không có uncaught exception ở lần mở thứ hai: ${pageErrors.length} lỗi`);
     });
 

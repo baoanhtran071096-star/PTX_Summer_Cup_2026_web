@@ -7019,9 +7019,9 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <!-- Round Tabs -->
                 <div style="display:flex;gap:8px;flex-wrap:wrap;" id="matchRoundTabBox">
                     <button class="match-round-tab active" onclick="filterMatchRound('all', this)" style="background:#1D4ED8;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_all_matches">🏆 Tất cả trận</button>
-                    <button class="match-round-tab" onclick="filterMatchRound(1, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match1">⚽ Trận 1 (Mở Màn)</button>
-                    <button class="match-round-tab" onclick="filterMatchRound(2, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match2">⚽ Trận 2 (Bán kết)</button>
-                    <button class="match-round-tab" onclick="filterMatchRound(3, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match3">🔥 Trận 3 (Chung kết)</button>
+                    <button class="match-round-tab" onclick="filterMatchRound(1, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match1">⚽ Trận 1</button>
+                    <button class="match-round-tab" onclick="filterMatchRound(2, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match2">⚽ Trận 2</button>
+                    <button class="match-round-tab" onclick="filterMatchRound(3, this)" style="background:rgba(255,255,255,0.06);color:var(--accent-slate);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;" data-i18n="f_match3">🔥 Trận 3</button>
                 </div>
 
                 <!-- Filter By Team Select -->
@@ -9643,9 +9643,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 st_no_goals_long: '⏳ Chưa có bàn thắng nào được ghi nhận',
                 gps_title: 'GPS DẪN ĐƯỜNG',
                 f_all_matches: '🏆 Tất cả trận',
-                f_match1: '⚽ Trận 1 (Mở Màn)',
-                f_match2: '⚽ Trận 2 (Bán kết)',
-                f_match3: '🔥 Trận 3 (Chung kết)',
+                f_match1: '⚽ Trận 1',
+                f_match2: '⚽ Trận 2',
+                f_match3: '🔥 Trận 3',
                 g_all: '🖼️ Tất cả',
                 g_teams: '👥 Đội bóng',
                 g_opening: '🏆 Lễ khai mạc',
@@ -9935,9 +9935,9 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 st_no_goals_long: '⏳ No goals recorded yet',
                 gps_title: 'GPS DIRECTIONS',
                 f_all_matches: '🏆 All matches',
-                f_match1: '⚽ Match 1 (Opener)',
-                f_match2: '⚽ Match 2 (Semi-final)',
-                f_match3: '🔥 Match 3 (Final)',
+                f_match1: '⚽ Match 1',
+                f_match2: '⚽ Match 2',
+                f_match3: '🔥 Match 3',
                 g_all: '🖼️ All',
                 g_teams: '👥 Teams',
                 g_opening: '🏆 Opening ceremony',
@@ -10040,7 +10040,32 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 btn.classList.toggle('active', bLang === lang);
             });
             if (typeof renderTournamentStatusBar === 'function') renderTournamentStatusBar();
+            // Phải chạy SAU translateSubtree: nó vừa ghi đè innerHTML của các nút theo từ
+            // điển, tức xoá mất phần cặp đấu vừa gắn vào.
+            if (typeof renderMatchRoundTabs === 'function') renderMatchRoundTabs();
         }
+
+        // Nhãn nút lọc trận lấy cặp đấu THẲNG TỪ MATCHES_CONFIG.
+        //
+        // Trước đây ba nút ghi cứng "(Mở Màn)", "(Bán kết)", "(Chung kết)" — sai thể thức.
+        // Giải này ba đội đá vòng tròn một lượt (P–X, P–T, X–T) rồi xếp hạng theo điểm;
+        // không có trận loại trực tiếp nào cả, nên không có bán kết lẫn chung kết. Gọi trận
+        // cuối là "chung kết" còn gây hiểu sai kết quả: đội vô địch được quyết bởi tổng
+        // điểm cả ba trận, không phải bởi ai thắng trận thứ ba.
+        //
+        // Đọc từ dữ liệu chứ không ghi tay, để đổi lịch đấu là nhãn tự đúng theo — cùng lý
+        // do đã bỏ bài thông cáo ghi cứng ở phần truyền thông.
+        function renderMatchRoundTabs() {
+            if (typeof MATCHES_CONFIG === 'undefined' || typeof TEAMS_DATA === 'undefined') return;
+            MATCHES_CONFIG.forEach(m => {
+                const btn = document.querySelector(`.match-round-tab[data-i18n="f_match${m.id}"]`);
+                if (!btn) return;
+                const home = (TEAMS_DATA[m.home] || {}).name || m.home;
+                const away = (TEAMS_DATA[m.away] || {}).name || m.away;
+                btn.innerHTML = `${btn.innerHTML.trim()} <span style="opacity:.75;font-weight:700;">· ${home} – ${away}</span>`;
+            });
+        }
+        window.renderMatchRoundTabs = renderMatchRoundTabs;
 
         document.querySelectorAll('.lang-switch button').forEach(btn => {
             btn.addEventListener('click', () => {
