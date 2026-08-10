@@ -233,6 +233,71 @@ module.exports = async function runMatchDataTests(browser) {
             `Nhãn ô nhập kết quả trong trang admin ghi đúng cặp đấu` +
             (badLabels.length ? ` — sai ở ${badLabels.map(l => `trận ${l.id} ("${l.text}")`).join(', ')}` : ''));
 
+        // ----------------------------------------------------------
+        // 8. Sự kiện phải tách đúng cột theo từng đội
+        // ----------------------------------------------------------
+        // Trang kết quả xếp bàn thắng/thẻ của mỗi đội vào một cột riêng. Nếu cột bị
+        // ghép nhầm, người xem đọc thành đội kia ghi bàn — sai nghiêm trọng hơn cả
+        // việc không hiển thị gì.
+        const columns = await page.evaluate(() => {
+            const cards = [...document.querySelectorAll('#matchResultsPage .match-result-summary')];
+            return cards.map((card, i) => {
+                const m = MATCHES_CONFIG[i];
+                const events = parseMatchEvents(localStorage.getItem('ptx_result_' + m.id), m);
+                const cols = [...card.querySelectorAll('.mrs-col')];
+                const read = col => [...col.querySelectorAll('.mrs-event')]
+                    .map(r => r.querySelector('.mrs-ev-min').textContent.replace("'", '')).sort();
+                const expect = teamId => events.filter(e => e.team === teamId)
+                    .map(e => String(e.minute)).sort();
+                return {
+                    id: m.id,
+                    colCount: cols.length,
+                    homeOk: cols[0] && JSON.stringify(read(cols[0])) === JSON.stringify(expect(m.home)),
+                    awayOk: cols[1] && JSON.stringify(read(cols[1])) === JSON.stringify(expect(m.away))
+                };
+            });
+        });
+        const badCols = columns.filter(c => c.colCount !== 2 || !c.homeOk || !c.awayOk);
+        assert(columns.length > 0 && badCols.length === 0,
+            `Trang kết quả tách sự kiện đúng cột cho từng đội ở cả ${columns.length} trận` +
+            (badCols.length ? ` — sai ở trận ${badCols.map(c => c.id).join(', ')}` : ''));
+
+        // ----------------------------------------------------------
+        // 9. Giải đã đá xong thì mọi nơi phải nói "đã kết thúc"
+        // ----------------------------------------------------------
+        // Thanh trạng thái ghi cứng "CHƯA KHỞI TRANH · 0/3 trận" trong HTML, hero đếm
+        // ngược về 00:00:00:00, còn Vinh danh vẫn ghi "Đang tranh cúp" — cả ba đều nói
+        // sai sau khi giải kết thúc, và không có gì cập nhật chúng.
+        const finished = await page.evaluate(() => ({
+            status: getTournamentStatus(),
+            stateText: document.getElementById('statusBarStateText').innerText.trim(),
+            matchInfo: document.getElementById('statusBarMatchInfo').innerText.trim(),
+            heroText: document.getElementById('heroCountdown').innerText.replace(/\s+/g, ' ').trim(),
+            hof: getSeasonAwards(2026),
+            champion: calculateStandings()[0].fullName
+        }));
+        assert(finished.status.phase === 'finished' && finished.status.played === finished.status.total,
+            `Trạng thái giải nhận đúng là đã kết thúc (${finished.status.played}/${finished.status.total} trận)`);
+        assert(/KẾT THÚC/i.test(finished.stateText) &&
+            finished.matchInfo.startsWith(`${finished.status.played} / ${finished.status.total}`),
+            `Thanh trạng thái hiện đúng tình trạng & số trận ("${finished.stateText} · ${finished.matchInfo}")`);
+        assert(!/00\s*00\s*00\s*00/.test(finished.heroText) && finished.heroText.includes(finished.champion),
+            `Hero thay đồng hồ đếm ngược bằng nhà vô địch ("${finished.heroText}")`);
+        assert(!/tranh cúp|Chờ VCK|Đang bình chọn|Vòng 1/i.test(finished.hof) &&
+            finished.hof.startsWith(finished.champion),
+            `Vinh danh mùa 2026 ghi nhà vô địch thật, không còn "đang tranh cúp" ("${finished.hof}")`);
+
+        // Con số trên thanh trạng thái không nằm trong từ điển i18n, nên phải kiểm tra
+        // nó không bị applyLanguage() ghi đè về chuỗi tĩnh "0 / 3" khi đổi ngôn ngữ.
+        const afterLangSwitch = await page.evaluate(() => {
+            applyLanguage('en');
+            const en = document.getElementById('statusBarMatchInfo').innerText.trim();
+            applyLanguage('vi');
+            return { en, vi: document.getElementById('statusBarMatchInfo').innerText.trim() };
+        });
+        assert(afterLangSwitch.en.startsWith('3 / 3') && afterLangSwitch.vi.startsWith('3 / 3'),
+            `Số trận trên thanh trạng thái không bị mất khi đổi ngôn ngữ (EN: "${afterLangSwitch.en}")`);
+
         assert(pageErrors.length === 0, `Không có uncaught exception trong luồng dữ liệu trận đấu: ${pageErrors.length} lỗi`);
     });
 };

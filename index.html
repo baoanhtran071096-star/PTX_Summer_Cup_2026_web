@@ -1198,6 +1198,41 @@
             font-family: var(--font-ui);
             margin-top: 4px;
         }
+        /* Hero khi giải đã kết thúc — thay chỗ đồng hồ đếm ngược */
+        .hero-countdown.hero-finished {
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        .hero-finished .hf-label {
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.65);
+            font-family: var(--font-ui);
+        }
+        .hero-finished .hf-champ {
+            font-size: clamp(26px, 4vw, 44px);
+            font-weight: 900;
+            font-family: var(--font-title);
+            color: #fbbf24;
+            line-height: 1.1;
+            text-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
+        }
+        .hero-finished .hf-champ span {
+            color: var(--white);
+        }
+        .hero-finished .hf-sub {
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.75);
+            font-family: var(--font-ui);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+        }
         .hero-ctas {
             display: flex;
             justify-content: center;
@@ -1713,21 +1748,15 @@
             margin-left: auto;
             font-size: 12px;
         }
-        .goal-timeline .goal-item.goal-home {
-            border-left: 3px solid var(--team-p-color);
+        /* Màu dải theo ĐỘI, không theo vị trí chủ/khách: cùng một đội luôn cùng một màu
+           dù đá sân nhà hay sân khách. Cách cũ tô cứng chủ nhà = màu TEAM P nên trận
+           TEAM X vs TEAM T hiện ra màu của Phoenix, một đội không có mặt trong trận. */
+        .goal-timeline .goal-item {
+            border-left: 3px solid transparent;
         }
-        .goal-timeline .goal-item.goal-away {
-            border-left: 3px solid var(--team-t-color);
-        }
-        .goal-timeline .goal-item.goal-away.goal-x {
-            border-left-color: var(--team-x-color);
-        }
-        .goal-timeline .goal-item.goal-home.goal-x {
-            border-left-color: var(--team-x-color);
-        }
-        .goal-timeline .goal-item.goal-home.goal-t {
-            border-left-color: var(--team-t-color);
-        }
+        .goal-timeline .goal-item.goal-p { border-left-color: var(--team-p-color); }
+        .goal-timeline .goal-item.goal-t { border-left-color: var(--team-t-color); }
+        .goal-timeline .goal-item.goal-x { border-left-color: var(--team-x-color); }
         .match-card-v3 .match-countdown {
             display: flex;
             justify-content: center;
@@ -4226,29 +4255,89 @@
             transition: all 0.3s ease;
         }
         .match-result-summary:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
-        .match-result-summary .mrs-teams {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 8px;
+
+        /* Đầu thẻ: hai đội đối xứng, tỷ số của đội nào nằm ngay dưới tên đội đó — nhìn
+           là biết bên nào ghi mấy bàn, không phải đọc "3—1" rồi tự đoán thứ tự. */
+        .match-result-summary .mrs-head {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
         }
-        .match-result-summary .mrs-score {
-            font-size: 36px;
+        .match-result-summary .mrs-side-team {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .match-result-summary .mrs-side-score {
+            font-size: 38px;
             font-weight: 900;
-            color: var(--text-primary);
             font-family: var(--font-title);
-            letter-spacing: 2px;
-            margin-bottom: 8px;
+            line-height: 1;
         }
-        .match-result-summary .mrs-scorers {
-            font-size: 11px;
+        .match-result-summary .mrs-vs {
+            font-size: 12px;
+            font-weight: 900;
             color: var(--text-muted);
-            line-height: 1.6;
+            letter-spacing: 1px;
+        }
+
+        /* Thân thẻ: mỗi đội một cột sự kiện riêng, thẳng hàng dưới đội của mình. */
+        .match-result-summary .mrs-events {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .match-result-summary .mrs-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+        .match-result-summary .mrs-event {
+            display: grid;
+            grid-template-columns: auto auto 1fr;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+        .match-result-summary .mrs-ev-icon { font-size: 11px; }
+        .match-result-summary .mrs-ev-min {
+            color: var(--text-muted);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        .match-result-summary .mrs-ev-name {
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+        .match-result-summary .mrs-og {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .match-result-summary .mrs-empty {
+            font-size: 12px;
+            color: var(--text-muted);
         }
         .match-result-summary .mrs-no-result {
             font-size: 14px;
             color: var(--text-muted);
             padding: 12px 0;
+        }
+        .match-result-summary .mrs-foot {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            font-weight: 700;
         }
 
         /* ===== PRE-MATCH COUNTDOWN ALERT ===== */
@@ -7042,7 +7131,8 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 <div id="standingsPageTable"><!-- Rendered by JS renderStandingsPageTable() --></div>
             </div>
             <!-- Match Results Summary -->
-            <div style="margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;" id="matchResultsPage"></div>
+            <!-- minmax cần rộng hơn 280px vì mỗi thẻ nay chứa hai cột sự kiện cạnh nhau. -->
+            <div style="margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;" id="matchResultsPage"></div>
         </div>
     </section>
 
@@ -8277,6 +8367,12 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             { id: 3, startH: 17, startM: 45, endH: 18, endM: 20, home: 'x', away: 't', pitch: 'Sân số 1' }
         ];
 
+        // Ngày thi đấu khai báo ngay cạnh lịch thi đấu, TRƯỚC phần i18n: applyLanguage()
+        // chạy ngay lúc nạp script và nay hỏi tới trạng thái giải, mà trạng thái lại tính
+        // trên baseDate. Để baseDate ở giữa file như trước thì lời gọi đó rơi vào vùng chết
+        // của `const` và ném ReferenceError, làm hỏng toàn bộ phần script phía sau.
+        const baseDate = new Date('2026-08-07');
+
         window.TEAMS_DATA = TEAMS_DATA;
         window.PLAYERS_DATA = PLAYERS_DATA;
         window.MATCHES_CONFIG = MATCHES_CONFIG;
@@ -8722,7 +8818,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 hof_top_scorer: 'Vua phá lưới',
                 nav_vip: '🎟️ VÉ VIP',
                 sb_not_started: '● CHƯA KHỞI TRANH',
+                sb_live: '● ĐANG THI ĐẤU',
+                sb_finished: '● ĐÃ KẾT THÚC',
                 sb_matches_played: '0 / 3 TRẬN ĐÃ THI ĐẤU',
+                sb_matches_suffix: 'TRẬN ĐÃ THI ĐẤU',
                 sb_schedule_link: 'LỊCH THI ĐẤU →',
                 st_undetermined: 'Chưa xác định',
                 st_no_finished: 'Chưa có trận nào kết thúc',
@@ -9006,7 +9105,10 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 hof_top_scorer: 'Top scorer',
                 nav_vip: '🎟️ VIP TICKET',
                 sb_not_started: '● NOT STARTED',
+                sb_live: '● LIVE NOW',
+                sb_finished: '● FINISHED',
                 sb_matches_played: '0 / 3 MATCHES PLAYED',
+                sb_matches_suffix: 'MATCHES PLAYED',
                 sb_schedule_link: 'SCHEDULE →',
                 st_undetermined: 'Not determined',
                 st_no_finished: 'No match finished yet',
@@ -9081,6 +9183,7 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 const bLang = btn.getAttribute ? btn.getAttribute('data-lang') : (btn.dataset ? btn.dataset.lang : null);
                 btn.classList.toggle('active', bLang === lang);
             });
+            if (typeof renderTournamentStatusBar === 'function') renderTournamentStatusBar();
         }
 
         document.querySelectorAll('.lang-switch button').forEach(btn => {
@@ -9361,6 +9464,13 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         // HERO COUNTDOWN
         // ============================================================
         function updateHeroCountdown() {
+            // Giải đã đá xong thì đồng hồ đếm ngược không còn nghĩa gì: nó đứng ở
+            // 00:00:00:00 và bật nền đỏ "ĐANG THI ĐẤU", khiến người vào trang tưởng
+            // giải sắp bắt đầu hoặc đang diễn ra. Thay bằng bảng tổng kết nhà vô địch.
+            if (typeof getTournamentStatus === 'function' && getTournamentStatus().phase === 'finished') {
+                renderHeroFinished();
+                return;
+            }
             const target = new Date('2026-08-07T16:00:00+07:00').getTime();
             const now = Date.now();
             const diff = Math.max(0, Math.floor((target - now) / 1000));
@@ -9384,13 +9494,96 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
                 if (heroSection) heroSection.style.background = 'linear-gradient(135deg,#0B1A2E 0%,#431407 60%,#1D3557 100%)';
             }
         }
-        setInterval(updateHeroCountdown, 1000);
-        updateHeroCountdown();
+
+        // Bảng tổng kết thay chỗ đồng hồ đếm ngược khi giải đã kết thúc.
+        function renderHeroFinished() {
+            const box = document.getElementById('heroCountdown');
+            if (!box || box.dataset.finished === '1') return;
+            const status = getTournamentStatus();
+            const table = calculateStandings();
+            const champ = table[0];
+            const boot = getGoldenBoot();
+            const stats = computeDashboardStats();
+            box.dataset.finished = '1';
+            box.classList.add('hero-finished');
+            box.innerHTML = `
+                <div class="hf-label">🏁 GIẢI ĐẤU ĐÃ KẾT THÚC</div>
+                <div class="hf-champ">🏆 ${champ ? champ.fullName : '—'} <span>VÔ ĐỊCH</span></div>
+                <div class="hf-sub">${status.played}/${status.total} trận · ${stats.goals} bàn thắng · Vua phá lưới: ${boot.label}</div>
+            `;
+            const heroSection = document.querySelector('.hero-v3');
+            if (heroSection) heroSection.style.background = 'linear-gradient(135deg,#0B1A2E 0%,#78350f 55%,#1D3557 100%)';
+        }
 
         // ============================================================
         // MATCH CENTER
         // ============================================================
-        const baseDate = new Date('2026-08-07');
+        setInterval(updateHeroCountdown, 1000);
+        updateHeroCountdown();
+
+        // ============================================================
+        // TRẠNG THÁI GIẢI ĐẤU — nguồn duy nhất
+        // ============================================================
+        // Thanh trạng thái, hero và trang Vinh danh trước đây mỗi nơi tự nói một kiểu:
+        // thanh trạng thái ghi cứng "CHƯA KHỞI TRANH / 0 3 trận" trong HTML và không
+        // hàm nào cập nhật, hero đếm ngược về 00:00:00:00 rồi bật nền đỏ, còn Vinh danh
+        // vẫn ghi "Đang tranh cúp". Cả ba nay đọc chung hàm này.
+        function getTournamentStatus() {
+            const matches = (typeof MATCHES_CONFIG !== 'undefined' ? MATCHES_CONFIG : []);
+            const played = matches.filter(m => localStorage.getItem('ptx_result_' + m.id)).length;
+            const day = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+            const at = (h, m) => { const d = new Date(day); d.setHours(h, m, 0, 0); return d; };
+            const now = new Date();
+            const first = matches[0];
+            const last = matches[matches.length - 1];
+            let phase = 'upcoming';
+            if (matches.length > 0) {
+                // "Kết thúc" đòi CẢ hai điều kiện: đã qua giờ trận cuối VÀ mọi trận đều có
+                // kết quả. Chỉ dựa vào thời gian thì hôm sau ngày thi đấu trang sẽ báo đã
+                // kết thúc dù chưa ai nhập tỷ số nào.
+                if (played >= matches.length && now > at(last.endH, last.endM)) phase = 'finished';
+                else if (now >= at(first.startH, first.startM)) phase = 'live';
+            }
+            return { phase, played, total: matches.length };
+        }
+
+        // Vua phá lưới: trả về cả trường hợp nhiều người cùng dẫn đầu.
+        function getGoldenBoot() {
+            const scorers = PLAYERS_DATA.filter(p => p.goals > 0);
+            if (scorers.length === 0) return { players: [], goals: 0, label: 'Chưa xác định' };
+            const top = Math.max(...scorers.map(p => p.goals));
+            const players = scorers.filter(p => p.goals === top);
+            return { players, goals: top, label: `${players.map(p => p.name).join(' · ')} (${top} bàn)` };
+        }
+
+        function getMostValuablePlayer() {
+            const rated = PLAYERS_DATA.filter(p => p.mvp > 0).sort((a, b) => b.mvp - a.mvp);
+            return rated.length ? rated[0] : null;
+        }
+
+        function renderTournamentStatusBar() {
+            const stateEl = document.getElementById('statusBarStateText');
+            const infoEl = document.getElementById('statusBarMatchInfo');
+            if (!stateEl || !infoEl) return;
+            const status = getTournamentStatus();
+            const dict = (typeof translations !== 'undefined' && translations[currentLang]) || {};
+            const meta = {
+                upcoming: { key: 'sb_not_started', color: '#38bdf8' },
+                live: { key: 'sb_live', color: '#ef4444' },
+                finished: { key: 'sb_finished', color: '#22c55e' }
+            }[status.phase];
+
+            stateEl.setAttribute('data-i18n', meta.key);
+            stateEl.innerHTML = dict[meta.key] || stateEl.innerHTML;
+            stateEl.style.color = meta.color;
+            const dot = document.getElementById('statusBarDot');
+            if (dot) { dot.style.background = meta.color; dot.style.boxShadow = '0 0 8px ' + meta.color; }
+
+            // Con số thay đổi theo dữ liệu nên không thể nằm trong từ điển i18n; chỉ phần
+            // chữ được dịch, và bỏ data-i18n để applyLanguage không ghi đè lại con số.
+            infoEl.removeAttribute('data-i18n');
+            infoEl.textContent = `${status.played} / ${status.total} ${dict.sb_matches_suffix || 'TRẬN ĐÃ THI ĐẤU'}`;
+        }
 
         function getPlayerTeam(playerName) {
             const p = PLAYERS_DATA.find(p => p.name.toLowerCase() === playerName.toLowerCase() ||
@@ -9451,11 +9644,14 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         function renderEventTimeline(events, match) {
             if (!events || events.length === 0) return '';
             const items = events.map(e => {
+                // Dải màu bên trái phải là màu ĐỘI THẬT của sự kiện. CSS đã có sẵn các lớp
+                // goal-p/goal-t/goal-x nhưng trước đây không ai gắn vào, nên mọi sự kiện của
+                // đội nhà đều tô màu TEAM P — trận X vs T hiện ra màu xanh của Phoenix.
                 const teamClass = e.team === match.home ? 'goal-home' : 'goal-away';
                 const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
                 const ogTag = e.ownGoal ? ' <span class="goal-og">(phản lưới)</span>' : '';
                 return `
-                            <div class="goal-item ${teamClass}">
+                            <div class="goal-item ${teamClass} goal-${e.team}">
                                 <span class="goal-icon">${icon}</span>
                                 <span class="goal-scorer">${e.scorer}${ogTag}</span>
                                 <span class="goal-time">${e.minute}'</span>
@@ -11551,11 +11747,37 @@ function renderGallery() {
         // ============================================================
         let activeHofYearFilter = 'all';
 
+        const CURRENT_SEASON_YEAR = 2026;
+
         const DEFAULT_HOF_DATA = {
             2025: 'Đang cập nhật tư liệu lịch sử... | Đang cập nhật... | Đang cập nhật... | Đang cập nhật... | Đang cập nhật...',
             2026: 'PTX Summer Cup 2026 (Đang tranh cúp) | Chờ VCK | Chờ VCK | Vòng 1 (Live) | Đang bình chọn',
             2027: 'Mùa giải 2027 (Khởi tranh 08/2027) | Dự kiến 4 đội | Sắp diễn ra | Sắp diễn ra | Sắp diễn ra'
         };
+
+        // Mùa hiện tại KHÔNG đọc chuỗi ghi cứng: vô địch, á quân, hạng ba và vua phá
+        // lưới đều suy ra từ bảng xếp hạng và nhật ký ghi bàn. Nhờ vậy trang Vinh danh
+        // không thể còn ghi "Đang tranh cúp / Chờ VCK" sau khi giải đã đá xong — đúng
+        // thứ đã xảy ra: ba trận có kết quả đầy đủ mà mục này vẫn nói giải chưa ngã ngũ.
+        function getSeasonAwards(year) {
+            const stored = localStorage.getItem('hof_' + year);
+            if (stored) return stored;
+            if (year !== CURRENT_SEASON_YEAR) return DEFAULT_HOF_DATA[year] || '';
+
+            const status = getTournamentStatus();
+            if (status.phase !== 'finished') return DEFAULT_HOF_DATA[year] || '';
+
+            const table = calculateStandings();
+            const podium = i => table[i] ? `${table[i].fullName} (${table[i].label})` : '—';
+            const mvp = getMostValuablePlayer();
+            return [
+                podium(0),
+                podium(1),
+                podium(2),
+                getGoldenBoot().label,
+                mvp ? `${mvp.name} (${(TEAMS_DATA[mvp.team] || {}).name || ''})`.trim() : 'Chưa trao danh hiệu'
+            ].join(' | ');
+        }
 
         function filterHofByYear(year) {
             activeHofYearFilter = year.toString();
@@ -11596,7 +11818,7 @@ function renderGallery() {
                 : years.filter(y => y.toString() === activeHofYearFilter);
 
             const cardsHtml = visibleYears.map(y => {
-                const raw = localStorage.getItem('hof_' + y) || DEFAULT_HOF_DATA[y];
+                const raw = getSeasonAwards(y);
                 if (!raw) return '';
                 const parts = raw.split('|').map(s => s.trim());
                 const awards = awardMeta.map((meta, i) => {
@@ -11611,10 +11833,21 @@ function renderGallery() {
                     </div>`;
                 }).join('');
 
-                const isCurrentYear = (y === 2026);
-                const badgeText = (y === 2025) ? '⏳ ĐANG TÌM DỮ LIỆU CŨ' : isCurrentYear ? '🔥 MÙA HIỆN TẠI' : y < 2026 ? '🏆 ĐÃ XÁC LẬP' : '📅 HOẠCH ĐỊNH';
-                const badgeColor = (y === 2025) ? '#94a3b8' : isCurrentYear ? 'var(--ptx-orange)' : y < 2026 ? '#fbbf24' : '#38bdf8';
-                const borderStyle = (y === 2025) ? 'rgba(148,163,184,0.3)' : isCurrentYear ? 'rgba(249,115,22,0.6)' : 'rgba(255,255,255,0.1)';
+                // Mùa hiện tại đã đá xong thì phải mang huy hiệu "ĐÃ XÁC LẬP" như các mùa
+                // cũ, chứ không còn là "MÙA HIỆN TẠI (đang diễn ra)".
+                const isCurrentYear = (y === CURRENT_SEASON_YEAR);
+                const seasonDone = isCurrentYear && getTournamentStatus().phase === 'finished';
+                const badgeText = (y === 2025) ? '⏳ ĐANG TÌM DỮ LIỆU CŨ'
+                    : seasonDone ? '🏆 ĐÃ XÁC LẬP'
+                    : isCurrentYear ? '🔥 MÙA HIỆN TẠI'
+                    : y < CURRENT_SEASON_YEAR ? '🏆 ĐÃ XÁC LẬP' : '📅 HOẠCH ĐỊNH';
+                const badgeColor = (y === 2025) ? '#94a3b8'
+                    : seasonDone ? '#fbbf24'
+                    : isCurrentYear ? 'var(--ptx-orange)'
+                    : y < CURRENT_SEASON_YEAR ? '#fbbf24' : '#38bdf8';
+                const borderStyle = (y === 2025) ? 'rgba(148,163,184,0.3)'
+                    : seasonDone ? 'rgba(251,191,36,0.6)'
+                    : isCurrentYear ? 'rgba(249,115,22,0.6)' : 'rgba(255,255,255,0.1)';
 
                 return `
                     <div class="hof-card-v2" style="background:linear-gradient(145deg,#0f172a,#1e293b);border:1.5px solid ${borderStyle};border-radius:20px;padding:24px 20px;box-shadow:0 12px 36px rgba(0,0,0,0.4);position:relative;overflow:hidden;">
@@ -12169,20 +12402,44 @@ function renderGallery() {
                 div.className = 'match-result-summary reveal';
                 div.style.cssText = `border-top: 3px solid ${home.color};`;
 
-                const scorersHtml = events.map(e => {
-                    const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
-                    const ogTag = e.ownGoal ? ' <span style="color:#94a3b8;">(phản lưới)</span>' : '';
-                    return `<div>${icon} ${e.scorer}${ogTag} <span style="color:var(--accent-orange);">${e.minute}'</span></div>`;
-                }).join('');
+                // Sự kiện tách theo ĐỘI, mỗi đội một cột dưới chính huy hiệu đội mình.
+                // Trước đây bàn thắng và thẻ của cả hai đội đổ chung vào một danh sách,
+                // nên nhìn vào không biết ai ghi cho bên nào — với trận 2-9 gồm 12 sự kiện
+                // thì gần như không đọc nổi.
+                const columnFor = teamId => {
+                    const rows = events.filter(e => e.team === teamId);
+                    if (rows.length === 0) return '<div class="mrs-empty">—</div>';
+                    return rows.map(e => {
+                        const icon = e.type === 'yellow' ? '🟨' : e.type === 'red' ? '🟥' : '⚽';
+                        const ogTag = e.ownGoal ? ' <span class="mrs-og">(phản lưới)</span>' : '';
+                        return `<div class="mrs-event mrs-event-${e.type}">
+                                    <span class="mrs-ev-icon">${icon}</span>
+                                    <span class="mrs-ev-min">${e.minute}'</span>
+                                    <span class="mrs-ev-name">${e.scorer}${ogTag}</span>
+                                </div>`;
+                    }).join('');
+                };
+
+                const side = (team, score) => `
+                    <div class="mrs-side">
+                        <div class="mrs-side-team">${renderTeamLogo(team)}<span style="color:${team.color};">${team.name}</span></div>
+                        ${score !== null ? `<div class="mrs-side-score" style="color:${team.color};">${score}</div>` : ''}
+                    </div>`;
 
                 div.innerHTML = `
-                    <div class="mrs-teams">${renderTeamLogo(home)} ${home.name} vs ${renderTeamLogo(away)} ${away.name}</div>
+                    <div class="mrs-head">
+                        ${side(home, result ? result.homeScore : null)}
+                        <div class="mrs-vs">${result ? 'VS' : ''}</div>
+                        ${side(away, result ? result.awayScore : null)}
+                    </div>
                     ${ result
-                        ? `<div class="mrs-score" style="color:${home.color};">${result.homeScore}<span style="color:#475569;margin:0 8px;font-size:24px;">—</span><span style="color:${away.color};">${result.awayScore}</span></div>
-                           <div class="mrs-scorers">${scorersHtml || '<span style="color:#475569;">Chưa có thông tin ghi bàn</span>'}</div>`
+                        ? `<div class="mrs-events">
+                               <div class="mrs-col">${columnFor(match.home)}</div>
+                               <div class="mrs-col">${columnFor(match.away)}</div>
+                           </div>`
                         : `<div class="mrs-no-result" data-i18n="st_no_result">⏳ Chưa có kết quả</div>`
                     }
-                    <div style="font-size:10px;color:#475569;margin-top:10px;font-weight:700;">TRẬN ${match.id} • ${String(match.startH).padStart(2,'0')}:${String(match.startM).padStart(2,'0')}</div>
+                    <div class="mrs-foot">TRẬN ${match.id} • ${String(match.startH).padStart(2,'0')}:${String(match.startM).padStart(2,'0')}</div>
                 `;
                 container.appendChild(div);
             });
@@ -12242,6 +12499,10 @@ function renderGallery() {
                 renderLiveCenter();
                 updateDashboard();
                 applyLanguage(currentLang);
+                // Sau applyLanguage: thanh trạng thái chứa con số nên phải ghi lại đè lên
+                // bản dịch tĩnh, nếu không nó quay về "0 / 3 TRẬN ĐÃ THI ĐẤU".
+                renderTournamentStatusBar();
+                updateHeroCountdown();
                 refreshPending = false;
             });
         }
