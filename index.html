@@ -5303,20 +5303,11 @@
             color: #64748b !important;
         }
 
-        /* ===== VIDEO CONTAINER HEIGHT & ASPECT RATIO BOUNDS (ISSUE 3) ===== */
-        .video-wrapper, #videoWrapper {
-            position: relative !important;
-            width: 100% !important;
-            max-width: 880px !important;
-            max-height: 480px !important;
-            margin: 0 auto 20px auto !important;
-            border-radius: 20px !important;
-            overflow: hidden !important;
-            background: #000 !important;
-            border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7) !important;
-            aspect-ratio: 16 / 9 !important;
-        }
+        /* Khối "(ISSUE 3)" từng nằm ở đây đã gộp vào khối "Widescreen Video Player Fix"
+           bên dưới. Hai lần vá khác nhau trong quá khứ sinh ra CSS giống hệt nhau: cùng
+           selector, cùng 12 thuộc tính, cùng giá trị, cùng !important, và cả hai đều ở
+           độ sâu 0 nên không phải cặp desktop/mobile. Đã đối chiếu từng dòng và kiểm cả
+           @media trước khi xoá. Giữ khối dưới vì nó nằm cạnh rule #player liên quan. */
         #player, video#player {
             width: 100% !important;
             height: 100% !important;
