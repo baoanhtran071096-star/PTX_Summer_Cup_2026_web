@@ -7180,7 +7180,11 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
             
             <div class="card" style="padding:0;overflow:hidden;background:transparent;box-shadow:none;margin-bottom:24px;">
                 <div class="video-wrapper" id="videoWrapper">
-                    <video id="player" controls playsinline preload="metadata" src="thư viện/Media/5.mp4" poster="thư viện/ảnh logo - banner/banner PTX Summer Cup.webp" style="width:100%;height:100%;object-fit:contain;background:#0b1329;" onerror="handleVideoError(this)">
+                    <!-- Bỏ poster là ảnh banner: banner rộng 1600×266 (tỷ lệ 6:1) trong khi
+                         4/5 clip là video DỌC 720×1280, nên poster đó luôn sai khung và che
+                         mất khung hình thật. Không có poster thì trình duyệt hiện frame đầu
+                         của đúng clip đang chọn — luôn đúng, không cần thêm ảnh nào. -->
+                    <video id="player" controls playsinline preload="metadata" src="thư viện/Media/5.mp4" style="width:100%;height:100%;object-fit:contain;background:#0b1329;" onerror="handleVideoError(this)">
                         <source src="thư viện/Media/5.mp4" type="video/mp4" />
                         <source src="thư viện/Media/1.mp4" type="video/mp4" />
                     </video>
@@ -7229,7 +7233,15 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                     </div>
 
                     <div class="video-clip-card active" onclick="loadVideoClip('thư viện/Media/5.mp4',this)">
-                        <img src="thư viện/ảnh logo - banner/banner PTX Summer Cup.webp" alt="Highlight" class="video-clip-bg">
+                        <!-- Lấy frame của chính clip làm ảnh thẻ, thay cho ảnh banner.
+                             Banner rộng 1600×266 nhét vào thẻ dọc thì bị cắt đúng vào giữa,
+                             tức đúng chỗ có chữ in lớn nướng sẵn trong ảnh — và chữ đó đâm
+                             thẳng vào caption phủ bên trên, thành hai lớp chữ chồng nhau
+                             không đọc được. Thẻ 1–4 không bị vì ảnh của chúng là 798×1200,
+                             vừa khít khung.
+                             #t=3 báo trình duyệt hiện khung hình ở giây thứ 3; preload
+                             "metadata" nên không tải cả clip. Không cần thêm file ảnh nào. -->
+                        <video src="thư viện/Media/5.mp4#t=3" class="video-clip-bg" muted playsinline preload="metadata" tabindex="-1" aria-hidden="true"></video>
                         <div class="video-play-btn">🔥</div>
                         <div class="video-clip-overlay" style="border-top:1px solid var(--ptx-orange);">
                             <div style="font-size:12px;font-weight:900;color:#fbbf24;">🔥 Highlight PTX Summer Cup 2026</div>
@@ -10143,15 +10155,52 @@ committee_staff_title: 'BAN HẬU CẦN & TRUYỀN THÔNG',
         // different, unused key 'ptx_admin_pass') was removed here — it was silently overriding the
         // secure implementation since it was declared later in the same scope.
         // Unified Video Clip Loader (Issue 5 Fix - Targets #player reliably)
+        // Khung phát phải co theo TỶ LỆ THẬT của clip đang mở.
+        //
+        // Đây là nguyên nhân của "màn hình đen". 4 trong 5 clip là video DỌC 720×1280 (quay
+        // bằng điện thoại), còn khung phát thì cố định ngang. Đo được: video hiển thị ở
+        // 878×146 bên trong khung cao 520px — tức một dải mỏng, phần còn lại là nền #0b1329.
+        // Video không hề hỏng: readyState = 4, không lỗi, không request nào fail. Chỉ là gần
+        // như toàn bộ khung là nền trống.
+        //
+        // Với video dọc thì giới hạn CHIỀU RỘNG (không phải chiều cao): đặt aspect-ratio rồi
+        // để width tự do sẽ cho ra khung cao 1700px chiếm trọn màn hình.
+        function fitPlayerToVideo() {
+            const v = document.getElementById('player');
+            const wrap = document.getElementById('videoWrapper');
+            if (!v || !wrap || !v.videoWidth || !v.videoHeight) return;
+            const MAX_H = 480;
+            const ratio = v.videoWidth / v.videoHeight;
+
+            // setProperty(..., 'important') là BẮT BUỘC, không phải cho chắc.
+            //
+            // `.video-wrapper, #videoWrapper` được khai báo HAI LẦN trùng nhau (dòng ~5307 và
+            // ~5392), cả hai đều ép `aspect-ratio: 16/9 !important`, `max-height: 480px
+            // !important` và `overflow: hidden !important`. Inline style thường thua hết —
+            // đã đo: hàm này đặt width 293px nhưng computed vẫn ra 880px.
+            //
+            // Đó cũng chính là thứ tạo ra "màn hình đen": Plyr giãn đúng thành khung dọc
+            // 878×1561, rồi khung cha cắt cụt còn 480px, nên người xem chỉ thấy lát trên.
+            wrap.style.setProperty('aspect-ratio', String(ratio), 'important');
+            wrap.style.setProperty('max-height', MAX_H + 'px', 'important');
+            // Video dọc thì phải bó CHIỀU RỘNG. Chỉ đặt aspect-ratio rồi để width:100% sẽ ra
+            // khung cao gần 1600px, và max-height lại cắt tiếp — quay về đúng lỗi cũ.
+            wrap.style.setProperty('width', ratio < 1 ? Math.round(MAX_H * ratio) + 'px' : '100%', 'important');
+            // Plyr bọc ngoài và tự áp tỷ lệ riêng, nên sửa mỗi khung chứa là chưa đủ.
+            if (window.mainPlyrInstance) {
+                try { window.mainPlyrInstance.ratio = v.videoWidth + ':' + v.videoHeight; } catch (e) { /* bản Plyr cũ không có */ }
+            }
+        }
+        window.fitPlayerToVideo = fitPlayerToVideo;
+
         function loadVideoClip(src, cardEl) {
             const player = document.getElementById('player') || document.getElementById('mainGalleryVideo');
             if (player) {
-                const img = cardEl ? cardEl.querySelector('.video-clip-bg') : null;
-                if (img && img.src) {
-                    player.setAttribute('poster', img.src);
-                }
                 player.src = src;
                 player.load();
+                // Mỗi clip một tỷ lệ khác nhau nên phải đo lại sau khi có metadata; `once`
+                // để đổi clip nhiều lần không chồng listener.
+                player.addEventListener('loadedmetadata', fitPlayerToVideo, { once: true });
                 player.play().catch(err => console.log('[PTX Video Play Note]:', err.message));
             }
             document.querySelectorAll('.video-clip-card').forEach(c => {
@@ -14191,6 +14240,10 @@ function renderGallery() {
                 window.mainPlyrInstance = new Plyr(mainVideo, {
                     controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
                 });
+                // Clip mặc định cũng phải được đo. Nếu metadata đã có sẵn (readyState ≥ 1)
+                // thì sự kiện đã bắn xong trước khi Plyr khởi tạo, nên gọi thẳng.
+                if (mainVideo.readyState >= 1) fitPlayerToVideo();
+                else mainVideo.addEventListener('loadedmetadata', fitPlayerToVideo, { once: true });
             }
             const secondVideo = document.getElementById('player2');
             if (secondVideo) {
