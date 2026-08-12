@@ -2,12 +2,39 @@
   "name": "ptx-summer-cup-2026",
   "version": "1.0.0",
   "private": true,
-  "description": "PTX Summer Cup 2026 - website giải bóng đá nội bộ PTX Group",
+  "description": "PTX Summer Cup 2026 — nền tảng giải bóng đá nội bộ PTX Group",
   "scripts": {
-    "test": "node tests/run-tests.js",
-    "serve": "python3 -m http.server 8123"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.112.0",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "playwright": "^1.56.0"
+    "@axe-core/playwright": "^4.12.1",
+    "@eslint/eslintrc": "^3.3.6",
+    "@playwright/test": "^1.62.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@vitejs/plugin-react": "^6.0.5",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.12",
+    "jsdom": "^30.0.1",
+    "playwright": "^1.62.1",
+    "vitest": "^4.1.10"
   }
 }
