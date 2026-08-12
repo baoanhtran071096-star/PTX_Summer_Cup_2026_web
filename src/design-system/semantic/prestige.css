@@ -1,0 +1,15 @@
+/**
+ * Prestige semantics — Hall of Fame, trophies, VIP tickets, awards.
+ */
+:root {
+  --prestige-gold: var(--ptx-gold);
+  --prestige-accent: color-mix(in srgb, var(--ptx-gold) 70%, var(--ptx-orange));
+  --prestige-glow: 0 0 24px color-mix(in srgb, var(--ptx-gold) 45%, transparent);
+
+  /**
+   * White text on --prestige-accent measures only ~2.66:1 (WCAG AA
+   * needs 4.5:1 for normal-size text) — found via automated axe-core
+   * check. Near-black measures ~6.5:1.
+   */
+  --text-on-prestige-accent: var(--ptx-neutral-900);
+}

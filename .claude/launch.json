@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ptx-site",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/dev-server.js"],
+      "port": 8123
+    },
+    {
+      "name": "ptx-next",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    }
+  ]
+}

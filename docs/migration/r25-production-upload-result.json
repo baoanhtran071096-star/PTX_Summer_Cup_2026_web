@@ -1,0 +1,320 @@
+[
+  {
+    "bucket": "team-logos",
+    "targetKey": "bieu-tuong-doi-p-phoenix-.webp",
+    "sourcePath": "thư viện\\logo biểu tượng 3 đội\\Biểu tượng đội P (Phoenix).webp",
+    "captionSource": "Biểu tượng đội P (Phoenix)"
+  },
+  {
+    "bucket": "team-logos",
+    "targetKey": "bieu-tuong-doi-t-tiger-.webp",
+    "sourcePath": "thư viện\\logo biểu tượng 3 đội\\Biểu tượng đội T (Tiger).webp",
+    "captionSource": "Biểu tượng đội T (Tiger)"
+  },
+  {
+    "bucket": "team-logos",
+    "targetKey": "bieu-tuong-doi-x-xiphias-gladius-.webp",
+    "sourcePath": "thư viện\\logo biểu tượng 3 đội\\Biểu tượng đội X (Xiphias Gladius).webp",
+    "captionSource": "Biểu tượng đội X (Xiphias Gladius)"
+  },
+  {
+    "bucket": "team-logos",
+    "targetKey": "mo-ta-3-doi.webp",
+    "sourcePath": "thư viện\\logo biểu tượng 3 đội\\mô tả 3 đội.webp",
+    "captionSource": "mô tả 3 đội"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "1.mp4",
+    "sourcePath": "thư viện\\Media\\1.mp4",
+    "captionSource": "1"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "2.mp4",
+    "sourcePath": "thư viện\\Media\\2.mp4",
+    "captionSource": "2"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "3.mp4",
+    "sourcePath": "thư viện\\Media\\3.mp4",
+    "captionSource": "3"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "4.mp4",
+    "sourcePath": "thư viện\\Media\\4.mp4",
+    "captionSource": "4"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "5.mp4",
+    "sourcePath": "thư viện\\Media\\5.mp4",
+    "captionSource": "5"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "1.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\1.webp",
+    "captionSource": "1"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "2.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\2.webp",
+    "captionSource": "2"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "3.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\3.webp",
+    "captionSource": "3"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "4.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\4.webp",
+    "captionSource": "4"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "5.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\5.webp",
+    "captionSource": "5"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "6.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\6.webp",
+    "captionSource": "6"
+  },
+  {
+    "bucket": "gallery",
+    "targetKey": "7.webp",
+    "sourcePath": "thư viện\\đội cổ động viên\\7.webp",
+    "captionSource": "7"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "anh-truong.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Anh Trương.webp",
+    "captionSource": "Anh Trương"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "bao-anh.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Bảo Anh.webp",
+    "captionSource": "Bảo Anh"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "chi-dai.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Chí Đại.webp",
+    "captionSource": "Chí Đại"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "hoang-nam.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Hoàng Nam.webp",
+    "captionSource": "Hoàng Nam"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "khanh-hung.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Khánh Hưng.webp",
+    "captionSource": "Khánh Hưng"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "minh-hieu.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Minh Hiếu.webp",
+    "captionSource": "Minh Hiếu"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "minh-the.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Minh Thế.webp",
+    "captionSource": "Minh Thế"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "manh-tuan.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Mạnh Tuấn.webp",
+    "captionSource": "Mạnh Tuấn"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "mau-quoc.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Mậu Quốc.webp",
+    "captionSource": "Mậu Quốc"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "xuan-su.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Nguyễn Sử.webp",
+    "captionSource": "Xuân Sử"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "phan-hien.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Phan Hiền.webp",
+    "captionSource": "Phan Hiền"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "phat-tai.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Phát Tài.webp",
+    "captionSource": "Phát Tài"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "phuong-toan.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Phương Toàn.webp",
+    "captionSource": "Phương Toàn"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "quang-minh.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Quang Minh.webp",
+    "captionSource": "Quang Minh"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "quang-toan.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Quang Toàn.webp",
+    "captionSource": "Quang Toàn"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "thanh-long.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Thanh Long.webp",
+    "captionSource": "Thanh Long"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "thanh-truc.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Thanh Trúc.webp",
+    "captionSource": "Thanh Trúc"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "thanh-tu.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Thanh Tú.webp",
+    "captionSource": "Thanh Tú"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "thien-phu.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Thiên Phú.webp",
+    "captionSource": "Thiên Phú"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "thanh-thai.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Thành Thái.webp",
+    "captionSource": "Thành Thái"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "tuong-khanh.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Tường Khánh.webp",
+    "captionSource": "Tường Khánh"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "van-lan.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Văn Lân.webp",
+    "captionSource": "Văn Lân"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "dinh-huy.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Đình Huy.webp",
+    "captionSource": "Đình Huy"
+  },
+  {
+    "bucket": "player-avatars",
+    "targetKey": "dang-quan.webp",
+    "sourcePath": "thư viện\\Ảnh cầu thủ\\Đăng Quân.webp",
+    "captionSource": "Đăng Quân"
+  },
+  {
+    "bucket": "operations-media",
+    "targetKey": "ban-hau-can-1.webp",
+    "sourcePath": "thư viện\\Ảnh hậu cần\\Ban hậu cần 1.webp",
+    "captionSource": "Ban hậu cần 1"
+  },
+  {
+    "bucket": "operations-media",
+    "targetKey": "ban-hau-can-2.webp",
+    "sourcePath": "thư viện\\Ảnh hậu cần\\Ban hậu cần 2.webp",
+    "captionSource": "Ban hậu cần 2"
+  },
+  {
+    "bucket": "operations-media",
+    "targetKey": "ban-truyen-thong-1.webp",
+    "sourcePath": "thư viện\\Ảnh hậu cần\\Ban truyền thông 1.webp",
+    "captionSource": "Ban truyền thông 1"
+  },
+  {
+    "bucket": "operations-media",
+    "targetKey": "ban-truyen-thong-2.webp",
+    "sourcePath": "thư viện\\Ảnh hậu cần\\Ban truyền thông 2.webp",
+    "captionSource": "Ban truyền thông 2"
+  },
+  {
+    "bucket": "operations-media",
+    "targetKey": "ban-trong-tai.webp",
+    "sourcePath": "thư viện\\Ảnh hậu cần\\BAN TRỌNG TÀI.webp",
+    "captionSource": "BAN TRỌNG TÀI"
+  },
+  {
+    "bucket": "operations-media",
+    "targetKey": "ban-y-te.webp",
+    "sourcePath": "thư viện\\Ảnh hậu cần\\Ban Y tế.webp",
+    "captionSource": "Ban Y tế"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "banner-ptx-summer-cup.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\banner PTX Summer Cup.webp",
+    "captionSource": "banner PTX Summer Cup"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "icon-192.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\icon-192.webp",
+    "captionSource": "icon-192"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "icon-512.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\icon-512.webp",
+    "captionSource": "icon-512"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "logo-cong-doan.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\Logo Công Đoàn.webp",
+    "captionSource": "Logo Công Đoàn"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "logo-ptx.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\Logo PTX.webp",
+    "captionSource": "Logo PTX"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "logo-cong-doan-ptx-combined.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\logo-cong-doan-ptx-combined.webp",
+    "captionSource": "logo-cong-doan-ptx-combined"
+  },
+  {
+    "bucket": "branding",
+    "targetKey": "trang-phuc-thi-dau.webp",
+    "sourcePath": "thư viện\\ảnh logo - banner\\trang phục thi đấu.webp",
+    "captionSource": "trang phục thi đấu"
+  }
+]

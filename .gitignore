@@ -15,3 +15,14 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Kết quả build & cache — dựng lại được, không thuộc mã nguồn
+.next/
+.vercel/
+test-results/
+tsconfig.tsbuildinfo
+playwright-report/
+
+# Bản dump cơ sở dữ liệu production — CHỨA DỮ LIỆU THẬT, không đưa vào git.
+# Schema thì có (supabase/migrations/), còn nội dung bảng thì không.
+backups/

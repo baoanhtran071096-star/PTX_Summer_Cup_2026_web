@@ -1,0 +1,390 @@
+{
+  "totalLocalFiles": 53,
+  "byBucket": {
+    "team-logos": 4,
+    "gallery": 12,
+    "player-avatars": 24,
+    "operations-media": 6,
+    "branding": 7
+  },
+  "unmappedCount": 0,
+  "knownExternalDependencies": [
+    {
+      "description": "3 team group-lineup photos (Team P/T/X) hotlinked from postimg.cc, no local file found",
+      "status": "UNRESOLVED — requires manual download, see r25-asset-migration-plan.md §3"
+    }
+  ],
+  "files": [
+    {
+      "sourcePath": "thư viện\\logo biểu tượng 3 đội\\Biểu tượng đội P (Phoenix).webp",
+      "bucket": "team-logos",
+      "targetKey": "bieu-tuong-doi-p-phoenix-.webp",
+      "captionSource": "Biểu tượng đội P (Phoenix)",
+      "sizeBytes": 19200
+    },
+    {
+      "sourcePath": "thư viện\\logo biểu tượng 3 đội\\Biểu tượng đội T (Tiger).webp",
+      "bucket": "team-logos",
+      "targetKey": "bieu-tuong-doi-t-tiger-.webp",
+      "captionSource": "Biểu tượng đội T (Tiger)",
+      "sizeBytes": 26312
+    },
+    {
+      "sourcePath": "thư viện\\logo biểu tượng 3 đội\\Biểu tượng đội X (Xiphias Gladius).webp",
+      "bucket": "team-logos",
+      "targetKey": "bieu-tuong-doi-x-xiphias-gladius-.webp",
+      "captionSource": "Biểu tượng đội X (Xiphias Gladius)",
+      "sizeBytes": 25008
+    },
+    {
+      "sourcePath": "thư viện\\logo biểu tượng 3 đội\\mô tả 3 đội.webp",
+      "bucket": "team-logos",
+      "targetKey": "mo-ta-3-doi.webp",
+      "captionSource": "mô tả 3 đội",
+      "sizeBytes": 30154
+    },
+    {
+      "sourcePath": "thư viện\\Media\\1.mp4",
+      "bucket": "gallery",
+      "targetKey": "1.mp4",
+      "captionSource": "1",
+      "sizeBytes": 3364984
+    },
+    {
+      "sourcePath": "thư viện\\Media\\2.mp4",
+      "bucket": "gallery",
+      "targetKey": "2.mp4",
+      "captionSource": "2",
+      "sizeBytes": 3370897
+    },
+    {
+      "sourcePath": "thư viện\\Media\\3.mp4",
+      "bucket": "gallery",
+      "targetKey": "3.mp4",
+      "captionSource": "3",
+      "sizeBytes": 1501127
+    },
+    {
+      "sourcePath": "thư viện\\Media\\4.mp4",
+      "bucket": "gallery",
+      "targetKey": "4.mp4",
+      "captionSource": "4",
+      "sizeBytes": 4023978
+    },
+    {
+      "sourcePath": "thư viện\\Media\\5.mp4",
+      "bucket": "gallery",
+      "targetKey": "5.mp4",
+      "captionSource": "5",
+      "sizeBytes": 19271717
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\1.webp",
+      "bucket": "gallery",
+      "targetKey": "1.webp",
+      "captionSource": "1",
+      "sizeBytes": 46762
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\2.webp",
+      "bucket": "gallery",
+      "targetKey": "2.webp",
+      "captionSource": "2",
+      "sizeBytes": 74536
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\3.webp",
+      "bucket": "gallery",
+      "targetKey": "3.webp",
+      "captionSource": "3",
+      "sizeBytes": 224630
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\4.webp",
+      "bucket": "gallery",
+      "targetKey": "4.webp",
+      "captionSource": "4",
+      "sizeBytes": 165040
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\5.webp",
+      "bucket": "gallery",
+      "targetKey": "5.webp",
+      "captionSource": "5",
+      "sizeBytes": 101336
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\6.webp",
+      "bucket": "gallery",
+      "targetKey": "6.webp",
+      "captionSource": "6",
+      "sizeBytes": 100690
+    },
+    {
+      "sourcePath": "thư viện\\đội cổ động viên\\7.webp",
+      "bucket": "gallery",
+      "targetKey": "7.webp",
+      "captionSource": "7",
+      "sizeBytes": 75342
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Anh Trương.webp",
+      "bucket": "player-avatars",
+      "targetKey": "anh-truong.webp",
+      "captionSource": "Anh Trương",
+      "sizeBytes": 30644
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Bảo Anh.webp",
+      "bucket": "player-avatars",
+      "targetKey": "bao-anh.webp",
+      "captionSource": "Bảo Anh",
+      "sizeBytes": 42772
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Chí Đại.webp",
+      "bucket": "player-avatars",
+      "targetKey": "chi-dai.webp",
+      "captionSource": "Chí Đại",
+      "sizeBytes": 27074
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Hoàng Nam.webp",
+      "bucket": "player-avatars",
+      "targetKey": "hoang-nam.webp",
+      "captionSource": "Hoàng Nam",
+      "sizeBytes": 28236
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Khánh Hưng.webp",
+      "bucket": "player-avatars",
+      "targetKey": "khanh-hung.webp",
+      "captionSource": "Khánh Hưng",
+      "sizeBytes": 27352
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Minh Hiếu.webp",
+      "bucket": "player-avatars",
+      "targetKey": "minh-hieu.webp",
+      "captionSource": "Minh Hiếu",
+      "sizeBytes": 55474
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Minh Thế.webp",
+      "bucket": "player-avatars",
+      "targetKey": "minh-the.webp",
+      "captionSource": "Minh Thế",
+      "sizeBytes": 34838
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Mạnh Tuấn.webp",
+      "bucket": "player-avatars",
+      "targetKey": "manh-tuan.webp",
+      "captionSource": "Mạnh Tuấn",
+      "sizeBytes": 26970
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Mậu Quốc.webp",
+      "bucket": "player-avatars",
+      "targetKey": "mau-quoc.webp",
+      "captionSource": "Mậu Quốc",
+      "sizeBytes": 29142
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Nguyễn Sử.webp",
+      "bucket": "player-avatars",
+      "targetKey": "nguyen-su.webp",
+      "captionSource": "Nguyễn Sử",
+      "sizeBytes": 24144
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Phan Hiền.webp",
+      "bucket": "player-avatars",
+      "targetKey": "phan-hien.webp",
+      "captionSource": "Phan Hiền",
+      "sizeBytes": 29822
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Phát Tài.webp",
+      "bucket": "player-avatars",
+      "targetKey": "phat-tai.webp",
+      "captionSource": "Phát Tài",
+      "sizeBytes": 28038
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Phương Toàn.webp",
+      "bucket": "player-avatars",
+      "targetKey": "phuong-toan.webp",
+      "captionSource": "Phương Toàn",
+      "sizeBytes": 21524
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Quang Minh.webp",
+      "bucket": "player-avatars",
+      "targetKey": "quang-minh.webp",
+      "captionSource": "Quang Minh",
+      "sizeBytes": 25610
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Quang Toàn.webp",
+      "bucket": "player-avatars",
+      "targetKey": "quang-toan.webp",
+      "captionSource": "Quang Toàn",
+      "sizeBytes": 25550
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Thanh Long.webp",
+      "bucket": "player-avatars",
+      "targetKey": "thanh-long.webp",
+      "captionSource": "Thanh Long",
+      "sizeBytes": 28390
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Thanh Trúc.webp",
+      "bucket": "player-avatars",
+      "targetKey": "thanh-truc.webp",
+      "captionSource": "Thanh Trúc",
+      "sizeBytes": 34996
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Thanh Tú.webp",
+      "bucket": "player-avatars",
+      "targetKey": "thanh-tu.webp",
+      "captionSource": "Thanh Tú",
+      "sizeBytes": 24404
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Thiên Phú.webp",
+      "bucket": "player-avatars",
+      "targetKey": "thien-phu.webp",
+      "captionSource": "Thiên Phú",
+      "sizeBytes": 27396
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Thành Thái.webp",
+      "bucket": "player-avatars",
+      "targetKey": "thanh-thai.webp",
+      "captionSource": "Thành Thái",
+      "sizeBytes": 40114
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Tường Khánh.webp",
+      "bucket": "player-avatars",
+      "targetKey": "tuong-khanh.webp",
+      "captionSource": "Tường Khánh",
+      "sizeBytes": 23394
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Văn Lân.webp",
+      "bucket": "player-avatars",
+      "targetKey": "van-lan.webp",
+      "captionSource": "Văn Lân",
+      "sizeBytes": 26800
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Đình Huy.webp",
+      "bucket": "player-avatars",
+      "targetKey": "dinh-huy.webp",
+      "captionSource": "Đình Huy",
+      "sizeBytes": 50902
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh cầu thủ\\Đăng Quân.webp",
+      "bucket": "player-avatars",
+      "targetKey": "dang-quan.webp",
+      "captionSource": "Đăng Quân",
+      "sizeBytes": 26050
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh hậu cần\\Ban hậu cần 1.webp",
+      "bucket": "operations-media",
+      "targetKey": "ban-hau-can-1.webp",
+      "captionSource": "Ban hậu cần 1",
+      "sizeBytes": 115088
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh hậu cần\\Ban hậu cần 2.webp",
+      "bucket": "operations-media",
+      "targetKey": "ban-hau-can-2.webp",
+      "captionSource": "Ban hậu cần 2",
+      "sizeBytes": 129288
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh hậu cần\\Ban truyền thông 1.webp",
+      "bucket": "operations-media",
+      "targetKey": "ban-truyen-thong-1.webp",
+      "captionSource": "Ban truyền thông 1",
+      "sizeBytes": 99446
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh hậu cần\\Ban truyền thông 2.webp",
+      "bucket": "operations-media",
+      "targetKey": "ban-truyen-thong-2.webp",
+      "captionSource": "Ban truyền thông 2",
+      "sizeBytes": 89038
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh hậu cần\\BAN TRỌNG TÀI.webp",
+      "bucket": "operations-media",
+      "targetKey": "ban-trong-tai.webp",
+      "captionSource": "BAN TRỌNG TÀI",
+      "sizeBytes": 92072
+    },
+    {
+      "sourcePath": "thư viện\\Ảnh hậu cần\\Ban Y tế.webp",
+      "bucket": "operations-media",
+      "targetKey": "ban-y-te.webp",
+      "captionSource": "Ban Y tế",
+      "sizeBytes": 133534
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\banner PTX Summer Cup.webp",
+      "bucket": "branding",
+      "targetKey": "banner-ptx-summer-cup.webp",
+      "captionSource": "banner PTX Summer Cup",
+      "sizeBytes": 52644
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\icon-192.webp",
+      "bucket": "branding",
+      "targetKey": "icon-192.webp",
+      "captionSource": "icon-192",
+      "sizeBytes": 2756
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\icon-512.webp",
+      "bucket": "branding",
+      "targetKey": "icon-512.webp",
+      "captionSource": "icon-512",
+      "sizeBytes": 9054
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\Logo Công Đoàn.webp",
+      "bucket": "branding",
+      "targetKey": "logo-cong-doan.webp",
+      "captionSource": "Logo Công Đoàn",
+      "sizeBytes": 37314
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\Logo PTX.webp",
+      "bucket": "branding",
+      "targetKey": "logo-ptx.webp",
+      "captionSource": "Logo PTX",
+      "sizeBytes": 7826
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\logo-cong-doan-ptx-combined.webp",
+      "bucket": "branding",
+      "targetKey": "logo-cong-doan-ptx-combined.webp",
+      "captionSource": "logo-cong-doan-ptx-combined",
+      "sizeBytes": 32850
+    },
+    {
+      "sourcePath": "thư viện\\ảnh logo - banner\\trang phục thi đấu.webp",
+      "bucket": "branding",
+      "targetKey": "trang-phuc-thi-dau.webp",
+      "captionSource": "trang phục thi đấu",
+      "sizeBytes": 131688
+    }
+  ]
+}

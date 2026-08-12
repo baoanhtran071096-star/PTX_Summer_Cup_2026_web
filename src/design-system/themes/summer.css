@@ -1,0 +1,21 @@
+/**
+ * Summer Identity theme — NET NEW, does not exist in R25 (confirmed absent
+ * by exhaustive audit, docs/legacy/r25-ui-inventory.md §2). Designed per
+ * the R25 Visual Fidelity Contract to complement, not replace, the existing
+ * navy/orange/gold identity: navy remains the anchor (nav/brand), orange and
+ * gold are amplified into a warmer, sun-lit surface treatment, with a fresh
+ * sky-teal introduced only as a light accent — never overriding team colors
+ * or the primary brand navy. Explicitly not a generic unrelated palette.
+ */
+:root[data-theme='summer'] {
+  --surface-page: #fff8ec;
+  --surface-card: #ffffff;
+  --surface-nav: var(--ptx-navy);
+  --border-color: #f3dfb8;
+  --text-primary: var(--ptx-neutral-900);
+  --text-muted: #8a6d3b;
+  --interactive-primary: var(--ptx-orange);
+  --interactive-primary-hover: #d94a15;
+  --prestige-accent: var(--ptx-gold);
+  --summer-sky-accent: #2dd4bf;
+}

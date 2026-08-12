@@ -1,0 +1,74 @@
+name: PTX Summer Cup 2026 CI
+
+# Note: the legacy workflows/ci.yml at repo root was never actually wired
+# into GitHub Actions (Actions only reads .github/workflows/) — this is the
+# first real CI pipeline for this repo. It covers both the new Next.js
+# foundation (M00+) and the R25 legacy regression suite, which stays
+# authoritative until the M12 Release Candidate / M13 cutover.
+
+on:
+  push:
+    branches: [main, dev, 'feature/*']
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  next-app:
+    name: Next.js foundation — lint, typecheck, gates, unit, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run verify:architecture
+      - run: npm run verify:design-tokens
+      - run: npm run verify:secrets
+      - run: npm run test:unit
+      - run: npm run build
+
+  e2e-and-accessibility:
+    name: Next.js E2E + accessibility (Supabase-independent flows)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+  database-migrations:
+    name: Supabase schema — migrations + RLS + seed apply cleanly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: supabase db start
+      - run: supabase db reset --local
+      # `db reset` already applies migrations/*.sql then seed.sql and fails
+      # the step on any SQL error — this is the migration-safety gate
+      # (docs/roadmap Part II §5) that this session's Docker Desktop could
+      # not verify locally (never finished initializing in time).
+      - run: supabase stop
+
+  legacy-regression:
+    name: R25 legacy regression suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:legacy

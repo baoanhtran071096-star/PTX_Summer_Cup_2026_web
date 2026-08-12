@@ -1,0 +1,388 @@
+{
+  "extractedAt": "(set at run time by consumer — Date.now() intentionally not embedded by this script)",
+  "sourceFiles": {
+    "indexHtml": "index.html",
+    "migrationJson": "ptx_migration_data.json"
+  },
+  "counts": {
+    "teams": 3,
+    "players": 24,
+    "matches": 3,
+    "hallOfFameYears": 1,
+    "galleryOverrideItems": 1
+  },
+  "warnings": [
+    "NAME_ASSET_MISMATCH: display name \"Xuân Sử\" vs avatar filename \"Nguyễn Sử.webp\" — resolve with product owner before final import",
+    "Gallery 2025/opening still hotlinked: https://i.postimg.cc/J4BFgJp7/CD.jpg",
+    "This extraction reflects the CURRENT working copy of index.html + ptx_migration_data.json at run time. ptx_migration_data.json is a point-in-time export (2026-07-30) — re-run this script against a FRESH export/live admin state immediately before actual cutover, per r25-data-reconciliation-plan.md §5."
+  ],
+  "teams": [
+    {
+      "legacy_id": "p",
+      "name": "TEAM P",
+      "full_name": "PHOENIX",
+      "icon": "🦅",
+      "color": "#1A5BB5",
+      "captain_name": "Anh Trương",
+      "stats": {
+        "attack": 92,
+        "defense": 88,
+        "speed": 90,
+        "power": 85
+      },
+      "ovr": 89,
+      "logo_source_path": "th%C6%B0%20vi%E1%BB%87n/logo%20bi%E1%BB%83u%20t%C6%B0%E1%BB%A3ng%203%20%C4%91%E1%BB%99i/Bi%E1%BB%83u%20t%C6%B0%E1%BB%A3ng%20%C4%91%E1%BB%99i%20P%20(Phoenix).webp"
+    },
+    {
+      "legacy_id": "t",
+      "name": "TEAM T",
+      "full_name": "TIGER",
+      "icon": "🐯",
+      "color": "#D32F2F",
+      "captain_name": "Minh Thế",
+      "stats": {
+        "attack": 88,
+        "defense": 85,
+        "speed": 80,
+        "power": 90
+      },
+      "ovr": 86,
+      "logo_source_path": "th%C6%B0%20vi%E1%BB%87n/logo%20bi%E1%BB%83u%20t%C6%B0%E1%BB%A3ng%203%20%C4%91%E1%BB%99i/Bi%E1%BB%83u%20t%C6%B0%E1%BB%A3ng%20%C4%91%E1%BB%99i%20T%20(Tiger).webp"
+    },
+    {
+      "legacy_id": "x",
+      "name": "TEAM X",
+      "full_name": "XIPHIAS",
+      "icon": "🐟",
+      "color": "#F5A623",
+      "captain_name": "Đình Huy",
+      "stats": {
+        "attack": 85,
+        "defense": 90,
+        "speed": 95,
+        "power": 82
+      },
+      "ovr": 88,
+      "logo_source_path": "th%C6%B0%20vi%E1%BB%87n/logo%20bi%E1%BB%83u%20t%C6%B0%E1%BB%A3ng%203%20%C4%91%E1%BB%99i/Bi%E1%BB%83u%20t%C6%B0%E1%BB%A3ng%20%C4%91%E1%BB%99i%20X%20(Xiphias%20Gladius).webp"
+    }
+  ],
+  "players": [
+    {
+      "legacy_id": 1,
+      "name": "Anh Trương",
+      "team_legacy_id": "p",
+      "position": "FW",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Anh Trương.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 2,
+      "name": "Phan Hiền",
+      "team_legacy_id": "p",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Phan Hiền.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 3,
+      "name": "Thanh Long",
+      "team_legacy_id": "p",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Thanh Long.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 4,
+      "name": "Thanh Trúc",
+      "team_legacy_id": "p",
+      "position": "GK",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Thanh Trúc.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 5,
+      "name": "Mậu Quốc",
+      "team_legacy_id": "p",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Mậu Quốc.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 6,
+      "name": "Quang Minh",
+      "team_legacy_id": "p",
+      "position": "FW",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Quang Minh.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 7,
+      "name": "Khánh Hưng",
+      "team_legacy_id": "p",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Khánh Hưng.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 8,
+      "name": "Mạnh Tuấn",
+      "team_legacy_id": "p",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Mạnh Tuấn.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 9,
+      "name": "Minh Thế",
+      "team_legacy_id": "t",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Minh Thế.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 10,
+      "name": "Tường Khánh",
+      "team_legacy_id": "t",
+      "position": "GK",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Tường Khánh.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 11,
+      "name": "Hoàng Nam",
+      "team_legacy_id": "t",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Hoàng Nam.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 12,
+      "name": "Đăng Quân",
+      "team_legacy_id": "t",
+      "position": "FW",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Đăng Quân.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 13,
+      "name": "Thanh Tú",
+      "team_legacy_id": "t",
+      "position": "FW",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Thanh Tú.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 14,
+      "name": "Chí Đại",
+      "team_legacy_id": "t",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Chí Đại.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 15,
+      "name": "Quang Toàn",
+      "team_legacy_id": "t",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Quang Toàn.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 16,
+      "name": "Phát Tài",
+      "team_legacy_id": "t",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Phát Tài.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 17,
+      "name": "Đình Huy",
+      "team_legacy_id": "x",
+      "position": "GK",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Đình Huy.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 18,
+      "name": "Xuân Sử",
+      "team_legacy_id": "x",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Nguyễn Sử.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": [
+        "NAME_ASSET_MISMATCH: display name \"Xuân Sử\" vs avatar filename \"Nguyễn Sử.webp\" — resolve with product owner before final import"
+      ]
+    },
+    {
+      "legacy_id": 19,
+      "name": "Văn Lân",
+      "team_legacy_id": "x",
+      "position": "FW",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Văn Lân.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 20,
+      "name": "Thiên Phú",
+      "team_legacy_id": "x",
+      "position": "DF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Thiên Phú.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 21,
+      "name": "Bảo Anh",
+      "team_legacy_id": "x",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Bảo Anh.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 22,
+      "name": "Phương Toàn",
+      "team_legacy_id": "x",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Phương Toàn.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 23,
+      "name": "Minh Hiếu",
+      "team_legacy_id": "x",
+      "position": "FW",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Minh Hiếu.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    },
+    {
+      "legacy_id": 24,
+      "name": "Thành Thái",
+      "team_legacy_id": "x",
+      "position": "MF",
+      "avatar_source_path": "thư viện/Ảnh cầu thủ/Thành Thái.webp",
+      "legacy_static_goals": 0,
+      "legacy_static_assists": 0,
+      "legacy_static_mvp": 0,
+      "flags": []
+    }
+  ],
+  "matches": [
+    {
+      "legacy_id": 1,
+      "home_team_legacy_id": "p",
+      "away_team_legacy_id": "t",
+      "match_date": "2026-08-07",
+      "start_time": "17:00",
+      "end_time": "17:35"
+    },
+    {
+      "legacy_id": 2,
+      "home_team_legacy_id": "p",
+      "away_team_legacy_id": "x",
+      "match_date": "2026-08-07",
+      "start_time": "17:50",
+      "end_time": "18:25"
+    },
+    {
+      "legacy_id": 3,
+      "home_team_legacy_id": "x",
+      "away_team_legacy_id": "t",
+      "match_date": "2026-08-07",
+      "start_time": "18:40",
+      "end_time": "19:15"
+    }
+  ],
+  "tournamentSettings": {
+    "slogan": "Làm hết sức – Chơi hết mình",
+    "message": "Giải bóng đá truyền thống do Công đoàn PTX Group Việt Nam tổ chức",
+    "event_date": "07/08/2026",
+    "location": "152 Hoàng Hoa Thám, Bảy Hiền, Hồ Chí Minh, Việt Nam"
+  },
+  "hallOfFame": [
+    {
+      "year": 2025,
+      "champion": "TEAM P (PHOENIX)",
+      "runner_up": null,
+      "third_place": null,
+      "golden_boot": null,
+      "mvp": null,
+      "note": "champion/runner_up/third_place stored as free text here pending name-to-team_id resolution at import time"
+    }
+  ],
+  "galleryOverrides": [
+    {
+      "year": 2025,
+      "category": "opening",
+      "source_url": "https://i.postimg.cc/J4BFgJp7/CD.jpg",
+      "external": true
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+/**
+ * Ported from R25 legacy type stack (docs/legacy/r25-ui-inventory.md §3).
+ */
+:root {
+  --ptx-font-logo: 'Bebas Neue', sans-serif;
+  --ptx-font-title: 'Barlow Condensed', sans-serif;
+  --ptx-font-ui: 'Be Vietnam Pro', 'Inter', system-ui, sans-serif;
+}

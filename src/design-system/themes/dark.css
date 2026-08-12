@@ -1,0 +1,17 @@
+/**
+ * Dark theme — ported 1:1 from legacy [data-theme="dark"]
+ * (docs/legacy/r25-ui-inventory.md §2).
+ */
+:root[data-theme='dark'] {
+  --surface-page: #0f172a;
+  --surface-card: #1e293b;
+  --surface-nav: #0b1526;
+  --border-color: #334155;
+  --text-primary: #f1f5f9;
+  --text-muted: #94a3b8;
+  /* The light-surface fallback in sports.css (neutral-900) would be
+     near-invisible on this theme's dark card surface — but the raw
+     Xiphias orange already clears 4.5:1 against #1e293b, so use it
+     directly here instead of graying it out. */
+  --text-on-team-x: var(--team-color-x);
+}

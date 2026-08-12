@@ -1,0 +1,90 @@
+# ============================================================
+# M14 — Automated production backup (ACTIVE)
+#
+# Runs daily at 02:00 UTC against the production Supabase project only
+# (ref tqdsvtuspehavhcygipf, guarded below), plus manual dispatch.
+# Requires SUPABASE_ACCESS_TOKEN in this repository's Actions secrets
+# (Settings > Secrets and variables > Actions) — provisioned directly
+# by the product owner; this agent has never seen its value.
+#
+# No external storage account is needed — private GitHub Actions
+# artifacts satisfy the locked retention policy on their own (verified
+# against GitHub's own docs; see docs/m14-backup-architecture.md for
+# the retention-days and artifact-storage-quota findings, and the
+# pre-execution audit this workflow passed before activation).
+# ============================================================
+
+name: Production Database Backup
+
+on:
+  schedule:
+    # Daily at 02:00 UTC — adjust once the storage destination is chosen
+    # and this workflow is actually enabled.
+    - cron: '0 2 * * *'
+  workflow_dispatch: {}
+
+# Least-privilege: this workflow only reads the repo (to check out the
+# migrations directory Supabase CLI needs) and uploads an artifact —
+# it never writes back to the repository. Explicit here rather than
+# relying on whatever default GITHUB_TOKEN permissions this repo/org
+# happens to have configured (found during the M14 pre-activation audit).
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Dump + verify + upload production backup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to production (ref confirmed, never any other project)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase link --project-ref tqdsvtuspehavhcygipf --yes
+          LINKED=$(cat supabase/.temp/project-ref)
+          if [ "$LINKED" != "tqdsvtuspehavhcygipf" ]; then
+            echo "ABORT: linked ref ($LINKED) does not match the approved production ref"
+            exit 1
+          fi
+
+      - name: Dump production database
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          TIMESTAMP=$(date -u +"%Y%m%dT%H%M%SZ")
+          echo "BACKUP_FILE=production-${TIMESTAMP}.sql" >> "$GITHUB_ENV"
+          supabase db dump --linked -f "production-${TIMESTAMP}.sql"
+
+      - name: Verify backup integrity (structural, not just "command exited 0")
+        run: |
+          set -e
+          FILE="$BACKUP_FILE"
+          test -s "$FILE" || { echo "ABORT: backup file is empty"; exit 1; }
+          head -1 "$FILE" | grep -q "SET" || { echo "ABORT: unexpected file header, not a pg_dump output"; exit 1; }
+          COUNT=$(grep -c "CREATE EXTENSION" "$FILE" || true)
+          if [ "$COUNT" -lt 1 ]; then
+            echo "ABORT: no CREATE EXTENSION statements found — dump looks incomplete"
+            exit 1
+          fi
+          echo "Backup integrity check passed: $FILE ($COUNT extension statements found)"
+
+      - name: Upload backup as a private GitHub Actions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-backup-${{ github.run_id }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 90
+          # Artifacts are only downloadable by accounts with read access
+          # to this repository — requires the repo to be PRIVATE (see
+          # docs/m14-backup-architecture.md). A public repo would make
+          # every backup, including production data, publicly downloadable.
+
+      - name: Clean up local dump file (never leave it on the runner or commit it)
+        if: always()
+        run: rm -f "$BACKUP_FILE"

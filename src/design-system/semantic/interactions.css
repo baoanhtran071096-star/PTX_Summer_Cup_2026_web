@@ -1,0 +1,17 @@
+:root {
+  --interactive-primary: var(--ptx-orange);
+  --interactive-primary-hover: color-mix(in srgb, var(--ptx-orange) 85%, black);
+  --interactive-secondary: var(--ptx-navy);
+  --interactive-secondary-hover: color-mix(in srgb, var(--ptx-navy) 85%, black);
+  --focus-ring: var(--ptx-orange);
+  --transition-interactive: var(--ptx-transition);
+
+  /**
+   * White text on --interactive-primary (#F15A24) measures only
+   * 3.37:1 (WCAG AA requires 4.5:1 for normal-size text) — found via
+   * an automated axe-core check in tests/e2e/accessibility.spec.ts.
+   * Use this token for text on that background instead of
+   * --ptx-white; it measures ~5.15:1.
+   */
+  --text-on-interactive-primary: var(--ptx-neutral-900);
+}

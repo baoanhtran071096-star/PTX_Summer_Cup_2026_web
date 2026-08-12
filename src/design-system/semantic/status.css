@@ -1,0 +1,6 @@
+:root {
+  --status-success: var(--ptx-success);
+  --status-warning: var(--ptx-warning);
+  --status-danger: var(--ptx-danger);
+  --status-live: var(--ptx-live-red);
+}

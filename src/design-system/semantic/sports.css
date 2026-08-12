@@ -1,0 +1,17 @@
+/**
+ * Team identity semantic tokens — legacy_id 'p'/'t'/'x' map to these.
+ * See docs/legacy/r25-ui-inventory.md §2 and the visual fidelity contract.
+ */
+:root {
+  --team-color-p: var(--ptx-team-phoenix);
+  --team-color-t: var(--ptx-team-tiger);
+  --team-color-x: var(--ptx-team-xiphias);
+  --live-indicator: var(--ptx-live-red);
+
+  /* --ptx-team-xiphias (#f5a623) is only 2.02:1 on a light card surface,
+     below the 4.5:1 WCAG AA text minimum (found via M12.5 live axe scan
+     of /doi) — Phoenix/Tiger both already pass. Text usage (e.g. the OVR
+     badge) must use this darker readable variant; the brand color itself
+     (border/accent use) is unchanged, per the visual fidelity contract. */
+  --text-on-team-x: var(--ptx-neutral-900);
+}
