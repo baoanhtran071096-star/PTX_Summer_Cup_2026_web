@@ -29,3 +29,22 @@ export async function createSupabaseServerClient() {
     },
   });
 }
+
+/**
+ * Client đã NẠP SẴN phiên đăng nhập — dùng cho mọi thao tác ghi cần RLS nhận ra người dùng.
+ *
+ * Client của @supabase/ssr chỉ đọc phiên từ cookie khi có ai gọi một hàm auth trên CHÍNH
+ * thể hiện đó. Các Server Action thường gọi requireAdminUserId() trước — hàm đó tạo và nạp
+ * phiên cho MỘT client riêng — rồi tạo client thứ hai để ghi. Client thứ hai chưa nạp gì
+ * nên gửi request bằng mỗi anon key; trong Postgres `auth.uid()` thành null và mọi chính
+ * sách RLS dựa trên danh tính đều từ chối.
+ *
+ * Đã đo trên production: tải ảnh lên Storage nhận về "new row violates row-level security
+ * policy" — đúng câu mà một request nặc danh thật sự nhận được. Chính sách RLS không sai;
+ * nó chặn đúng một request mà nó nhìn thấy là nặc danh.
+ */
+export async function createAuthedSupabaseServerClient() {
+  const supabase = await createSupabaseServerClient();
+  await supabase.auth.getUser();
+  return supabase;
+}
