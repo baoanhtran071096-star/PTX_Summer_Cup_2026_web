@@ -11,7 +11,8 @@ import { deletePrediction } from '@/services/database/predictions.db';
 import { updateProfileRole } from '@/services/database/profiles.db';
 import { uploadMedia, type MediaBucket } from '@/services/storage/media';
 import { isValidTeamAttributes } from '@/domain/team/rules';
-import { ValidationError } from '@/lib/errors';
+import { ValidationError, PtxError } from '@/lib/errors';
+import { logger } from '@/lib/logger';
 import {
   updateTournamentSettingsSchema,
   updateTeamSchema,
@@ -80,25 +81,76 @@ export async function deletePredictionAction(formData: FormData) {
   revalidatePath('/admin/predictions');
 }
 
-export async function uploadMediaAction(formData: FormData) {
-  const actorId = await requireAdminUserId();
-  const file = formData.get('file');
-  if (!(file instanceof File) || file.size === 0) {
-    throw new ValidationError('Vui lòng chọn một tệp.');
+export type UploadMediaState = { error: string | null; uploaded: string | null };
+
+/** Khớp với serverActions.bodySizeLimit trong next.config.ts. */
+const MAX_UPLOAD_MB = 10;
+
+/**
+ * Trả về trạng thái thay vì ném lỗi.
+ *
+ * Bản trước ném `ValidationError` và để lỗi hạ tầng nổi lên, nhưng form gọi nó không có
+ * chỗ nào bắt và hiển thị. Hậu quả đo được: bấm "Tải lên" và KHÔNG có gì xảy ra — không
+ * báo lỗi, không báo thành công, không cách nào biết vì sao. Mọi kiểu thất bại trông hệt
+ * nhau: tệp quá lớn, sai định dạng, thiếu quyền, mạng hỏng.
+ *
+ * Đúng lớp lỗi đã dọn khỏi bản web cũ, chỉ khác chiều: bên kia là "báo thành công cho việc
+ * chưa làm", bên này là "làm hỏng mà không báo gì".
+ */
+export async function uploadMediaAction(
+  _prevState: UploadMediaState,
+  formData: FormData
+): Promise<UploadMediaState> {
+  try {
+    const actorId = await requireAdminUserId();
+
+    const file = formData.get('file');
+    if (!(file instanceof File) || file.size === 0) {
+      return { error: 'Vui lòng chọn một tệp.', uploaded: null };
+    }
+
+    const parsed = uploadMediaSchema.safeParse({
+      bucket: formData.get('bucket'),
+      targetKey: formData.get('targetKey'),
+    });
+    if (!parsed.success) {
+      return { error: parsed.error.issues[0]?.message ?? 'Dữ liệu không hợp lệ.', uploaded: null };
+    }
+
+    // Kiểm cỡ tệp ở đây để câu báo nói đúng nguyên nhân, thay vì trả về một lỗi hạ tầng
+    // khó hiểu. Vượt hẳn bodySizeLimit thì request còn không tới được hàm này — đó là lý
+    // do ngưỡng hai nơi phải bằng nhau.
+    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
+      return {
+        error: `Tệp ${(file.size / 1024 / 1024).toFixed(1)} MB, vượt giới hạn ${MAX_UPLOAD_MB} MB. Hãy nén ảnh nhỏ lại rồi thử lại.`,
+        uploaded: null,
+      };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    await uploadMedia(
+      supabase,
+      parsed.data.bucket as MediaBucket,
+      parsed.data.targetKey,
+      file,
+      file.type || 'application/octet-stream'
+    );
+    await recordAuditLog(supabase, {
+      actorId,
+      action: 'upload',
+      entityType: 'media',
+      entityId: `${parsed.data.bucket}/${parsed.data.targetKey}`,
+    });
+
+    revalidatePath('/admin/media');
+    return { error: null, uploaded: `${parsed.data.bucket}/${parsed.data.targetKey}` };
+  } catch (err) {
+    // Lỗi hạ tầng — Supabase từ chối kiểu tệp, thiếu quyền, mạng hỏng — cũng phải tới
+    // được màn hình, không được chết lặng trong log máy chủ.
+    const message = err instanceof PtxError ? err.message : 'Tải lên thất bại. Vui lòng thử lại.';
+    logger.warn('Media upload failed', { reason: message });
+    return { error: message, uploaded: null };
   }
-
-  const parsed = uploadMediaSchema.parse({ bucket: formData.get('bucket'), targetKey: formData.get('targetKey') });
-
-  const supabase = await createSupabaseServerClient();
-  await uploadMedia(supabase, parsed.bucket as MediaBucket, parsed.targetKey, file, file.type || 'application/octet-stream');
-  await recordAuditLog(supabase, {
-    actorId,
-    action: 'upload',
-    entityType: 'media',
-    entityId: `${parsed.bucket}/${parsed.targetKey}`,
-  });
-
-  revalidatePath('/admin/media');
 }
 
 export async function updateUserRoleAction(formData: FormData) {

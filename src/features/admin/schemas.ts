@@ -34,5 +34,19 @@ export const updateUserRoleSchema = z.object({
 
 export const uploadMediaSchema = z.object({
   bucket: z.enum(['team-logos', 'player-avatars', 'gallery', 'operations-media', 'branding']),
-  targetKey: z.string().trim().min(1).max(200),
+  // Phải có đuôi tệp, và chỉ dùng ký tự an toàn cho URL.
+  //
+  // Trước đây chỉ yêu cầu 1–200 ký tự, nên "logos" lọt qua và tệp nằm trong Storage không
+  // có đuôi — trình duyệt không đoán được đó là ảnh nên không hiển thị. Dấu tiếng Việt và
+  // khoảng trắng cũng bị chặn ở đây: chúng buộc phải mã hoá URL ở mọi nơi dùng về sau, và
+  // đó là nguồn lỗi 404 rất khó lần ra.
+  targetKey: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .regex(
+      /^[a-z0-9][a-z0-9._-]*\.[a-z0-9]{2,5}$/i,
+      'Tên tệp phải có đuôi, chỉ gồm chữ không dấu, số, dấu chấm, gạch ngang hoặc gạch dưới — ví dụ: phoenix-logo.webp'
+    ),
 });
