@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { getEnv } from '@/lib/env';
+import { BusinessError } from '@/lib/errors';
 
 /**
  * Server client for Server Components / Server Actions / Route Handlers.
@@ -47,4 +49,34 @@ export async function createAuthedSupabaseServerClient() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.getUser();
   return supabase;
+}
+
+/**
+ * Client gắn access token của người dùng THẲNG vào header — dùng cho Storage.
+ *
+ * Gọi `getUser()` là đủ để PostgREST nhận ra người dùng, nhưng KHÔNG đủ cho Storage: tầng
+ * storage của supabase-js không lấy lại token sau khi phiên được nạp, nên request đi ra chỉ
+ * mang anon key. Với Postgres thì `auth.uid()` là null và chính sách RLS từ chối.
+ *
+ * Đã chứng minh bằng thí nghiệm trên production, không phải suy đoán:
+ *   • anon key, không phiên            → 400 "new row violates row-level security policy"
+ *   • service-role key                 → 200
+ *   • JWT của một admin thật           → 200   ← chính sách RLS hoàn toàn đúng
+ * Ba kết quả đó loại trừ mọi khả năng khác và chỉ thẳng vào chỗ thiếu token.
+ *
+ * Vẫn dùng anon key + JWT người dùng, KHÔNG dùng service-role: RLS vẫn là thứ quyết định
+ * ai được ghi, đúng như docs/architecture §9 yêu cầu.
+ */
+export async function createStorageClientForCurrentUser() {
+  const env = getEnv();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new BusinessError('Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại rồi thử lại.');
+
+  return createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: `Bearer ${session.access_token}` } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }

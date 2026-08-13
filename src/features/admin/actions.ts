@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createAuthedSupabaseServerClient } from '@/services/database/client-server';
+import { createAuthedSupabaseServerClient, createStorageClientForCurrentUser } from '@/services/database/client-server';
 import { requireAdminUserId } from '@/services/auth/session';
 import { recordAuditLog } from '@/services/database/audit.db';
 import { updateTournamentSettings } from '@/services/database/settings.db';
@@ -127,11 +127,13 @@ export async function uploadMediaAction(
       };
     }
 
-    // Phải là bản đã nạp phiên — xem chú thích ở createAuthedSupabaseServerClient().
+    // Storage cần client gắn token tường minh — getUser() không đủ, xem chú thích ở
+    // createStorageClientForCurrentUser(). Nhật ký thì ghi bằng client thường.
+    const storage = await createStorageClientForCurrentUser();
     const supabase = await createAuthedSupabaseServerClient();
 
     await uploadMedia(
-      supabase,
+      storage,
       parsed.data.bucket as MediaBucket,
       parsed.data.targetKey,
       file,
