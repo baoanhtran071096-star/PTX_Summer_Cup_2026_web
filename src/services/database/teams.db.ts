@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { InfrastructureError } from '@/lib/errors';
 import type { TeamRow } from './types';
+import { assertWrote } from '@/lib/db-write';
 
 /**
  * Low-level data access only — no business rules (Rule 6). Callers
@@ -23,9 +24,10 @@ export async function updateTeam(
   id: string,
   input: { captainName: string | null; stats: TeamRow['stats'] }
 ): Promise<void> {
-  const { error } = await client
+  const { data, error } = await client
     .from('teams')
     .update({ captain_name: input.captainName, stats: input.stats })
-    .eq('id', id);
-  if (error) throw new InfrastructureError(`Failed to update team ${id}: ${error.message}`, error);
+    .eq('id', id)
+    .select('id');
+  assertWrote(data, error, `update team ${id}`);
 }

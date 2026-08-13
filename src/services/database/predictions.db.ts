@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { assertWrote } from '@/lib/db-write';
 import { InfrastructureError } from '@/lib/errors';
 import type { PredictionRow } from './types';
 
@@ -35,6 +36,6 @@ export async function insertPrediction(
 }
 
 export async function deletePrediction(client: SupabaseClient, id: string): Promise<void> {
-  const { error } = await client.from('predictions').delete().eq('id', id);
-  if (error) throw new InfrastructureError(`Failed to delete prediction ${id}: ${error.message}`, error);
+  const { data, error } = await client.from('predictions').delete().eq('id', id).select('id');
+  assertWrote(data, error, `delete prediction ${id}`);
 }

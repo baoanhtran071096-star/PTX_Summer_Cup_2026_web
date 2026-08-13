@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createAuthedSupabaseServerClient, createStorageClientForCurrentUser } from '@/services/database/client-server';
+import { createUserScopedSupabaseClient } from '@/services/database/client-server';
 import { requireAdminUserId } from '@/services/auth/session';
 import { recordAuditLog } from '@/services/database/audit.db';
 import { updateTournamentSettings } from '@/services/database/settings.db';
@@ -31,7 +31,7 @@ export async function updateTournamentSettingsAction(formData: FormData) {
   const actorId = await requireAdminUserId();
   const parsed = updateTournamentSettingsSchema.parse(formEntries(formData));
 
-  const supabase = await createAuthedSupabaseServerClient();
+  const supabase = await createUserScopedSupabaseClient();
   await updateTournamentSettings(supabase, parsed);
   await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'tournament_settings' });
 
@@ -48,7 +48,7 @@ export async function updateTeamAction(formData: FormData) {
     throw new ValidationError('Chỉ số đội phải nằm trong khoảng 0-99.');
   }
 
-  const supabase = await createAuthedSupabaseServerClient();
+  const supabase = await createUserScopedSupabaseClient();
   await updateTeam(supabase, parsed.teamId, { captainName: parsed.captainName || null, stats });
   await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'team', entityId: parsed.teamId, metadata: stats });
 
@@ -61,7 +61,7 @@ export async function updatePlayerAction(formData: FormData) {
   const actorId = await requireAdminUserId();
   const parsed = updatePlayerSchema.parse(formEntries(formData));
 
-  const supabase = await createAuthedSupabaseServerClient();
+  const supabase = await createUserScopedSupabaseClient();
   await updatePlayer(supabase, parsed.playerId, { name: parsed.name, teamId: parsed.teamId, position: parsed.position });
   await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'player', entityId: parsed.playerId });
 
@@ -73,7 +73,7 @@ export async function deletePredictionAction(formData: FormData) {
   const actorId = await requireAdminUserId();
   const parsed = deletePredictionSchema.parse(formEntries(formData));
 
-  const supabase = await createAuthedSupabaseServerClient();
+  const supabase = await createUserScopedSupabaseClient();
   await deletePrediction(supabase, parsed.predictionId);
   await recordAuditLog(supabase, { actorId, action: 'delete', entityType: 'prediction', entityId: parsed.predictionId });
 
@@ -127,13 +127,10 @@ export async function uploadMediaAction(
       };
     }
 
-    // Storage cần client gắn token tường minh — getUser() không đủ, xem chú thích ở
-    // createStorageClientForCurrentUser(). Nhật ký thì ghi bằng client thường.
-    const storage = await createStorageClientForCurrentUser();
-    const supabase = await createAuthedSupabaseServerClient();
+    const supabase = await createUserScopedSupabaseClient();
 
     await uploadMedia(
-      storage,
+      supabase,
       parsed.data.bucket as MediaBucket,
       parsed.data.targetKey,
       file,
@@ -161,7 +158,7 @@ export async function updateUserRoleAction(formData: FormData) {
   const actorId = await requireAdminUserId();
   const parsed = updateUserRoleSchema.parse(formEntries(formData));
 
-  const supabase = await createAuthedSupabaseServerClient();
+  const supabase = await createUserScopedSupabaseClient();
   await updateProfileRole(supabase, parsed.profileId, parsed.role);
   await recordAuditLog(supabase, {
     actorId,

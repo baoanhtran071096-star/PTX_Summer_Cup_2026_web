@@ -52,22 +52,24 @@ export async function createAuthedSupabaseServerClient() {
 }
 
 /**
- * Client gắn access token của người dùng THẲNG vào header — dùng cho Storage.
+ * Client mang token của người dùng — DÙNG CHO MỌI THAO TÁC GHI, cả bảng lẫn Storage.
  *
- * Gọi `getUser()` là đủ để PostgREST nhận ra người dùng, nhưng KHÔNG đủ cho Storage: tầng
- * storage của supabase-js không lấy lại token sau khi phiên được nạp, nên request đi ra chỉ
- * mang anon key. Với Postgres thì `auth.uid()` là null và chính sách RLS từ chối.
+ * Không dùng bản này thì RLS nhìn request như nặc danh, và hai tầng hỏng theo hai kiểu
+ * khác nhau — kiểu thứ hai nguy hiểm hơn nhiều:
  *
- * Đã chứng minh bằng thí nghiệm trên production, không phải suy đoán:
- *   • anon key, không phiên            → 400 "new row violates row-level security policy"
- *   • service-role key                 → 200
- *   • JWT của một admin thật           → 200   ← chính sách RLS hoàn toàn đúng
- * Ba kết quả đó loại trừ mọi khả năng khác và chỉ thẳng vào chỗ thiếu token.
+ *   Storage        → ném lỗi "new row violates row-level security policy"
+ *   Bảng dữ liệu   → KHÔNG lỗi, chỉ khớp 0 dòng → ứng dụng tưởng đã lưu xong
+ *
+ * Đã đo trên production, đổi đúng một biến mỗi lượt:
+ *   • client không có phiên, update teams  → 0 dòng, không lỗi
+ *   • client có accessToken, update teams  → sửa được
+ *   • JWT admin thật gửi bằng fetch thô    → 200
+ * Ba kết quả đó cho thấy chính sách RLS đúng; thứ thiếu là token trên đường truyền.
  *
  * Vẫn dùng anon key + JWT người dùng, KHÔNG dùng service-role: RLS vẫn là thứ quyết định
  * ai được ghi, đúng như docs/architecture §9 yêu cầu.
  */
-export async function createStorageClientForCurrentUser() {
+export async function createUserScopedSupabaseClient() {
   const env = getEnv();
   const supabase = await createSupabaseServerClient();
   const {

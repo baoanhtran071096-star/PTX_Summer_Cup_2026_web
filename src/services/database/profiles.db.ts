@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { assertWrote } from '@/lib/db-write';
 import { InfrastructureError } from '@/lib/errors';
 import type { ProfileRow, ProfileRole } from './types';
 
@@ -9,6 +10,6 @@ export async function listProfiles(client: SupabaseClient): Promise<ProfileRow[]
 }
 
 export async function updateProfileRole(client: SupabaseClient, profileId: string, role: ProfileRole): Promise<void> {
-  const { error } = await client.from('profiles').update({ role }).eq('id', profileId);
-  if (error) throw new InfrastructureError(`Failed to update role for ${profileId}: ${error.message}`, error);
+  const { data, error } = await client.from('profiles').update({ role }).eq('id', profileId).select('id');
+  assertWrote(data, error, `update role for ${profileId}`);
 }

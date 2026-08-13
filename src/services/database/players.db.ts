@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { InfrastructureError } from '@/lib/errors';
 import type { PlayerRow, PlayerStatsRow } from './types';
+import { assertWrote } from '@/lib/db-write';
 
 export async function listPlayers(client: SupabaseClient, teamId?: string): Promise<PlayerRow[]> {
   let query = client.from('players').select('*').order('name');
@@ -28,11 +29,12 @@ export async function updatePlayer(
   id: string,
   input: { name: string; teamId: string; position: PlayerRow['position'] }
 ): Promise<void> {
-  const { error } = await client
+  const { data, error } = await client
     .from('players')
     .update({ name: input.name, team_id: input.teamId, position: input.position })
-    .eq('id', id);
-  if (error) throw new InfrastructureError(`Failed to update player ${id}: ${error.message}`, error);
+    .eq('id', id)
+    .select('id');
+  assertWrote(data, error, `update player ${id}`);
 }
 
 /** Reads the always-derived v_player_stats view — never independently editable. */
