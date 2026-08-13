@@ -75,8 +75,16 @@ export async function createStorageClientForCurrentUser() {
   } = await supabase.auth.getSession();
   if (!session) throw new BusinessError('Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại rồi thử lại.');
 
+  // Dùng tuỳ chọn `accessToken` chứ KHÔNG nhét Authorization vào global.headers.
+  //
+  // Đặt header thủ công không có tác dụng: supabase-js tự dựng header cho mỗi request qua
+  // `_getAccessToken()`, và hàm đó rơi về anon key khi client không có phiên — nên nó ghi
+  // đè đúng cái header vừa đặt. Đã thử và vẫn nhận nguyên câu lỗi RLS cũ.
+  //
+  // `accessToken: () => Promise<string | null>` là điểm móc chính thức của thư viện cho
+  // trường hợp token đến từ nơi khác (khai báo trong index.d.mts), và mọi tầng — PostgREST,
+  // Storage, Functions — đều đọc qua đó.
   return createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: `Bearer ${session.access_token}` } },
-    auth: { persistSession: false, autoRefreshToken: false },
+    accessToken: async () => session.access_token,
   });
 }
