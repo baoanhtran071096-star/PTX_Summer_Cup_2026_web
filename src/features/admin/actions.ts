@@ -22,63 +22,104 @@ import {
   uploadMediaSchema,
 } from './schemas';
 import { ROUTES } from '@/constants/routes';
+import type { AdminActionState } from './action-state';
 
 function formEntries(formData: FormData): Record<string, FormDataEntryValue> {
   return Object.fromEntries(formData.entries());
 }
 
-export async function updateTournamentSettingsAction(formData: FormData) {
-  const actorId = await requireAdminUserId();
-  const parsed = updateTournamentSettingsSchema.parse(formEntries(formData));
-
-  const supabase = await createUserScopedSupabaseClient();
-  await updateTournamentSettings(supabase, parsed);
-  await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'tournament_settings' });
-
-  revalidatePath(ROUTES.home);
-  revalidatePath(ROUTES.admin);
-}
-
-export async function updateTeamAction(formData: FormData) {
-  const actorId = await requireAdminUserId();
-  const parsed = updateTeamSchema.parse(formEntries(formData));
-
-  const stats = { attack: parsed.attack, defense: parsed.defense, speed: parsed.speed, power: parsed.power };
-  if (!isValidTeamAttributes(stats)) {
-    throw new ValidationError('Chỉ số đội phải nằm trong khoảng 0-99.');
+/**
+ * Gói một thao tác quản trị thành trạng thái hiển thị được.
+ *
+ * Đặt ở MỘT chỗ để không action nào có thể "quên" báo kết quả — chính chỗ quên đó là thứ
+ * khiến cả khu quản trị im lặng.
+ */
+async function runAdminAction(what: string, fn: () => Promise<string>): Promise<AdminActionState> {
+  try {
+    return { error: null, ok: await fn() };
+  } catch (err) {
+    const message = err instanceof PtxError ? err.message : `Không lưu được ${what}. Vui lòng thử lại.`;
+    logger.warn('Admin action failed', { what, reason: err instanceof Error ? err.message : String(err) });
+    return { error: message, ok: null };
   }
-
-  const supabase = await createUserScopedSupabaseClient();
-  await updateTeam(supabase, parsed.teamId, { captainName: parsed.captainName || null, stats });
-  await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'team', entityId: parsed.teamId, metadata: stats });
-
-  revalidatePath(ROUTES.teams);
-  revalidatePath(ROUTES.team(parsed.teamId));
-  revalidatePath('/admin/teams');
 }
 
-export async function updatePlayerAction(formData: FormData) {
-  const actorId = await requireAdminUserId();
-  const parsed = updatePlayerSchema.parse(formEntries(formData));
+export async function updateTournamentSettingsAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  return runAdminAction('cài đặt giải đấu', async () => {
+    const actorId = await requireAdminUserId();
+    const parsed = updateTournamentSettingsSchema.parse(formEntries(formData));
 
-  const supabase = await createUserScopedSupabaseClient();
-  await updatePlayer(supabase, parsed.playerId, { name: parsed.name, teamId: parsed.teamId, position: parsed.position });
-  await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'player', entityId: parsed.playerId });
+    const supabase = await createUserScopedSupabaseClient();
+    await updateTournamentSettings(supabase, parsed);
+    await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'tournament_settings' });
 
-  revalidatePath(ROUTES.players);
-  revalidatePath('/admin/players');
+    revalidatePath(ROUTES.home);
+    revalidatePath(ROUTES.admin);
+    return 'Đã lưu cài đặt giải đấu.';
+  });
 }
 
-export async function deletePredictionAction(formData: FormData) {
-  const actorId = await requireAdminUserId();
-  const parsed = deletePredictionSchema.parse(formEntries(formData));
+export async function updateTeamAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  return runAdminAction('thông tin đội', async () => {
+    const actorId = await requireAdminUserId();
+    const parsed = updateTeamSchema.parse(formEntries(formData));
 
-  const supabase = await createUserScopedSupabaseClient();
-  await deletePrediction(supabase, parsed.predictionId);
-  await recordAuditLog(supabase, { actorId, action: 'delete', entityType: 'prediction', entityId: parsed.predictionId });
+    const stats = { attack: parsed.attack, defense: parsed.defense, speed: parsed.speed, power: parsed.power };
+    if (!isValidTeamAttributes(stats)) {
+      throw new ValidationError('Chỉ số đội phải nằm trong khoảng 0-99.');
+    }
 
-  revalidatePath(ROUTES.predictions);
-  revalidatePath('/admin/predictions');
+    const supabase = await createUserScopedSupabaseClient();
+    await updateTeam(supabase, parsed.teamId, { captainName: parsed.captainName || null, stats });
+    await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'team', entityId: parsed.teamId, metadata: stats });
+
+    revalidatePath(ROUTES.teams);
+    revalidatePath(ROUTES.team(parsed.teamId));
+    revalidatePath('/admin/teams');
+    return `Đã lưu đội ${parsed.teamId.toUpperCase()}.`;
+  });
+}
+
+export async function updatePlayerAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  return runAdminAction('thông tin cầu thủ', async () => {
+    const actorId = await requireAdminUserId();
+    const parsed = updatePlayerSchema.parse(formEntries(formData));
+
+    const supabase = await createUserScopedSupabaseClient();
+    await updatePlayer(supabase, parsed.playerId, { name: parsed.name, teamId: parsed.teamId, position: parsed.position });
+    await recordAuditLog(supabase, { actorId, action: 'update', entityType: 'player', entityId: parsed.playerId });
+
+    revalidatePath(ROUTES.players);
+    revalidatePath('/admin/players');
+    return `Đã lưu cầu thủ ${parsed.name}.`;
+  });
+}
+
+export async function deletePredictionAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  return runAdminAction('xoá phiếu dự đoán', async () => {
+    const actorId = await requireAdminUserId();
+    const parsed = deletePredictionSchema.parse(formEntries(formData));
+
+    const supabase = await createUserScopedSupabaseClient();
+    await deletePrediction(supabase, parsed.predictionId);
+    await recordAuditLog(supabase, { actorId, action: 'delete', entityType: 'prediction', entityId: parsed.predictionId });
+
+    revalidatePath(ROUTES.predictions);
+    revalidatePath('/admin/predictions');
+    return 'Đã xoá phiếu dự đoán.';
+  });
 }
 
 export type UploadMediaState = { error: string | null; uploaded: string | null };
@@ -154,19 +195,25 @@ export async function uploadMediaAction(
   }
 }
 
-export async function updateUserRoleAction(formData: FormData) {
-  const actorId = await requireAdminUserId();
-  const parsed = updateUserRoleSchema.parse(formEntries(formData));
+export async function updateUserRoleAction(
+  _prev: AdminActionState,
+  formData: FormData
+): Promise<AdminActionState> {
+  return runAdminAction('vai trò người dùng', async () => {
+    const actorId = await requireAdminUserId();
+    const parsed = updateUserRoleSchema.parse(formEntries(formData));
 
-  const supabase = await createUserScopedSupabaseClient();
-  await updateProfileRole(supabase, parsed.profileId, parsed.role);
-  await recordAuditLog(supabase, {
-    actorId,
-    action: 'update_role',
-    entityType: 'profile',
-    entityId: parsed.profileId,
-    metadata: { role: parsed.role },
+    const supabase = await createUserScopedSupabaseClient();
+    await updateProfileRole(supabase, parsed.profileId, parsed.role);
+    await recordAuditLog(supabase, {
+      actorId,
+      action: 'update_role',
+      entityType: 'profile',
+      entityId: parsed.profileId,
+      metadata: { role: parsed.role },
+    });
+
+    revalidatePath('/admin/users');
+    return `Đã đổi vai trò thành ${parsed.role}.`;
   });
-
-  revalidatePath('/admin/users');
 }

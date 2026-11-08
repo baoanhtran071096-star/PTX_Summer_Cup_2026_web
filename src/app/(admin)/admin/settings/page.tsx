@@ -1,5 +1,6 @@
 import { getCurrentTournamentSettings } from '@/features/admin/queries';
 import { updateTournamentSettingsAction } from '@/features/admin/actions';
+import { AdminForm } from '@/features/admin/components/AdminForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,12 @@ export default async function AdminSettingsPage() {
   return (
     <div>
       <h1>Cài đặt giải đấu</h1>
-      <form action={updateTournamentSettingsAction} style={{ display: 'grid', gap: 'var(--ptx-space-4)', maxWidth: '480px' }}>
+      <AdminForm
+        action={updateTournamentSettingsAction}
+        style={{ display: 'grid', gap: 'var(--ptx-space-4)', maxWidth: '480px' }}
+        submitLabel="Lưu"
+        submitStyle={{ justifySelf: 'start' }}
+      >
         <label>
           Khẩu hiệu
           <input name="slogan" defaultValue={settings?.slogan ?? ''} style={{ display: 'block', width: '100%', padding: 'var(--ptx-space-2)' }} />
@@ -26,13 +32,7 @@ export default async function AdminSettingsPage() {
           Địa điểm
           <input name="location" defaultValue={settings?.location ?? ''} style={{ display: 'block', width: '100%', padding: 'var(--ptx-space-2)' }} />
         </label>
-        <button
-          type="submit"
-          style={{ background: 'var(--interactive-primary)', color: 'var(--text-on-interactive-primary)', border: 'none', borderRadius: 'var(--ptx-radius-sm)', padding: 'var(--ptx-space-2) var(--ptx-space-4)' }}
-        >
-          Lưu
-        </button>
-      </form>
+      </AdminForm>
     </div>
   );
 }

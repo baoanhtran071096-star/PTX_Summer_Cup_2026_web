@@ -1,5 +1,6 @@
 import { getPredictionLeaderboard } from '@/features/predictions/queries';
 import { deletePredictionAction } from '@/features/admin/actions';
+import { AdminForm } from '@/features/admin/components/AdminForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,10 +29,14 @@ export default async function AdminPredictionsPage() {
                 <td>{entry.ticketCode}</td>
                 <td>{entry.points}</td>
                 <td>
-                  <form action={deletePredictionAction}>
+                  <AdminForm
+                    action={deletePredictionAction}
+                    submitLabel="Xóa"
+                    pendingLabel="Đang xoá…"
+                    submitStyle={{ background: 'var(--status-danger)' }}
+                  >
                     <input type="hidden" name="predictionId" value={entry.id} />
-                    <button type="submit">Xóa</button>
-                  </form>
+                  </AdminForm>
                 </td>
               </tr>
             ))}

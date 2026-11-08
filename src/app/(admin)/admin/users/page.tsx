@@ -1,5 +1,6 @@
 import { getAllProfiles } from '@/features/admin/queries';
 import { updateUserRoleAction } from '@/features/admin/actions';
+import { AdminForm } from '@/features/admin/components/AdminForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,11 +24,14 @@ export default async function AdminUsersPage() {
               <td>{profile.display_name ?? profile.username ?? profile.id}</td>
               <td>{profile.role}</td>
               <td>
-                <form action={updateUserRoleAction}>
+                <AdminForm
+                  action={updateUserRoleAction}
+                  submitLabel={profile.role === 'admin' ? 'Thu hồi quyền admin' : 'Cấp quyền admin'}
+                  pendingLabel="Đang đổi…"
+                >
                   <input type="hidden" name="profileId" value={profile.id} />
                   <input type="hidden" name="role" value={profile.role === 'admin' ? 'viewer' : 'admin'} />
-                  <button type="submit">{profile.role === 'admin' ? 'Thu hồi quyền admin' : 'Cấp quyền admin'}</button>
-                </form>
+                </AdminForm>
               </td>
             </tr>
           ))}

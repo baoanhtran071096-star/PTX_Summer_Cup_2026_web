@@ -1,6 +1,7 @@
 import { getAllPlayersWithStats } from '@/features/players/queries';
 import { getAllTeamsWithSquads } from '@/features/teams/queries';
 import { updatePlayerAction } from '@/features/admin/actions';
+import { AdminForm } from '@/features/admin/components/AdminForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,10 +26,12 @@ export default async function AdminPlayersPage() {
           {players.map((player) => (
             <tr key={player.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
               <td>
-                <form id={`player-form-${player.id}`} action={updatePlayerAction}>
+                {/* Nút Lưu nằm ở ô cuối hàng và trỏ về đây bằng thuộc tính `form=`, nên
+                    AdminForm không tự dựng nút — chỉ nhận và hiện kết quả. */}
+                <AdminForm id={`player-form-${player.id}`} action={updatePlayerAction}>
                   <input type="hidden" name="playerId" value={player.id} />
                   <input name="name" defaultValue={player.name} style={{ width: '100%', padding: 'var(--ptx-space-1)' }} />
-                </form>
+                </AdminForm>
               </td>
               <td>
                 <select name="teamId" form={`player-form-${player.id}`} defaultValue={player.teamId}>

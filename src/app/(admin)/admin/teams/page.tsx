@@ -1,5 +1,6 @@
 import { getAllTeamsWithSquads } from '@/features/teams/queries';
 import { updateTeamAction } from '@/features/admin/actions';
+import { AdminForm } from '@/features/admin/components/AdminForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,10 +12,12 @@ export default async function AdminTeamsPage() {
       <h1>Đội bóng</h1>
       <div style={{ display: 'grid', gap: 'var(--ptx-space-6)' }}>
         {teams.map((team) => (
-          <form
+          <AdminForm
             key={team.id}
             action={updateTeamAction}
             style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--ptx-radius-md)', padding: 'var(--ptx-space-4)', display: 'grid', gap: 'var(--ptx-space-2)', maxWidth: '480px' }}
+            submitLabel="Lưu"
+            submitStyle={{ justifySelf: 'start' }}
           >
             <h2 style={{ margin: 0 }}>
               {team.icon} {team.name} (OVR {team.ovr})
@@ -42,13 +45,7 @@ export default async function AdminTeamsPage() {
                 <input type="number" name="power" min={0} max={99} defaultValue={team.stats.power} style={{ width: '100%' }} />
               </label>
             </div>
-            <button
-              type="submit"
-              style={{ justifySelf: 'start', background: 'var(--interactive-primary)', color: 'var(--text-on-interactive-primary)', border: 'none', borderRadius: 'var(--ptx-radius-sm)', padding: 'var(--ptx-space-2) var(--ptx-space-4)' }}
-            >
-              Lưu
-            </button>
-          </form>
+          </AdminForm>
         ))}
       </div>
     </div>
